@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
+import org.apache.camel.Exchange;
+import org.apache.camel.Expression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,13 +31,6 @@ public class InromqConfig {
             token = ironJson.get("token");
         }
         Client client = new Client(projectId, token, Cloud.ironAWSUSEast);
-        /*        Queue queue = client.queue("bar");
-        QueueModel infoAboutQueue = queue.getInfoAboutQueue();
-        System.out.println("bar size..." + infoAboutQueue.getSizeLong());
-        Message reserve = queue.reserve();
-        System.out.println(reserve.getBody());
-        queue.deleteMessage(reserve);*/
         return client;
     }
-
 }
