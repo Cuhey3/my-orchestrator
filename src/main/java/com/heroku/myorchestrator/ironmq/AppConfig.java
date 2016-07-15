@@ -8,14 +8,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AppConfig {
 
-    @Autowired
-    CamelContext context;
+  @Autowired
+  CamelContext context;
 
-    @Bean
-    AppConfig converterReady() {
-        MyConverters myConverters = new MyConverters(context);
-        context.getTypeConverterRegistry().addTypeConverters(myConverters);
-        return this;
-    }
-
+  @Bean
+  AppConfig converterReady() {
+    MyConverters myConverters = new MyConverters(context);
+    context.getTypeConverterRegistry().addTypeConverters(myConverters);
+    return this;
+  }
 }
