@@ -1,2 +1,3 @@
 target
-src/main/resources/iron.json
+src/main/resources/config/iron.json
+src/main/resources/config/settings.json
