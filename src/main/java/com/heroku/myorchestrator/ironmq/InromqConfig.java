@@ -1,33 +1,26 @@
 package com.heroku.myorchestrator.ironmq;
 
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
+import com.heroku.myorchestrator.JsonResourceUtil;
 import io.iron.ironmq.Client;
 import io.iron.ironmq.Cloud;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.util.Map;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class InromqConfig {
 
-  @Bean(name = "myclient")
-  Client getIronmqClient() throws UnsupportedEncodingException, IOException {
-    String projectId = System.getenv("IRON_MQ_PROJECT_ID");
-    String token = System.getenv("IRON_MQ_TOKEN");
-    if (projectId == null || token == null) {
-      Gson gson = new Gson();
-      InputStream resourceAsStream = ClassLoader.class.getResourceAsStream("/iron.json");
-      JsonReader reader = new JsonReader(new InputStreamReader(resourceAsStream, "UTF-8"));
-      Map<String, String> ironJson = gson.fromJson(reader, Map.class);
-      projectId = ironJson.get("project_id");
-      token = ironJson.get("token");
+    @Bean(name = "myclient")
+    Client getIronmqClient() throws UnsupportedEncodingException, IOException {
+        String projectId = System.getenv("IRON_MQ_PROJECT_ID");
+        String token = System.getenv("IRON_MQ_TOKEN");
+        if (projectId == null || token == null) {
+            JsonResourceUtil jru = new JsonResourceUtil("/config/iron.json");
+            projectId = jru.get("project_id");
+            token = jru.get("token");
+        }
+        Client client = new Client(projectId, token, Cloud.ironAWSUSEast);
+        return client;
     }
-    Client client = new Client(projectId, token, Cloud.ironAWSUSEast);
-    return client;
-  }
 }
