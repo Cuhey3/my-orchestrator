@@ -5,7 +5,6 @@ import com.heroku.myorchestrator.util.JsonResourceUtil.Paths;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import java.io.UnsupportedEncodingException;
-import java.net.UnknownHostException;
 import java.util.Map;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,19 +12,20 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MongoConfig {
 
-    String mongoUri;
-    Map mongoSettings;
+    String ownMongoUri;
+    static Map mongoSettings;
 
     public MongoConfig() throws UnsupportedEncodingException {
         String settingKey = "MONGODB_URI";
-        mongoUri = System.getenv(settingKey);
-        if (mongoUri == null) {
+        ownMongoUri = System.getenv(settingKey);
+        if (ownMongoUri == null) {
             JsonResourceUtil jru = new JsonResourceUtil(Paths.SETTINGS);
-            mongoUri = jru.get(settingKey);
+            ownMongoUri = jru.get(settingKey);
         }
-        MongoClientURI mongoClientURI = new MongoClientURI(mongoUri);
+        MongoClientURI mongoClientURI = new MongoClientURI(ownMongoUri);
         String database = mongoClientURI.getDatabase();
         try (MongoClient mongoClient = new MongoClient(mongoClientURI)) {
+            mongoClient.getDatabase(database);
             mongoSettings = mongoClient.getDatabase(database)
                     .getCollection("settings").find().iterator().next()
                     .get("mongodb", Map.class);
@@ -33,25 +33,11 @@ public class MongoConfig {
     }
 
     @Bean(name = "own")
-    MongoClient mongoClient() throws UnknownHostException, UnsupportedEncodingException {
-        return new MongoClient(new MongoClientURI(mongoUri));
+    public MongoClient getMongoClient() {
+        return new MongoClient(new MongoClientURI(ownMongoUri));
     }
 
-    @Bean(name = "master")
-    MongoClient mongoClientMaster() {
-        String masterMongoUri = (String) mongoSettings.get("master");
-        return new MongoClient(new MongoClientURI(masterMongoUri));
-    }
-
-    @Bean(name = "snapshot")
-    MongoClient mongoClientSnapshot() {
-        String snapshotMongoUri = (String) mongoSettings.get("snapshot");
-        return new MongoClient(new MongoClientURI(snapshotMongoUri));
-    }
-
-    @Bean(name = "diff")
-    MongoClient mongoClientDiff() {
-        String diffMongoUri = (String) mongoSettings.get("diff");
-        return new MongoClient(new MongoClientURI(diffMongoUri));
+    public static MongoClientURI getMongoClientURI(String kind) {
+        return new MongoClientURI((String) mongoSettings.get(kind));
     }
 }
