@@ -6,8 +6,8 @@ import org.apache.camel.Expression;
 
 public class IronmqUtil {
 
-  public static String consumeQueueUri(String queue, boolean batchDelete, int timeout) {
-    return String.format("ironmq:%s?client=myclient&batchDelete=%s&timeout=%s", queue, batchDelete, timeout);
+  public static String consumeQueueUri(String queue, int timeout) {
+    return String.format("ironmq:%s?client=myclient&timeout=%s", queue, timeout);
   }
 
   public static String postQueueUri(String queue) {

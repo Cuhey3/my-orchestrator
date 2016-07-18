@@ -20,10 +20,10 @@ public class MongoConfig {
     @Bean(name = "own")
     MongoClient mongoClient() throws UnknownHostException, UnsupportedEncodingException {
         String settingKey = "MONGODB_URI";
-        String mongoUri = System.getenv("MONGODB_URI");
+        String mongoUri = System.getenv(settingKey);
         if (mongoUri == null) {
             JsonResourceUtil jru = new JsonResourceUtil(Paths.SETTINGS);
-            mongoUri = jru.get("MONGODB_URI");
+            mongoUri = jru.get(settingKey);
         }
         return new MongoClient(new MongoClientURI(mongoUri));
     }
