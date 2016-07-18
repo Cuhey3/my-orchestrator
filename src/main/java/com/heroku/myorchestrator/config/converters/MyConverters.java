@@ -1,4 +1,4 @@
-package com.heroku.myorchestrator.ironmq;
+package com.heroku.myorchestrator.config.converters;
 
 import com.google.gson.Gson;
 import io.iron.ironmq.Client;

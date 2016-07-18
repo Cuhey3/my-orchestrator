@@ -1,4 +1,4 @@
-package com.heroku.myorchestrator.ironmq;
+package com.heroku.myorchestrator.util;
 
 import java.util.Map;
 import org.apache.camel.Exchange;

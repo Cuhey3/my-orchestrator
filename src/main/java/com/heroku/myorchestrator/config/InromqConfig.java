@@ -1,6 +1,7 @@
-package com.heroku.myorchestrator.ironmq;
+package com.heroku.myorchestrator.config;
 
-import com.heroku.myorchestrator.JsonResourceUtil;
+import com.heroku.myorchestrator.util.JsonResourceUtil;
+import com.heroku.myorchestrator.util.JsonResourceUtil.Paths;
 import io.iron.ironmq.Client;
 import io.iron.ironmq.Cloud;
 import java.io.IOException;
@@ -16,7 +17,7 @@ public class InromqConfig {
         String projectId = System.getenv("IRON_MQ_PROJECT_ID");
         String token = System.getenv("IRON_MQ_TOKEN");
         if (projectId == null || token == null) {
-            JsonResourceUtil jru = new JsonResourceUtil("/config/iron.json");
+            JsonResourceUtil jru = new JsonResourceUtil(Paths.IRON);
             projectId = jru.get("project_id");
             token = jru.get("token");
         }

@@ -1,6 +1,6 @@
 package com.heroku.myorchestrator.ironmq.consumers.common;
 
-import static com.heroku.myorchestrator.ironmq.IronmqUtil.*;
+import static com.heroku.myorchestrator.util.IronmqUtil.*;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.stereotype.Component;

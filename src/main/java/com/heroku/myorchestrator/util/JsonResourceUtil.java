@@ -1,4 +1,4 @@
-package com.heroku.myorchestrator;
+package com.heroku.myorchestrator.util;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
@@ -18,11 +18,25 @@ public class JsonResourceUtil {
         map = gson.fromJson(reader, Map.class);
     }
 
+    public JsonResourceUtil(Paths paths) throws UnsupportedEncodingException {
+        this(paths.path);
+    }
+
     public <T> T get(String key, Class<T> clazz) {
         return (T) map.get(key);
     }
 
     public String get(String key) {
         return (String) map.get(key);
+    }
+
+    public enum Paths {
+        SETTINGS("/config/settings.json"),
+        IRON("/config/iron.json");
+        public String path;
+
+        private Paths(String path) {
+            this.path = path;
+        }
     }
 }
