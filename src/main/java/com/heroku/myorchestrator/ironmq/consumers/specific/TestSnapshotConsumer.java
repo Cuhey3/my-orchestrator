@@ -9,18 +9,20 @@ import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TestSnapshotConsumer extends RouteBuilder {
 
   @Autowired
-  MongoUtil mongoUtil;
+  ApplicationContext applicationContext;
 
   @Override
   public void configure() throws Exception {
     from(consumeQueueUri("test_snapshot", 60))
             .process((Exchange exchange) -> {
+              MongoUtil mongoUtil = new MongoUtil(applicationContext);
               MongoCollection<Document> collection = mongoUtil.getCollection("snapshot", "foo");
               collection.insertOne(new Document().append("foo", "bar").append("timestamp", new Date()));
               //mongoUtil.close();

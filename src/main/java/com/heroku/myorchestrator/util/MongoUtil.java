@@ -4,15 +4,15 @@ import com.heroku.myorchestrator.config.MongoConfig;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
 
-@Component
 public class MongoUtil {
 
-  @Autowired
   ApplicationContext applicationContext;
+
+  public MongoUtil(ApplicationContext applicationContext) {
+    this.applicationContext = applicationContext;
+  }
 
   public MongoCollection<Document> getCollection(
           String kind, String collectionKind) {
