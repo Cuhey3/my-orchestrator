@@ -1,4 +1,4 @@
-package com.heroku.myorchestrator.ironmq.consumers.specific;
+package com.heroku.myorchestrator.ironmq.consumers.specific.snapshot;
 
 import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
 import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
@@ -17,15 +17,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SnapshotFemaleSeiyuCategoryMembers extends RouteBuilder {
-  
+
   @Autowired
   ApplicationContext applicationContext;
   String collectionKind = "female_seiyu_category_members";
-  
+
   @Override
   public void configure() throws Exception {
     from(consumeQueueUri("snapshot", collectionKind, 60))
             .routeId("snapshot_" + collectionKind)
+            .filter(simple("${exchangeProperty.CamelBatchComplete}"))
             .process((Exchange exchange) -> {
               List<Map<String, Object>> mapList
                       = new MediawikiApiRequest()
@@ -40,7 +41,7 @@ public class SnapshotFemaleSeiyuCategoryMembers extends RouteBuilder {
                       .setContinueElementName("cmcontinue")
                       .setIgnoreFields("ns")
                       .getResultByMapList();
-              
+
               mapList.forEach((m) -> m.put("gender", "f"));
               Document document = new Document();
               document.put("data", mapList);
@@ -52,5 +53,5 @@ public class SnapshotFemaleSeiyuCategoryMembers extends RouteBuilder {
             })
             .to(postQueueUri("diff", collectionKind));
   }
-  
+
 }

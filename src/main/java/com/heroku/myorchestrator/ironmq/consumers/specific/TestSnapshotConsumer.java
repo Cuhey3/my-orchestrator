@@ -21,6 +21,7 @@ public class TestSnapshotConsumer extends RouteBuilder {
   @Override
   public void configure() throws Exception {
     from(consumeQueueUri("test_snapshot", 60))
+            .filter(simple("${exchangeProperty.CamelBatchComplete}"))
             .process((Exchange exchange) -> {
               MongoUtil mongoUtil = new MongoUtil(applicationContext);
               MongoCollection<Document> collection = mongoUtil.getCollection("snapshot", "foo");

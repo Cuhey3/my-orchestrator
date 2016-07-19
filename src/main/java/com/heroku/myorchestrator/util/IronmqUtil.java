@@ -7,11 +7,11 @@ import org.apache.camel.Expression;
 public class IronmqUtil {
 
   public static String consumeQueueUri(String queue, int timeout) {
-    return String.format("ironmq:%s?client=myclient&timeout=%s", queue, timeout);
+    return String.format("ironmq:%s?client=myclient&timeout=%s&maxMessagesPerPoll=100", queue, timeout);
   }
 
   public static String consumeQueueUri(String kind, String collectionKind, int timeout) {
-    return String.format("ironmq:%s?client=myclient&timeout=%s", kind + "_" + collectionKind, timeout);
+    return String.format("ironmq:%s?client=myclient&timeout=%s&maxMessagesPerPoll=100", kind + "_" + collectionKind, timeout);
   }
 
   public static String postQueueUri(String queue) {
