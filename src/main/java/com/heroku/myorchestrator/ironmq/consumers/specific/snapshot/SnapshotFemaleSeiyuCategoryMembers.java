@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class SnapshotFemaleSeiyuCategoryMembers extends RouteBuilder {
 
   @Autowired
@@ -45,11 +45,11 @@ public class SnapshotFemaleSeiyuCategoryMembers extends RouteBuilder {
               mapList.forEach((m) -> m.put("gender", "f"));
               Document document = new Document();
               document.put("data", mapList);
-              document.put("creationDate", new Date());
               MongoUtil mongoUtil = new MongoUtil(applicationContext);
-              MongoCollection<Document> collection
-                      = mongoUtil.getCollection("snapshot", collectionKind);
-              collection.insertOne(document);
+              String objectIdHexString = mongoUtil.insertOne("snapshot", collectionKind, document);
+              Map body = exchange.getIn().getBody(Map.class);
+              body.put("snapshot_id", objectIdHexString);
+              exchange.getIn().setBody(body, String.class);
             })
             .to(postQueueUri("diff", collectionKind));
   }

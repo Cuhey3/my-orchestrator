@@ -5,9 +5,11 @@ import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
 import com.heroku.myorchestrator.util.MongoUtil;
 import com.mongodb.client.MongoCollection;
 import java.util.Date;
+import java.util.Map;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -23,9 +25,13 @@ public class TestSnapshotConsumer extends RouteBuilder {
     from(consumeQueueUri("test_snapshot", 60))
             .filter(simple("${exchangeProperty.CamelBatchComplete}"))
             .process((Exchange exchange) -> {
+              Map body = exchange.getIn().getBody(Map.class);
               MongoUtil mongoUtil = new MongoUtil(applicationContext);
-              MongoCollection<Document> collection = mongoUtil.getCollection("snapshot", "foo");
-              collection.insertOne(new Document().append("foo", "bar").append("timestamp", new Date()));
+              Document document = new Document().append("foo", "bar");
+              String objectIdHexString
+                      = mongoUtil.insertOne("snapshot", "foo", document);
+              body.put("snapshot_id", objectIdHexString);
+              exchange.getIn().setBody(body, String.class);
             })
             .to(postQueueUri("test_diff"));
 
