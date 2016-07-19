@@ -25,7 +25,6 @@ public class TestSnapshotConsumer extends RouteBuilder {
               MongoUtil mongoUtil = new MongoUtil(applicationContext);
               MongoCollection<Document> collection = mongoUtil.getCollection("snapshot", "foo");
               collection.insertOne(new Document().append("foo", "bar").append("timestamp", new Date()));
-              //mongoUtil.close();
             })
             .to(postQueueUri("test_diff"));
 

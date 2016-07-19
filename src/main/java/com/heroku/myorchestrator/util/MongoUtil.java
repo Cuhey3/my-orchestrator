@@ -32,7 +32,7 @@ public class MongoUtil {
   public Document findLatest(String kind, String collectionKind) {
     String collectionName = getCollectionName(kind, collectionKind);
     return this.getCollection(kind, collectionName).find()
-            .sort(new Document("timestamp", -1)).limit(1).iterator().next();
+            .sort(new Document("creationDate", -1)).limit(1).iterator().next();
   }
 
   public String getCollectionName(String kind, String collectionKind) {
