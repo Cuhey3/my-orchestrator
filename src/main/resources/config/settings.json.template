@@ -1,4 +1,5 @@
 {
-    "PORT": "2525"
+    "PORT": "2525",
+    "MONGODB_URI":"mongodb://<databasename>:<password>@<host>:<port>/<databasename>"
 }
 

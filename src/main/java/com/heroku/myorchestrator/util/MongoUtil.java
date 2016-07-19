@@ -2,40 +2,40 @@ package com.heroku.myorchestrator.util;
 
 import com.heroku.myorchestrator.config.MongoConfig;
 import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
-import org.bson.conversions.Bson;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
+@Component
 public class MongoUtil {
 
-    MongoClientURI mongoClientURI;
-    String databaseName;
-    String collectionName;
-    MongoClient client;
+  @Autowired
+  ApplicationContext applicationContext;
 
-    public MongoUtil(String kind, String collectionName) {
-        mongoClientURI = MongoConfig.getMongoClientURI(kind);
-        databaseName = mongoClientURI.getDatabase();
-        this.collectionName = kind + "_" + collectionName;
-    }
+  public MongoCollection<Document> getCollection(
+          String kind, String collectionKind) {
+    String collectionName = getCollectionName(kind, collectionKind);
+    MongoClient client = applicationContext.getBean(kind, MongoClient.class);
+    String databaseName = MongoConfig.getMongoClientURI(kind).getDatabase();
+    return client.getDatabase(databaseName).getCollection(collectionName);
+  }
 
-    public MongoCollection<Document> getCollection() {
-        if (client == null) {
-            client = new MongoClient(mongoClientURI);
-        }
-        return client.getDatabase(databaseName).getCollection(collectionName);
-    }
+  public Document findFirst(String kind, String collectionKind) {
 
-    public void close() {
-        this.client.close();
-    }
+    String collectionName = getCollectionName(kind, collectionKind);
+    return this.getCollection(kind, collectionName).find()
+            .limit(1).iterator().next();
+  }
 
-    public Document findFirst() {
-        return this.getCollection().find().limit(1).iterator().next();
-    }
+  public Document findLatest(String kind, String collectionKind) {
+    String collectionName = getCollectionName(kind, collectionKind);
+    return this.getCollection(kind, collectionName).find()
+            .sort(new Document("timestamp", -1)).limit(1).iterator().next();
+  }
 
-    public Document findLatest() {
-        return this.getCollection().find().sort(new Document("timestamp", -1)).limit(1).iterator().next();
-    }
+  public String getCollectionName(String kind, String collectionKind) {
+    return kind + "_" + collectionKind;
+  }
 }
