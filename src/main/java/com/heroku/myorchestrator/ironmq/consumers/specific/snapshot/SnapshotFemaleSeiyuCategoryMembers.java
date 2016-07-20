@@ -1,11 +1,7 @@
 package com.heroku.myorchestrator.ironmq.consumers.specific.snapshot;
 
-import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
-import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
 import com.heroku.myorchestrator.util.MediawikiApiRequest;
 import com.heroku.myorchestrator.util.MongoUtil;
-import com.mongodb.client.MongoCollection;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.apache.camel.Exchange;
@@ -13,9 +9,11 @@ import org.apache.camel.builder.RouteBuilder;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
+import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
 import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 public class SnapshotFemaleSeiyuCategoryMembers extends RouteBuilder {
 
   @Autowired

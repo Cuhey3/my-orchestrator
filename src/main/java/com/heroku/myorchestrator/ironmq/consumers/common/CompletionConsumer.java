@@ -1,9 +1,9 @@
 package com.heroku.myorchestrator.ironmq.consumers.common;
 
-import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
-import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.stereotype.Component;
+import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
+import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
 
 @Component
 public class CompletionConsumer extends RouteBuilder {

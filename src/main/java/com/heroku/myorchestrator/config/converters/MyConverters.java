@@ -21,12 +21,12 @@ public class MyConverters implements TypeConverters {
   }
 
   @Converter
-  public static Map gsonStringToMap(String gsonString) {
+  public Map gsonStringToMap(String gsonString) {
     return new Gson().fromJson(gsonString, Map.class);
   }
 
   @Converter
-  public static String mapToGsonString(Map map) {
+  public String mapToGsonString(Map map) {
     return new Gson().toJson(map);
   }
 }

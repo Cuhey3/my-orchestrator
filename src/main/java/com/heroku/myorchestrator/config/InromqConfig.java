@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class InromqConfig {
 
-    @Bean(name = "myclient")
+    @Bean(name = "myironmq")
     Client getIronmqClient() throws UnsupportedEncodingException, IOException {
         String projectId = System.getenv("IRON_MQ_PROJECT_ID");
         String token = System.getenv("IRON_MQ_TOKEN");
@@ -20,6 +20,11 @@ public class InromqConfig {
             JsonResourceUtil jru = new JsonResourceUtil(Paths.IRON);
             projectId = jru.get("project_id");
             token = jru.get("token");
+            if (projectId == null || token == null) {
+              System.out.println("ironmq client initialization failed..."
+                      + "\nSystem is shutting down.");
+              System.exit(1);
+            }
         }
         Client client = new Client(projectId, token, Cloud.ironAWSUSEast);
         return client;

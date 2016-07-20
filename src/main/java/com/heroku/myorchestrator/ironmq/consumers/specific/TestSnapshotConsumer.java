@@ -1,18 +1,15 @@
 package com.heroku.myorchestrator.ironmq.consumers.specific;
 
-import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
-import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
 import com.heroku.myorchestrator.util.MongoUtil;
-import com.mongodb.client.MongoCollection;
-import java.util.Date;
 import java.util.Map;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
+import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
 
 @Component
 public class TestSnapshotConsumer extends RouteBuilder {

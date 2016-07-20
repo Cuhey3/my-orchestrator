@@ -6,20 +6,25 @@ import org.apache.camel.Expression;
 
 public class IronmqUtil {
 
+  public static final String IRONMQ_CLIENT_BEAN_NAME = "myironmq";
+
   public static String consumeQueueUri(String queue, int timeout) {
-    return String.format("ironmq:%s?client=myclient&timeout=%s&maxMessagesPerPoll=100", queue, timeout);
+    return String.format("ironmq:%s?client=%s&timeout=%s&maxMessagesPerPoll=100",
+            queue, IRONMQ_CLIENT_BEAN_NAME, timeout);
   }
 
   public static String consumeQueueUri(String kind, String collectionKind, int timeout) {
-    return String.format("ironmq:%s?client=myclient&timeout=%s&maxMessagesPerPoll=100", kind + "_" + collectionKind, timeout);
+    return String.format("ironmq:%s?client=%s&timeout=%s&maxMessagesPerPoll=100",
+            kind + "_" + collectionKind, IRONMQ_CLIENT_BEAN_NAME, timeout);
   }
 
   public static String postQueueUri(String queue) {
-    return String.format("ironmq:%s?client=myclient", queue);
+    return String.format("ironmq:%s?client=%s", queue, IRONMQ_CLIENT_BEAN_NAME);
   }
 
   public static String postQueueUri(String kind, String collectionKind) {
-    return String.format("ironmq:%s?client=myclient", kind + "_" + collectionKind);
+    return String.format("ironmq:%s?client=%s",
+            kind + "_" + collectionKind, IRONMQ_CLIENT_BEAN_NAME);
   }
 
   public static Expression defaultPostQueueUri() {
@@ -27,7 +32,8 @@ public class IronmqUtil {
       @Override
       public <T> T evaluate(Exchange exchange, Class<T> type) {
         Map body = exchange.getIn().getBody(Map.class);
-        return (T) String.format("ironmq:%s?client=myclient", body.get("queue"));
+        return (T) String.format("ironmq:%s?client=%s",
+                body.get("queue"), IRONMQ_CLIENT_BEAN_NAME);
       }
     };
   }

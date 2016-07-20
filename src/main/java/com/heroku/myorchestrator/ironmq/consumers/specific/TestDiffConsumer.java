@@ -1,7 +1,5 @@
 package com.heroku.myorchestrator.ironmq.consumers.specific;
 
-import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
-import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
 import com.heroku.myorchestrator.util.MongoUtil;
 import java.util.Map;
 import org.apache.camel.Exchange;
@@ -10,6 +8,8 @@ import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
+import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
 
 @Component
 public class TestDiffConsumer extends RouteBuilder {
