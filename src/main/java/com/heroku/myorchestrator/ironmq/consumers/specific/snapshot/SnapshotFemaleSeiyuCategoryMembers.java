@@ -1,5 +1,7 @@
 package com.heroku.myorchestrator.ironmq.consumers.specific.snapshot;
 
+import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
+import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
 import com.heroku.myorchestrator.util.MediawikiApiRequest;
 import com.heroku.myorchestrator.util.MongoUtil;
 import java.util.List;
@@ -9,8 +11,6 @@ import org.apache.camel.builder.RouteBuilder;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
-import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
 import org.springframework.stereotype.Component;
 
 @Component

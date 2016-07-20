@@ -1,7 +1,5 @@
 package com.heroku.myorchestrator.config;
 
-import com.heroku.myorchestrator.exceptions.SettingNotFoundException;
-import com.heroku.myorchestrator.util.JsonResourceUtil;
 import com.heroku.myorchestrator.util.JsonResourceUtil.Paths;
 import com.heroku.myorchestrator.util.SettingUtil;
 import com.mongodb.MongoClient;
