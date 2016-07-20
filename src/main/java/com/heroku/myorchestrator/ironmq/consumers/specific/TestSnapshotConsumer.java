@@ -4,7 +4,8 @@ import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
 import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
 import com.heroku.myorchestrator.util.MessageUtil;
 import com.heroku.myorchestrator.util.MongoUtil;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.bson.Document;
@@ -23,7 +24,10 @@ public class TestSnapshotConsumer extends RouteBuilder {
     from(consumeQueueUri("test_snapshot", 60))
             .filter(simple("${exchangeProperty.CamelBatchComplete}"))
             .process((Exchange exchange) -> {
-              Document document = new Document().append("foo", "bar");
+              SimpleDateFormat sdf = new SimpleDateFormat("mm");
+              Document document
+                      = new Document().append("foo", "bar")
+                      .append("minute_three", Math.round(Integer.parseInt(sdf.format(new Date())) / 3));
               String objectIdHexString
                       = new MongoUtil(applicationContext)
                       .insertOne("snapshot", "foo", document);

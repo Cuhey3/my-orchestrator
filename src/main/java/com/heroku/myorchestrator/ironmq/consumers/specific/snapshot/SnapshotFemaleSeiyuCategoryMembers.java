@@ -42,8 +42,7 @@ public class SnapshotFemaleSeiyuCategoryMembers extends RouteBuilder {
                       .getResultByMapList();
 
               mapList.forEach((m) -> m.put("gender", "f"));
-              Document document = new Document();
-              document.put("data", mapList);
+              Document document = new Document().append("data", mapList);
               String objectIdHexString
                       = new MongoUtil(applicationContext)
                       .insertOne("snapshot", collectionKind, document);

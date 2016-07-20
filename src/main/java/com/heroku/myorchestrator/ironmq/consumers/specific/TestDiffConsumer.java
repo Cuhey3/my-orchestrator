@@ -22,12 +22,39 @@ public class TestDiffConsumer extends RouteBuilder {
   public void configure() throws Exception {
     from(consumeQueueUri("test_diff", 60))
             .filter(simple("${exchangeProperty.CamelBatchComplete}"))
-            .process((Exchange exchange) -> {
-              Map body = new MessageUtil(exchange).getMessage();
-              Document document
-                      = new MongoUtil(applicationContext)
-                      .findById("snapshot", "foo", body);
-              System.out.println("in diff consumer: " + document);
+            .filter((Exchange exchange) -> {
+              MessageUtil messageUtil = new MessageUtil(exchange);
+              Map body = messageUtil.getMessage();
+              MongoUtil mongoUtil = new MongoUtil(applicationContext);
+              Document snapshot = mongoUtil.findById("snapshot", "foo", body)
+                      .orElse(new Document());
+              Document master = mongoUtil.findLatest("master", "foo")
+                      .orElse(new Document());
+              if (snapshot.isEmpty()) {
+                return false;
+              }
+              if (master.isEmpty()) {
+                System.out.println("master is empty.");
+              } else {
+                String masterObjectIdHexString
+                        = mongoUtil.getObjectIdHexString(master);
+                messageUtil.updateMessage(
+                        "compared_master_id", masterObjectIdHexString);
+              }
+              System.out.println("comparing... " + master + " to " + snapshot);
+              Integer snapshotMinuteThree = snapshot.get("minute_three", Integer.class);
+              if (master.get("minute_three", Integer.class)
+                      != snapshotMinuteThree) {
+                System.out.println("updated!" + snapshot);
+                Document diff = new Document().append("newValue", snapshotMinuteThree);
+                String diffObjectIdHexString
+                        = mongoUtil.insertOne("diff", "foo", diff);
+                messageUtil.updateMessage("diff_id", diffObjectIdHexString);
+                return true;
+              } else {
+                System.out.println("not updated...");
+                return false;
+              }
             })
             .to(postQueueUri("test_complete"));
   }
