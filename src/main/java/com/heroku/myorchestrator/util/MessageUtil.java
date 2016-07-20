@@ -6,24 +6,24 @@ import org.bson.Document;
 
 public class MessageUtil {
 
-  Exchange exchange;
+    Exchange exchange;
 
-  public MessageUtil(Exchange exchange) {
-    this.exchange = exchange;
-  }
+    public MessageUtil(Exchange exchange) {
+        this.exchange = exchange;
+    }
 
-  public void updateMessage(String key, Object value) {
-    Map message = getMessage();
-    message.put(key, value);
-    exchange.getIn().setBody(message, String.class);
-  }
+    public void updateMessage(String key, Object value) {
+        Map message = getMessage();
+        message.put(key, value);
+        exchange.getIn().setBody(message, String.class);
+    }
 
-  public Map getMessage() {
-    return exchange.getIn().getBody(Map.class);
-  }
+    public Map getMessage() {
+        return exchange.getIn().getBody(Map.class);
+    }
 
-  public void writeObjectId(String key, Document document) {
-    String objectIdHexString = MongoUtil.getObjectIdHexString(document);
-    updateMessage(key, objectIdHexString);
-  }
+    public void writeObjectId(String key, Document document) {
+        String objectIdHexString = MongoUtil.getObjectIdHexString(document);
+        updateMessage(key, objectIdHexString);
+    }
 }

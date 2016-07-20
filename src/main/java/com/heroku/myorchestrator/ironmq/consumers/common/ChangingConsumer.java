@@ -12,5 +12,4 @@ public class ChangingConsumer extends RouteBuilder {
         from(consumeQueueUri("test_changed", 60))
                 .to("log:foo");
     }
-
 }

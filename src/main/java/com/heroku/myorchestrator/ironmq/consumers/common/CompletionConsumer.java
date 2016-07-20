@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CompletionConsumer extends RouteBuilder {
-    
+
     final String consumeQueue = "completion_develop";
     final String toPostQueue = "changed_develop";
-    
+
     @Override
     public void configure() throws Exception {
 //        from(consumeQueueUri(consumeQueue, 60))
@@ -31,24 +31,24 @@ public class CompletionConsumer extends RouteBuilder {
                 })*/
                 .to(postQueueUri("test_changed"));
     }
-    
+
     public boolean masterIsValid(String messageType, String comparedMasterId) {
         return true;
     }
-    
+
     public boolean snapshotSaveToMaster(String messageType, String snapshotId) {
         return true;
     }
-    
+
     public boolean saveDiff(String messageType, String diffId) {
         return true;
     }
-    
+
     public void cleanUpDiff(String messageType) {
-        
+
     }
-    
+
     public void pushChanging(String messageType) {
-        
+
     }
 }

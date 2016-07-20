@@ -16,24 +16,27 @@ import org.springframework.stereotype.Component;
 @Component
 public class TestSnapshotConsumer extends RouteBuilder {
 
-  @Autowired
-  ApplicationContext applicationContext;
+    @Autowired
+    ApplicationContext applicationContext;
 
-  @Override
-  public void configure() throws Exception {
-    from(consumeQueueUri("test_snapshot", 60))
-            .filter(simple("${exchangeProperty.CamelBatchComplete}"))
-            .process((Exchange exchange) -> {
-              SimpleDateFormat sdf = new SimpleDateFormat("mm");
-              Document document
-                      = new Document().append("foo", "bar")
-                      .append("minute_three", Math.round(Integer.parseInt(sdf.format(new Date())) / 3));
-              new MongoUtil(applicationContext)
-                      .insertOne("snapshot", "foo", document);
-              new MessageUtil(exchange).writeObjectId("snapshot_id", document);
-            })
-            .to(postQueueUri("test_diff"));
+    @Override
+    public void configure() throws Exception {
+        from(consumeQueueUri("test_snapshot", 60))
+                .filter(simple("${exchangeProperty.CamelBatchComplete}"))
+                .process((Exchange exchange) -> {
+                    Document document
+                            = new Document().append("foo", "bar");
+                    document.append("minute_three",
+                            Math.round(Integer.parseInt(
+                                    new SimpleDateFormat("mm")
+                                    .format(new Date())) / 3));
+                    new MongoUtil(applicationContext)
+                            .insertOne("snapshot", "foo", document);
+                    new MessageUtil(exchange)
+                            .writeObjectId("snapshot_id", document);
+                })
+                .to(postQueueUri("test_diff"));
 
-  }
+    }
 
 }

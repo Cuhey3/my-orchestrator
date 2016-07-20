@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -12,18 +11,21 @@ public class JsonResourceUtil {
 
     Map<String, Object> map = new LinkedHashMap<>();
 
-    public JsonResourceUtil(String path) throws UnsupportedEncodingException {
-      try {
-        InputStream resourceAsStream = ClassLoader.class.getResourceAsStream(path);
-        JsonReader reader = new JsonReader(new InputStreamReader(resourceAsStream, "UTF-8"));
-        Gson gson = new Gson();
-        map = gson.fromJson(reader, Map.class);
-      } catch (NullPointerException e) {
-        System.out.println("resource: " + path + " is not find.");
-      }
+    public JsonResourceUtil(String path) throws Exception {
+        try {
+            InputStream resourceAsStream
+                    = ClassLoader.class.getResourceAsStream(path);
+            JsonReader reader
+                    = new JsonReader(
+                            new InputStreamReader(resourceAsStream, "UTF-8"));
+            Gson gson = new Gson();
+            map = gson.fromJson(reader, Map.class);
+        } catch (NullPointerException e) {
+            System.out.println("resource: " + path + " is not find.");
+        }
     }
 
-    public JsonResourceUtil(Paths paths) throws UnsupportedEncodingException {
+    public JsonResourceUtil(Paths paths) throws Exception {
         this(paths.path);
     }
 

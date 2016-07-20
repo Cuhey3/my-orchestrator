@@ -11,8 +11,7 @@ public class HatwioMain {
     public HatwioMain() throws Exception {
         Main main = new Main();
         System.setProperty("hawtio.authenticationEnabled", "false");
-        SettingUtil settingUtil = new SettingUtil(Paths.SETTINGS);
-        String port = settingUtil.get("PORT");
+        String port = new SettingUtil(Paths.SETTINGS).get("PORT");
         main.setPort(Integer.parseInt(port));
         main.setContextPath("/foo");
         main.setWarLocation("./");
