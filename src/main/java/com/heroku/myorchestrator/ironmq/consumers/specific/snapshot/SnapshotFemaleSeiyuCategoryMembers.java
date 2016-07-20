@@ -3,6 +3,7 @@ package com.heroku.myorchestrator.ironmq.consumers.specific.snapshot;
 import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
 import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
 import com.heroku.myorchestrator.util.MediawikiApiRequest;
+import com.heroku.myorchestrator.util.MessageUtil;
 import com.heroku.myorchestrator.util.MongoUtil;
 import java.util.List;
 import java.util.Map;
@@ -43,11 +44,11 @@ public class SnapshotFemaleSeiyuCategoryMembers extends RouteBuilder {
               mapList.forEach((m) -> m.put("gender", "f"));
               Document document = new Document();
               document.put("data", mapList);
-              MongoUtil mongoUtil = new MongoUtil(applicationContext);
-              String objectIdHexString = mongoUtil.insertOne("snapshot", collectionKind, document);
-              Map body = exchange.getIn().getBody(Map.class);
-              body.put("snapshot_id", objectIdHexString);
-              exchange.getIn().setBody(body, String.class);
+              String objectIdHexString
+                      = new MongoUtil(applicationContext)
+                      .insertOne("snapshot", collectionKind, document);
+              new MessageUtil(exchange)
+                      .updateMessage("snapshot_id", objectIdHexString);
             })
             .to(postQueueUri("diff", collectionKind));
   }
