@@ -28,11 +28,9 @@ public class TestSnapshotConsumer extends RouteBuilder {
               Document document
                       = new Document().append("foo", "bar")
                       .append("minute_three", Math.round(Integer.parseInt(sdf.format(new Date())) / 3));
-              String objectIdHexString
-                      = new MongoUtil(applicationContext)
+              new MongoUtil(applicationContext)
                       .insertOne("snapshot", "foo", document);
-              new MessageUtil(exchange)
-                      .updateMessage("snapshot_id", objectIdHexString);
+              new MessageUtil(exchange).writeObjectId("snapshot_id", document);
             })
             .to(postQueueUri("test_diff"));
 

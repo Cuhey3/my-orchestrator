@@ -61,7 +61,7 @@ public class MongoUtil {
     return objectId.toHexString();
   }
 
-  public String getCollectionName(String kind, String collectionKind) {
+  private String getCollectionName(String kind, String collectionKind) {
     return kind + "_" + collectionKind;
   }
 
@@ -74,7 +74,7 @@ public class MongoUtil {
     }
   }
 
-  public String getObjectIdHexString(Document document) {
+  public static String getObjectIdHexString(Document document) {
     return document.get("_id", ObjectId.class).toHexString();
   }
 }

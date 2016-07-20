@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
 import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
 import com.heroku.myorchestrator.util.MessageUtil;
+import java.util.Optional;
 
 @Component
 public class TestDiffConsumer extends RouteBuilder {
@@ -34,29 +35,37 @@ public class TestDiffConsumer extends RouteBuilder {
                 return false;
               }
               if (master.isEmpty()) {
-                System.out.println("master is empty.");
-              } else {
-                String masterObjectIdHexString
-                        = mongoUtil.getObjectIdHexString(master);
-                messageUtil.updateMessage(
-                        "compared_master_id", masterObjectIdHexString);
+                masterIsEmptyLogic();
+                //return false;
               }
-              System.out.println("comparing... " + master + " to " + snapshot);
-              Integer snapshotMinuteThree = snapshot.get("minute_three", Integer.class);
-              if (master.get("minute_three", Integer.class)
-                      != snapshotMinuteThree) {
-                System.out.println("updated!" + snapshot);
-                Document diff = new Document().append("newValue", snapshotMinuteThree);
-                String diffObjectIdHexString
-                        = mongoUtil.insertOne("diff", "foo", diff);
-                messageUtil.updateMessage("diff_id", diffObjectIdHexString);
-                return true;
-              } else {
+              //messageUtil.writeObjectId("compared_master_id", master);
+              Document diff = compareLogic(master, snapshot).get();
+              if (diff == null) {
                 System.out.println("not updated...");
                 return false;
+              } else {
+                mongoUtil.insertOne("diff", "foo", diff);
+                messageUtil.writeObjectId("diff_id", diff);
+                return true;
               }
             })
             .to(postQueueUri("test_complete"));
   }
 
+  public void masterIsEmptyLogic() {
+    System.out.println("master is empty.");
+  }
+
+  public Optional<Document> compareLogic(Document master, Document snapshot) {
+    System.out.println("comparing... " + master + " to " + snapshot);
+    Integer snapshotMinuteThree = snapshot.get("minute_three", Integer.class);
+    if (master.get("minute_three", Integer.class)
+            != snapshotMinuteThree) {
+      System.out.println("updated!" + snapshot);
+      Document diff = new Document().append("newValue", snapshotMinuteThree);
+      return Optional.ofNullable(diff);
+    } else {
+      return Optional.empty();
+    }
+  }
 }

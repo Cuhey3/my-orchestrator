@@ -2,6 +2,7 @@ package com.heroku.myorchestrator.util;
 
 import java.util.Map;
 import org.apache.camel.Exchange;
+import org.bson.Document;
 
 public class MessageUtil {
 
@@ -19,5 +20,10 @@ public class MessageUtil {
 
   public Map getMessage() {
     return exchange.getIn().getBody(Map.class);
+  }
+
+  public void writeObjectId(String key, Document document) {
+    String objectIdHexString = MongoUtil.getObjectIdHexString(document);
+    updateMessage(key, objectIdHexString);
   }
 }
