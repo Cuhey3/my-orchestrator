@@ -1,7 +1,9 @@
 package com.heroku.myorchestrator.config;
 
+import com.heroku.myorchestrator.exceptions.SettingNotFoundException;
 import com.heroku.myorchestrator.util.JsonResourceUtil;
 import com.heroku.myorchestrator.util.JsonResourceUtil.Paths;
+import com.heroku.myorchestrator.util.SettingUtil;
 import io.iron.ironmq.Client;
 import io.iron.ironmq.Cloud;
 import java.io.IOException;
@@ -14,19 +16,19 @@ public class InromqConfig {
 
     @Bean(name = "myironmq")
     Client getIronmqClient() throws UnsupportedEncodingException, IOException {
-        String projectId = System.getenv("IRON_MQ_PROJECT_ID");
-        String token = System.getenv("IRON_MQ_TOKEN");
-        if (projectId == null || token == null) {
-            JsonResourceUtil jru = new JsonResourceUtil(Paths.IRON);
-            projectId = jru.get("project_id");
-            token = jru.get("token");
-            if (projectId == null || token == null) {
-              System.out.println("ironmq client initialization failed..."
-                      + "\nSystem is shutting down.");
-              System.exit(1);
-            }
-        }
+      try {
+        SettingUtil settingUtil = new SettingUtil(Paths.IRON);
+        String projectId = settingUtil.get("IRON_MQ_PROJECT_ID","project_id");
+        String token = settingUtil.get("IRON_MQ_TOKEN","token");
         Client client = new Client(projectId, token, Cloud.ironAWSUSEast);
         return client;
-    }
+      } catch (Throwable e) {
+        e.printStackTrace();
+        System.out.println(
+                "ironmq client initialization failed..."
+                + "\nSystem is shutting down.");
+        System.exit(1);
+        return null;
+      }
+  }
 }
