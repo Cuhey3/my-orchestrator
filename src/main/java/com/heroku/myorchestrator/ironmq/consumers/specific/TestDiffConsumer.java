@@ -5,8 +5,6 @@ import java.util.Map;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.bson.Document;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
 import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
@@ -17,9 +15,6 @@ import java.util.Optional;
 @Component
 public class TestDiffConsumer extends RouteBuilder {
 
-    @Autowired
-    ApplicationContext applicationContext;
-
     @Override
     public void configure() throws Exception {
         from(consumeQueueUri("test_diff", 60))
@@ -27,7 +22,7 @@ public class TestDiffConsumer extends RouteBuilder {
                 .filter((Exchange exchange) -> {
                     MessageUtil messageUtil = new MessageUtil(exchange);
                     Map body = messageUtil.getMessage();
-                    MongoUtil mongoUtil = new MongoUtil(applicationContext);
+                    MongoUtil mongoUtil = new MongoUtil(exchange);
                     Document snapshot
                             = mongoUtil.findById("snapshot", "foo", body)
                             .orElse(new Document());

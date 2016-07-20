@@ -21,7 +21,6 @@ public class MongoConfig {
             MongoClientURI mongoClientURI = new MongoClientURI(ownMongoUri);
             String database = mongoClientURI.getDatabase();
             try (MongoClient mongoClient = new MongoClient(mongoClientURI)) {
-                mongoClient.getDatabase(database);
                 mongoSettings = mongoClient.getDatabase(database)
                         .getCollection("settings").find().iterator().next()
                         .get("mongodb", Map.class);

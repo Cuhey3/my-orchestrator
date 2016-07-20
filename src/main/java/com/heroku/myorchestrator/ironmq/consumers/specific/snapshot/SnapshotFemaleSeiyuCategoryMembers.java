@@ -3,22 +3,17 @@ package com.heroku.myorchestrator.ironmq.consumers.specific.snapshot;
 import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
 import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
 import com.heroku.myorchestrator.util.MediawikiApiRequest;
-import com.heroku.myorchestrator.util.MessageUtil;
-import com.heroku.myorchestrator.util.MongoUtil;
+import com.heroku.myorchestrator.util.SnapshotUtil;
 import java.util.List;
 import java.util.Map;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.bson.Document;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SnapshotFemaleSeiyuCategoryMembers extends RouteBuilder {
 
-    @Autowired
-    ApplicationContext applicationContext;
     String collectionKind = "female_seiyu_category_members";
 
     @Override
@@ -40,12 +35,11 @@ public class SnapshotFemaleSeiyuCategoryMembers extends RouteBuilder {
                             .setContinueElementName("cmcontinue")
                             .setIgnoreFields("ns")
                             .getResultByMapList();
-
                     mapList.forEach((m) -> m.put("gender", "f"));
                     Document document = new Document().append("data", mapList);
-                    new MongoUtil(applicationContext)
-                            .insertOne("snapshot", collectionKind, document);
-                    new MessageUtil(exchange).writeObjectId("snapshot_id", document);
+                    new SnapshotUtil(exchange, collectionKind)
+                            .saveDocument(document)
+                            .updateMessage(document);
                 })
                 .to(postQueueUri("diff", collectionKind));
     }

@@ -8,22 +8,23 @@ import com.mongodb.client.MongoCursor;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
+import org.apache.camel.Exchange;
+import org.apache.camel.spi.Registry;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.springframework.context.ApplicationContext;
 
 public class MongoUtil {
 
-    ApplicationContext applicationContext;
+    Registry registry;
 
-    public MongoUtil(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
+    public MongoUtil(Exchange exchange) {
+        this.registry = exchange.getContext().getRegistry();
     }
 
     public MongoCollection<Document> getCollection(String kind, String collectionKind) {
         String collectionName = getCollectionName(kind, collectionKind);
         MongoClient client
-                = applicationContext.getBean(kind, MongoClient.class);
+                = registry.lookupByNameAndType(kind, MongoClient.class);
         String databaseName = MongoConfig.getMongoClientURI(kind).getDatabase();
         return client.getDatabase(databaseName).getCollection(collectionName);
     }
