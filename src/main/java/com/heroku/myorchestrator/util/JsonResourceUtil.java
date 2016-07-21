@@ -2,6 +2,7 @@ package com.heroku.myorchestrator.util;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
+import com.heroku.myorchestrator.config.enumerate.Paths;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.LinkedHashMap;
@@ -36,19 +37,5 @@ public class JsonResourceUtil {
 
     public String get(String key) {
         return (String) map.get(key);
-    }
-
-    public enum Paths {
-        SETTINGS("/config/settings.json"),
-        IRON("/config/iron.json");
-        private final String path;
-
-        private Paths(String path) {
-            this.path = path;
-        }
-        
-        public String getPath(){
-            return this.path;
-        }
     }
 }

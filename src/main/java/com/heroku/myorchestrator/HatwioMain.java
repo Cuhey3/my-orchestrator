@@ -1,6 +1,6 @@
 package com.heroku.myorchestrator;
 
-import com.heroku.myorchestrator.util.JsonResourceUtil.Paths;
+import com.heroku.myorchestrator.config.enumerate.Paths;
 import com.heroku.myorchestrator.util.SettingUtil;
 import io.hawt.embedded.Main;
 import org.springframework.stereotype.Component;

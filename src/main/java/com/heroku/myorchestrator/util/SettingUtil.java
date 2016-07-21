@@ -1,7 +1,7 @@
 package com.heroku.myorchestrator.util;
 
+import com.heroku.myorchestrator.config.enumerate.Paths;
 import com.heroku.myorchestrator.exceptions.SettingNotFoundException;
-import com.heroku.myorchestrator.util.JsonResourceUtil.Paths;
 
 public class SettingUtil {
 

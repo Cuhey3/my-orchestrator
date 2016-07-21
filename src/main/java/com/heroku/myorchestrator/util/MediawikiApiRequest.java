@@ -69,7 +69,6 @@ public class MediawikiApiRequest {
         return resultMapList;
     }
 
-    // not use
     public Set<String> getResultBySet(String attr) throws IOException {
         String requestUrl = apiUrl + "?" + apiParam;
         Document get = Jsoup.connect(requestUrl).timeout(Integer.MAX_VALUE).get();

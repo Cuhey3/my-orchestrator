@@ -1,6 +1,6 @@
 package com.heroku.myorchestrator.config;
 
-import com.heroku.myorchestrator.util.JsonResourceUtil.Paths;
+import com.heroku.myorchestrator.config.enumerate.Paths;
 import com.heroku.myorchestrator.util.SettingUtil;
 import io.iron.ironmq.Client;
 import io.iron.ironmq.Cloud;
