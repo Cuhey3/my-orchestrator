@@ -1,7 +1,6 @@
 package com.heroku.myorchestrator.ironmq.consumers.specific;
 
-import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
-import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
+import com.heroku.myorchestrator.util.IronmqUtil;
 import com.heroku.myorchestrator.util.actions.SnapshotUtil;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -13,9 +12,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class TestSnapshotConsumer extends RouteBuilder {
 
+    private final IronmqUtil ironmqUtil = new IronmqUtil().kind("foo");
+
     @Override
     public void configure() throws Exception {
-        from(consumeQueueUri("test_snapshot", 60))
+        from(ironmqUtil.snapshot().consumeUri())
                 .filter(simple("${exchangeProperty.CamelBatchComplete}"))
                 .process((Exchange exchange) -> {
                     Document document = new Document();
@@ -24,7 +25,7 @@ public class TestSnapshotConsumer extends RouteBuilder {
                             .saveDocument(document)
                             .updateMessage(document);
                 })
-                .to(postQueueUri("test_diff"));
+                .to(ironmqUtil.diff().postUri());
     }
 
     private void doSnapshot(Document document) {

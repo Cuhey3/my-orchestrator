@@ -1,7 +1,6 @@
 package com.heroku.myorchestrator.ironmq.consumers.specific.snapshot;
 
-import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
-import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
+import com.heroku.myorchestrator.util.IronmqUtil;
 import com.heroku.myorchestrator.util.MediawikiApiRequest;
 import com.heroku.myorchestrator.util.actions.SnapshotUtil;
 import java.util.List;
@@ -15,10 +14,11 @@ import org.springframework.stereotype.Component;
 public class SnapshotFemaleSeiyuCategoryMembers extends RouteBuilder {
 
     private final String kind = "female_seiyu_category_members";
+    private final IronmqUtil ironmqUtil = new IronmqUtil().kind(kind);
 
     @Override
     public void configure() throws Exception {
-        from(consumeQueueUri("snapshot", kind, 60))
+        from(ironmqUtil.snapshot().consumeUri())
                 .routeId("snapshot_" + kind)
                 .filter(simple("${exchangeProperty.CamelBatchComplete}"))
                 .process((Exchange exchange) -> {
@@ -28,7 +28,7 @@ public class SnapshotFemaleSeiyuCategoryMembers extends RouteBuilder {
                             .saveDocument(document)
                             .updateMessage(document);
                 })
-                .to(postQueueUri("diff", kind));
+                .to(ironmqUtil.diff().postUri());
     }
 
     private void doSnapshot(Document document) throws Exception {

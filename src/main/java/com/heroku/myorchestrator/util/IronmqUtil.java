@@ -1,5 +1,6 @@
 package com.heroku.myorchestrator.util;
 
+import com.heroku.myorchestrator.config.enumerate.QueueType;
 import java.util.Map;
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
@@ -7,16 +8,52 @@ import org.apache.camel.Expression;
 public class IronmqUtil {
 
     private static final String IRONMQ_CLIENT_BEAN_NAME = "myironmq";
+    private String type;
+    private String kind;
+    private int timeout;
 
-    public static String consumeQueueUri(String queue, int timeout) {
-        return String.format("ironmq:%s"
-                + "?client=%s"
-                + "&timeout=%s"
-                + "&maxMessagesPerPoll=100",
-                queue, IRONMQ_CLIENT_BEAN_NAME, timeout);
+    public IronmqUtil() {
+        this.timeout = 60;
     }
 
-    public static String consumeQueueUri(String type, String kind, int timeout) {
+    public IronmqUtil type(QueueType type) {
+        this.type = type.expression();
+        return this;
+    }
+
+    public IronmqUtil kind(String kind) {
+        this.kind = kind;
+        return this;
+    }
+
+    public IronmqUtil timeout(int timeout) {
+        this.timeout = timeout;
+        return this;
+    }
+
+    public IronmqUtil snapshot() {
+        this.type = QueueType.SNAPSHOT.expression();
+        return this;
+    }
+
+    public IronmqUtil diff() {
+        this.type = QueueType.DIFF.expression();
+        return this;
+    }
+
+    public IronmqUtil completion() {
+        this.type = QueueType.COMPLETION.expression();
+        this.kind = "all";
+        return this;
+    }
+
+    public IronmqUtil changed() {
+        this.type = QueueType.CHANGED.expression();
+        this.kind = "all";
+        return this;
+    }
+
+    public String consumeUri() {
         return String.format("ironmq:%s"
                 + "?client=%s"
                 + "&timeout=%s"
@@ -24,12 +61,7 @@ public class IronmqUtil {
                 type + "_" + kind, IRONMQ_CLIENT_BEAN_NAME, timeout);
     }
 
-    public static String postQueueUri(String queue) {
-        return String.format("ironmq:%s?client=%s",
-                queue, IRONMQ_CLIENT_BEAN_NAME);
-    }
-
-    public static String postQueueUri(String type, String kind) {
+    public String postUri() {
         return String.format("ironmq:%s?client=%s",
                 type + "_" + kind, IRONMQ_CLIENT_BEAN_NAME);
     }
@@ -43,8 +75,5 @@ public class IronmqUtil {
                         body.get("queue"), IRONMQ_CLIENT_BEAN_NAME);
             }
         };
-    }
-
-    private IronmqUtil() {
     }
 }

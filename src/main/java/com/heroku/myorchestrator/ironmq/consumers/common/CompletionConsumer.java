@@ -1,20 +1,17 @@
 package com.heroku.myorchestrator.ironmq.consumers.common;
 
-import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
-import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
+import com.heroku.myorchestrator.util.IronmqUtil;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CompletionConsumer extends RouteBuilder {
 
-    final String consumeQueue = "completion_develop";
-    final String toPostQueue = "changed_develop";
+    private final IronmqUtil ironmqUtil = new IronmqUtil();
 
     @Override
     public void configure() throws Exception {
-//        from(consumeQueueUri(consumeQueue, 60))
-        from(consumeQueueUri("test_complete", 60))
+        from(ironmqUtil.completion().consumeUri())
                 /*.process((Exchange exchange) -> {
                     Map body = exchange.getIn().getBody(Map.class);
                     String messageType = (String) body.get("message_type");
@@ -29,7 +26,7 @@ public class CompletionConsumer extends RouteBuilder {
                         cleanUpDiff(messageType);
                     }
                 })*/
-                .to(postQueueUri("test_changed"));
+                .to(ironmqUtil.changed().postUri());
     }
 
     public boolean masterIsValid(String messageType, String comparedMasterId) {

@@ -1,8 +1,7 @@
 package com.heroku.myorchestrator.ironmq.consumers.specific;
 
+import com.heroku.myorchestrator.util.IronmqUtil;
 import com.heroku.myorchestrator.util.actions.DiffUtil;
-import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
-import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.actions.SnapshotUtil;
 import java.util.Objects;
@@ -15,9 +14,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class TestDiffConsumer extends RouteBuilder {
 
+    IronmqUtil ironmqUtil = new IronmqUtil().kind("foo");
+
     @Override
     public void configure() throws Exception {
-        from(consumeQueueUri("test_diff", 60))
+        from(ironmqUtil.diff().consumeUri())
                 .filter(simple("${exchangeProperty.CamelBatchComplete}"))
                 .filter((Exchange exchange) -> {
                     try {
@@ -50,7 +51,7 @@ public class TestDiffConsumer extends RouteBuilder {
                         return false;
                     }
                 })
-                .to(postQueueUri("test_complete"));
+                .to(ironmqUtil.completion().postUri());
     }
 
     public void masterIsEmptyLogic() {
