@@ -3,7 +3,7 @@ package com.heroku.myorchestrator.ironmq.consumers.specific.snapshot;
 import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
 import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
 import com.heroku.myorchestrator.util.MediawikiApiRequest;
-import com.heroku.myorchestrator.util.SnapshotUtil;
+import com.heroku.myorchestrator.util.actions.SnapshotUtil;
 import java.util.List;
 import java.util.Map;
 import org.apache.camel.Exchange;

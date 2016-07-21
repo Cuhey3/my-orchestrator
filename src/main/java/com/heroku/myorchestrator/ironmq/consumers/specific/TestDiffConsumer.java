@@ -1,10 +1,10 @@
 package com.heroku.myorchestrator.ironmq.consumers.specific;
 
-import com.heroku.myorchestrator.util.DiffUtil;
+import com.heroku.myorchestrator.util.actions.DiffUtil;
 import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
 import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
-import com.heroku.myorchestrator.util.MasterUtil;
-import com.heroku.myorchestrator.util.SnapshotUtil;
+import com.heroku.myorchestrator.util.actions.MasterUtil;
+import com.heroku.myorchestrator.util.actions.SnapshotUtil;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.camel.Exchange;

@@ -2,7 +2,7 @@ package com.heroku.myorchestrator.ironmq.consumers.specific;
 
 import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
 import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
-import com.heroku.myorchestrator.util.SnapshotUtil;
+import com.heroku.myorchestrator.util.actions.SnapshotUtil;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.apache.camel.Exchange;

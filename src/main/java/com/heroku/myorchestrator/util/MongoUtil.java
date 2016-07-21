@@ -1,6 +1,7 @@
 package com.heroku.myorchestrator.util;
 
 import com.heroku.myorchestrator.config.MongoConfig;
+import com.heroku.myorchestrator.config.enumerate.ActionType;
 import com.heroku.myorchestrator.exceptions.MongoUtilTypeNotSetException;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
@@ -31,6 +32,11 @@ public class MongoUtil {
 
     public MongoUtil type(String type) {
         this.type = type;
+        return this;
+    }
+
+    public MongoUtil type(ActionType type) {
+        this.type = type.expression();
         return this;
     }
 
