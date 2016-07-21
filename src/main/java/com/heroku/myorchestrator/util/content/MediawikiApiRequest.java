@@ -1,4 +1,4 @@
-package com.heroku.myorchestrator.util;
+package com.heroku.myorchestrator.util.content;
 
 import java.io.IOException;
 import java.util.ArrayList;

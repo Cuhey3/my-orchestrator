@@ -1,46 +1,46 @@
-package com.heroku.myorchestrator.util;
+package com.heroku.myorchestrator.util.consumers;
 
 import com.heroku.myorchestrator.config.enumerate.ActionType;
 import com.heroku.myorchestrator.config.enumerate.Kind;
 import org.apache.camel.builder.SimpleBuilder;
 
-public class ConsumerUtil {
+public class RouteUtil {
 
     private String type;
     private String kind;
 
-    public ConsumerUtil type(ActionType type) {
+    public RouteUtil type(ActionType type) {
         this.type = type.expression();
         return this;
     }
 
-    public ConsumerUtil kind(Kind kind) {
+    public RouteUtil kind(Kind kind) {
         this.kind = kind.expression();
         return this;
     }
 
-    public ConsumerUtil request() {
+    public RouteUtil request() {
         this.type = "request";
         return this;
     }
 
-    public ConsumerUtil snapshot() {
+    public RouteUtil snapshot() {
         this.type = ActionType.SNAPSHOT.expression();
         return this;
     }
 
-    public ConsumerUtil diff() {
+    public RouteUtil diff() {
         this.type = ActionType.DIFF.expression();
         return this;
     }
 
-    public ConsumerUtil completion() {
+    public RouteUtil completion() {
         this.type = "completion";
         this.kind = "all";
         return this;
     }
 
-    public ConsumerUtil changing() {
+    public RouteUtil changing() {
         this.type = "changing";
         this.kind = "all";
         return this;

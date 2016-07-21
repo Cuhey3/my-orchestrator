@@ -8,13 +8,13 @@ public class ChangingConsumer extends ConsumerRouteBuilder {
 
     public ChangingConsumer() {
         ironmqUtil.changed();
-        consumerUtil.changing();
+        routeUtil.changing();
     }
 
     @Override
     public void configure() throws Exception {
         from(ironmqUtil.consumeUri())
-                .routeId(consumerUtil.id())
+                .routeId(routeUtil.id())
                 .to("log:foo");
     }
 }

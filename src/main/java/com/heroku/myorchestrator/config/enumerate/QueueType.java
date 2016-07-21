@@ -2,15 +2,12 @@ package com.heroku.myorchestrator.config.enumerate;
 
 public enum QueueType {
 
-    SNAPSHOT("snapshot"),
-    DIFF("diff"),
-    COMPLETION("completion"),
-    CHANGED("changed");
+    SNAPSHOT, DIFF, COMPLETION, CHANGED;
 
     private final String expression;
 
-    private QueueType(String expression) {
-        this.expression = expression;
+    private QueueType() {
+        this.expression = this.name().toLowerCase();
     }
 
     public String expression() {

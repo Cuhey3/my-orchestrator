@@ -16,14 +16,14 @@ public class TestDiffConsumer extends ConsumerRouteBuilder {
 
     public TestDiffConsumer() {
         setKind(Kind.foo);
-        consumerUtil.diff();
+        routeUtil.diff();
     }
 
     @Override
     public void configure() throws Exception {
         from(ironmqUtil.diff().consumeUri())
-                .routeId(consumerUtil.id())
-                .filter(consumerUtil.camelBatchComplete())
+                .routeId(routeUtil.id())
+                .filter(routeUtil.camelBatchComplete())
                 .filter((Exchange exchange) -> {
                     try {
                         Optional<Document> snapshotOptional

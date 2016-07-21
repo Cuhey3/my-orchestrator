@@ -1,4 +1,4 @@
-package com.heroku.myorchestrator.util;
+package com.heroku.myorchestrator.util.consumers;
 
 import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.config.enumerate.QueueType;

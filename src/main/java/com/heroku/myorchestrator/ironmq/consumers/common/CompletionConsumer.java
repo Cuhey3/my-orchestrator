@@ -7,13 +7,13 @@ import org.springframework.stereotype.Component;
 public class CompletionConsumer extends ConsumerRouteBuilder {
 
     public CompletionConsumer() {
-        consumerUtil.completion();
+        routeUtil.completion();
     }
 
     @Override
     public void configure() throws Exception {
         from(ironmqUtil.completion().consumeUri())
-                .routeId(consumerUtil.id())
+                .routeId(routeUtil.id())
                 /*.process((Exchange exchange) -> {
                     Map body = exchange.getIn().getBody(Map.class);
                     String messageType = (String) body.get("message_type");

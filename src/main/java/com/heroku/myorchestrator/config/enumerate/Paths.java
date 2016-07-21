@@ -2,12 +2,12 @@ package com.heroku.myorchestrator.config.enumerate;
 
 public enum Paths {
 
-    SETTINGS("/config/settings.json"), IRON("/config/iron.json");
+    SETTINGS, IRON;
 
     private final String path;
 
-    private Paths(String path) {
-        this.path = path;
+    private Paths() {
+        this.path = String.format("/config/%s.json", this.name().toLowerCase());
     }
 
     public String getPath() {

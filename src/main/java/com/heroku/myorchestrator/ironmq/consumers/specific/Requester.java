@@ -2,7 +2,7 @@ package com.heroku.myorchestrator.ironmq.consumers.specific;
 
 import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.ironmq.consumers.ConsumerRouteBuilder;
-import com.heroku.myorchestrator.util.KindUtil;
+import com.heroku.myorchestrator.util.consumers.KindUtil;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +13,7 @@ public class Requester extends ConsumerRouteBuilder {
 
     public Requester() {
         ironmqUtil.snapshot();
-        consumerUtil.request();
+        routeUtil.request();
         Kind.foo.timerParam("period=60s");
         Kind.female_seiyu_category_members.timerParam("period=20m&delay=10m");
     }
@@ -26,9 +26,8 @@ public class Requester extends ConsumerRouteBuilder {
                 .forEach((Kind k) -> {
                     setKind(k);
                     from(k.timerUri())
-                            .routeId(consumerUtil.id())
-                            .setBody()
-                            .constant(kindUtil.kind(k).preMessage())
+                            .routeId(routeUtil.id())
+                            .setBody().constant(kindUtil.kind(k).preMessage())
                             .to(ironmqUtil.postUri());
                 });
     }
