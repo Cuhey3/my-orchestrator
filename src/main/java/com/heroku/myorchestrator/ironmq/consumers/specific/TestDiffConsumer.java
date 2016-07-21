@@ -15,9 +15,8 @@ import org.springframework.stereotype.Component;
 public class TestDiffConsumer extends ConsumerRouteBuilder {
 
     public TestDiffConsumer() {
-        kind = Kind.foo;
-        ironmqUtil.kind(kind);
-        consumerUtil.diff().kind(kind);
+        setKind(Kind.foo);
+        consumerUtil.diff();
     }
 
     @Override

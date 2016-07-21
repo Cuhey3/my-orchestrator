@@ -11,4 +11,9 @@ public abstract class ConsumerRouteBuilder extends RouteBuilder {
     protected IronmqUtil ironmqUtil = new IronmqUtil();
     protected ConsumerUtil consumerUtil = new ConsumerUtil();
 
+    public final void setKind(Kind kind) {
+        this.kind = kind;
+        ironmqUtil.kind(kind);
+        consumerUtil.kind(kind);
+    }
 }

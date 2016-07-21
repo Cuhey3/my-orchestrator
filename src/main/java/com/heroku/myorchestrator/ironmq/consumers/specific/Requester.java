@@ -24,11 +24,12 @@ public class Requester extends ConsumerRouteBuilder {
         Stream.of(Kind.values())
                 .filter((Kind k) -> k.timerUri() != null)
                 .forEach((Kind k) -> {
+                    setKind(k);
                     from(k.timerUri())
-                            .routeId(consumerUtil.kind(k).id())
+                            .routeId(consumerUtil.id())
                             .setBody()
                             .constant(kindUtil.kind(k).preMessage())
-                            .to(ironmqUtil.kind(k).postUri());
+                            .to(ironmqUtil.postUri());
                 });
     }
 }

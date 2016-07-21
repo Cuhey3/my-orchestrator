@@ -14,9 +14,8 @@ import org.springframework.stereotype.Component;
 public class SnapshotFemaleSeiyuCategoryMembers extends ConsumerRouteBuilder {
 
     public SnapshotFemaleSeiyuCategoryMembers() {
-        kind = Kind.female_seiyu_category_members;
-        ironmqUtil.kind(kind);
-        consumerUtil.snapshot().kind(kind);
+        setKind(Kind.female_seiyu_category_members);
+        consumerUtil.snapshot();
     }
 
     @Override

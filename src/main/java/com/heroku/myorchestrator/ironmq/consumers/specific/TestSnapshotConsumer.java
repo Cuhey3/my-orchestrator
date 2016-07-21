@@ -13,9 +13,8 @@ import org.springframework.stereotype.Component;
 public class TestSnapshotConsumer extends ConsumerRouteBuilder {
 
     public TestSnapshotConsumer() {
-        kind = Kind.foo;
-        ironmqUtil.kind(kind);
-        consumerUtil.snapshot().kind(kind);
+        setKind(Kind.foo);
+        consumerUtil.snapshot();
     }
 
     @Override
