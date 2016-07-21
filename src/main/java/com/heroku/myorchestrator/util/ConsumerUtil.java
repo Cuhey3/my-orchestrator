@@ -1,6 +1,7 @@
 package com.heroku.myorchestrator.util;
 
 import com.heroku.myorchestrator.config.enumerate.ActionType;
+import com.heroku.myorchestrator.config.enumerate.Kind;
 import org.apache.camel.builder.SimpleBuilder;
 
 public class ConsumerUtil {
@@ -13,8 +14,8 @@ public class ConsumerUtil {
         return this;
     }
 
-    public ConsumerUtil kind(String kind) {
-        this.kind = kind;
+    public ConsumerUtil kind(Kind kind) {
+        this.kind = kind.expression();
         return this;
     }
 

@@ -1,6 +1,6 @@
 {
-  "message_type": "female_seiyu_category_members",
-  "affect": [
-    "seiyu_category_members"
-  ]
+    "kind": "female_seiyu_category_members",
+    "affect": [
+        "seiyu_category_members"
+    ]
 }

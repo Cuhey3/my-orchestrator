@@ -1,5 +1,6 @@
 package com.heroku.myorchestrator.util;
 
+import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.config.enumerate.QueueType;
 import java.util.Map;
 import org.apache.camel.Exchange;
@@ -21,8 +22,8 @@ public class IronmqUtil {
         return this;
     }
 
-    public IronmqUtil kind(String kind) {
-        this.kind = kind;
+    public IronmqUtil kind(Kind kind) {
+        this.kind = kind.expression();
         return this;
     }
 

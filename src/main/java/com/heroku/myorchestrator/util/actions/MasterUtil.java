@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.bson.Document;
 
-public class MasterUtil extends ActionUtil{
+public class MasterUtil extends ActionUtil {
 
     public MasterUtil(Exchange exchange) {
         this.exchange = exchange;
@@ -14,6 +14,6 @@ public class MasterUtil extends ActionUtil{
     }
 
     public Optional<Document> loadLatestDocument() throws Exception {
-        return new MongoUtil(exchange).type("master").findLatest();
+        return new MongoUtil(exchange).type(type).findLatest();
     }
 }

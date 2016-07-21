@@ -20,8 +20,7 @@ public class JsonResourceUtil {
             JsonReader reader
                     = new JsonReader(
                             new InputStreamReader(resourceAsStream, "UTF-8"));
-            Gson gson = new Gson();
-            map = gson.fromJson(reader, Map.class);
+            map = new Gson().fromJson(reader, Map.class);
         } catch (NullPointerException e) {
             System.out.println("resource: " + path + " is not find.");
         }

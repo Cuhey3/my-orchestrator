@@ -1,5 +1,6 @@
 package com.heroku.myorchestrator.ironmq.consumers.specific.snapshot;
 
+import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.ironmq.consumers.ConsumerRouteBuilder;
 import com.heroku.myorchestrator.util.MediawikiApiRequest;
 import com.heroku.myorchestrator.util.actions.SnapshotUtil;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Component;
 public class SnapshotFemaleSeiyuCategoryMembers extends ConsumerRouteBuilder {
 
     public SnapshotFemaleSeiyuCategoryMembers() {
-        kind = "female_seiyu_category_members";
+        kind = Kind.female_seiyu_category_members;
         ironmqUtil.kind(kind);
         consumerUtil.snapshot().kind(kind);
     }

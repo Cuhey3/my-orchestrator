@@ -1,5 +1,6 @@
 package com.heroku.myorchestrator.ironmq.consumers.specific;
 
+import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.ironmq.consumers.ConsumerRouteBuilder;
 import com.heroku.myorchestrator.util.actions.SnapshotUtil;
 import java.text.SimpleDateFormat;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class TestSnapshotConsumer extends ConsumerRouteBuilder {
 
     public TestSnapshotConsumer() {
-        kind = "foo";
+        kind = Kind.foo;
         ironmqUtil.kind(kind);
         consumerUtil.snapshot().kind(kind);
     }
