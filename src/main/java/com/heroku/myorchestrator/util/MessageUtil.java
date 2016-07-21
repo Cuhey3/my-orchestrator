@@ -6,12 +6,13 @@ import org.bson.Document;
 
 public class MessageUtil {
 
-    Exchange exchange;
+    private final Exchange exchange;
 
     public MessageUtil(Exchange exchange) {
         this.exchange = exchange;
     }
 
+    @SuppressWarnings("unchecked")
     public void updateMessage(String key, Object value) {
         Map message = getMessage();
         message.put(key, value);

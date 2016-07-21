@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SnapshotFemaleSeiyuCategoryMembers extends RouteBuilder {
 
-    String collectionKind = "female_seiyu_category_members";
+    private final String collectionKind = "female_seiyu_category_members";
 
     @Override
     public void configure() throws Exception {

@@ -1,16 +1,16 @@
 package com.heroku.myorchestrator.ironmq.consumers.specific;
 
+import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
+import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
+import com.heroku.myorchestrator.util.MessageUtil;
 import com.heroku.myorchestrator.util.MongoUtil;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.bson.Document;
 import org.springframework.stereotype.Component;
-import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
-import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
-import com.heroku.myorchestrator.util.MessageUtil;
-import java.util.Objects;
-import java.util.Optional;
 
 @Component
 public class TestDiffConsumer extends RouteBuilder {
@@ -22,12 +22,14 @@ public class TestDiffConsumer extends RouteBuilder {
                 .filter((Exchange exchange) -> {
                     MessageUtil messageUtil = new MessageUtil(exchange);
                     Map body = messageUtil.getMessage();
-                    MongoUtil mongoUtil = new MongoUtil(exchange);
+                    MongoUtil mongoUtil
+                            = new MongoUtil(exchange).collection("foo");
                     Document snapshot
-                            = mongoUtil.findById("snapshot", "foo", body)
-                            .orElse(new Document());
-                    Document master = mongoUtil.findLatest("master", "foo")
-                            .orElse(new Document());
+                            = mongoUtil.kind("snapshot")
+                            .findById(body).orElse(new Document());
+                    Document master
+                            = mongoUtil.kind("master")
+                            .findLatest().orElse(new Document());
                     if (snapshot.isEmpty()) {
                         return false;
                     }
@@ -41,7 +43,7 @@ public class TestDiffConsumer extends RouteBuilder {
                         System.out.println("not updated...");
                         return false;
                     } else {
-                        mongoUtil.insertOne("diff", "foo", diff);
+                        mongoUtil.kind("diff").insertOne(diff);
                         messageUtil.writeObjectId("diff_id", diff);
                         return true;
                     }

@@ -29,7 +29,5 @@ public class TestSnapshotConsumer extends RouteBuilder {
                             .updateMessage(document);
                 })
                 .to(postQueueUri("test_diff"));
-
     }
-
 }

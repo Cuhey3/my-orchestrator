@@ -6,7 +6,7 @@ import org.apache.camel.Expression;
 
 public class IronmqUtil {
 
-    public static final String IRONMQ_CLIENT_BEAN_NAME = "myironmq";
+    private static final String IRONMQ_CLIENT_BEAN_NAME = "myironmq";
 
     public static String consumeQueueUri(String queue, int timeout) {
         return String.format("ironmq:%s"
@@ -43,5 +43,8 @@ public class IronmqUtil {
                         body.get("queue"), IRONMQ_CLIENT_BEAN_NAME);
             }
         };
+    }
+
+    private IronmqUtil() {
     }
 }

@@ -14,7 +14,9 @@ public class SnapshotUtil {
     }
 
     public SnapshotUtil saveDocument(Document document) {
-        new MongoUtil(exchange).insertOne("snapshot", collectionKind, document);
+        new MongoUtil(exchange)
+                .kind("snapshot").collection(collectionKind)
+                .insertOne(document);
         return this;
     }
 

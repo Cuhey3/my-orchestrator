@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class ConverterConfig {
 
     @Autowired
-    CamelContext context;
+    private CamelContext context;
 
     @Bean
     ConverterConfig converterReady() {

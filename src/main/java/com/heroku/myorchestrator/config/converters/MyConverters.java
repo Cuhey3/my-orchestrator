@@ -9,7 +9,7 @@ import org.apache.camel.TypeConverters;
 
 public class MyConverters implements TypeConverters {
 
-    CamelContext context;
+    private final CamelContext context;
 
     public MyConverters(CamelContext context) {
         this.context = context;

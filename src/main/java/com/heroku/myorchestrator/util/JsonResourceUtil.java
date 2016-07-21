@@ -9,9 +9,10 @@ import java.util.Map;
 
 public class JsonResourceUtil {
 
-    Map<String, Object> map = new LinkedHashMap<>();
+    private Map<String, Object> map;
 
     public JsonResourceUtil(String path) throws Exception {
+        this.map = new LinkedHashMap<>();
         try {
             InputStream resourceAsStream
                     = ClassLoader.class.getResourceAsStream(path);
@@ -26,7 +27,7 @@ public class JsonResourceUtil {
     }
 
     public JsonResourceUtil(Paths paths) throws Exception {
-        this(paths.path);
+        this(paths.getPath());
     }
 
     public <T> T get(String key, Class<T> clazz) {
@@ -40,10 +41,14 @@ public class JsonResourceUtil {
     public enum Paths {
         SETTINGS("/config/settings.json"),
         IRON("/config/iron.json");
-        public String path;
+        private final String path;
 
         private Paths(String path) {
             this.path = path;
+        }
+        
+        public String getPath(){
+            return this.path;
         }
     }
 }

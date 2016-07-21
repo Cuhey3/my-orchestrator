@@ -14,57 +14,67 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 
 public class MongoUtil {
+    public static String getObjectIdHexString(Document document) {
+        return document.get("_id", ObjectId.class).toHexString();
+    }
 
-    Registry registry;
+    private final Registry registry;
+    private String kind;
+    private String collectionKind;
 
     public MongoUtil(Exchange exchange) {
         this.registry = exchange.getContext().getRegistry();
     }
+    
+    public MongoUtil kind(String kind){
+      this.kind = kind;
+      return this;
+    }
 
-    public MongoCollection<Document> getCollection(String kind, String collectionKind) {
-        String collectionName = getCollectionName(kind, collectionKind);
+    public MongoUtil collection(String collectionKind){
+      this.collectionKind = collectionKind;
+      return this;
+    }
+
+    public MongoCollection<Document> getCollection() {
+        String collectionName = getCollectionName();
         MongoClient client
                 = registry.lookupByNameAndType(kind, MongoClient.class);
         String databaseName = MongoConfig.getMongoClientURI(kind).getDatabase();
         return client.getDatabase(databaseName).getCollection(collectionName);
     }
 
-    public Optional<Document> findFirst(String kind, String collectionKind) {
-        String collectionName = getCollectionName(kind, collectionKind);
+    public Optional<Document> findFirst() {
         FindIterable<Document> find
-                = this.getCollection(kind, collectionName).find().limit(1);
+                = this.getCollection().find().limit(1);
         return getNextDocument(find);
     }
 
-    public Optional<Document> findLatest(String kind, String collectionKind) {
-        String collectionName = getCollectionName(kind, collectionKind);
-        FindIterable<Document> find = this.getCollection(kind, collectionName)
+    public Optional<Document> findLatest() {
+        FindIterable<Document> find = this.getCollection()
                 .find().sort(new Document("creationDate", -1)).limit(1);
         return getNextDocument(find);
     }
 
-    public Optional<Document> findById(String kind, String collectionKind, String objectIdHexString) {
+    public Optional<Document> findById(String objectIdHexString) {
         ObjectId objectId = new ObjectId(objectIdHexString);
-        MongoCollection<Document> collection
-                = this.getCollection(kind, collectionKind);
+        MongoCollection<Document> collection = this.getCollection();
         Document query = new Document().append("_id", objectId);
         return getNextDocument(collection.find(query));
     }
 
-    public Optional<Document> findById(
-            String kind, String collectionKind, Map map) {
+    public Optional<Document> findById(Map map) {
         String objectIdHexString = (String) map.get(kind + "_id");
-        return this.findById(kind, collectionKind, objectIdHexString);
+        return this.findById(objectIdHexString);
     }
 
-    public String insertOne(
-            String kind, String collectionKind, Document document) {
+    public String insertOne(Document document) {
         document.append("creationDate", new Date());
-        this.getCollection(kind, collectionKind).insertOne(document);
+        this.getCollection().insertOne(document);
         return document.get("_id", ObjectId.class).toHexString();
     }
 
-    private String getCollectionName(String kind, String collectionKind) {
+    private String getCollectionName() {
         return kind + "_" + collectionKind;
     }
 
@@ -75,9 +85,5 @@ public class MongoUtil {
         } else {
             return Optional.empty();
         }
-    }
-
-    public static String getObjectIdHexString(Document document) {
-        return document.get("_id", ObjectId.class).toHexString();
     }
 }
