@@ -1,38 +1,40 @@
 package com.heroku.myorchestrator.ironmq.consumers.specific;
 
-import com.heroku.myorchestrator.util.IronmqUtil;
+import com.heroku.myorchestrator.ironmq.consumers.ConsumerRouteBuilder;
 import com.heroku.myorchestrator.util.actions.SnapshotUtil;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.apache.camel.Exchange;
-import org.apache.camel.builder.RouteBuilder;
 import org.bson.Document;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TestSnapshotConsumer extends RouteBuilder {
+public class TestSnapshotConsumer extends ConsumerRouteBuilder {
 
-    private final IronmqUtil ironmqUtil = new IronmqUtil().kind("foo");
+    public TestSnapshotConsumer() {
+        kind = "foo";
+        ironmqUtil.kind(kind);
+        consumerUtil.snapshot().kind(kind);
+    }
 
     @Override
     public void configure() throws Exception {
         from(ironmqUtil.snapshot().consumeUri())
-                .filter(simple("${exchangeProperty.CamelBatchComplete}"))
+                .routeId(consumerUtil.id())
+                .filter(consumerUtil.camelBatchComplete())
                 .process((Exchange exchange) -> {
-                    Document document = new Document();
-                    doSnapshot(document);
-                    new SnapshotUtil(exchange)
-                            .saveDocument(document)
+                    Document document = doSnapshot(new Document());
+                    new SnapshotUtil(exchange).saveDocument(document)
                             .updateMessage(document);
                 })
                 .to(ironmqUtil.diff().postUri());
     }
 
-    private void doSnapshot(Document document) {
+    private Document doSnapshot(Document document) {
         document.append("foo", "bar")
                 .append("minute_three",
-                        Math.round(Integer.parseInt(
-                                new SimpleDateFormat("mm")
+                        Math.round(Integer.parseInt(new SimpleDateFormat("mm")
                                 .format(new Date())) / 3));
+        return document;
     }
 }

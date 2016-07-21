@@ -1,16 +1,20 @@
 package com.heroku.myorchestrator.ironmq.consumers.common;
 
-import com.heroku.myorchestrator.util.IronmqUtil;
-import org.apache.camel.builder.RouteBuilder;
+import com.heroku.myorchestrator.ironmq.consumers.ConsumerRouteBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ChangingConsumer extends RouteBuilder {
+public class ChangingConsumer extends ConsumerRouteBuilder {
 
-    private final IronmqUtil ironmqUtil = new IronmqUtil().changed();
+    public ChangingConsumer() {
+        ironmqUtil.changed();
+        consumerUtil.changing();
+    }
 
     @Override
     public void configure() throws Exception {
-        from(ironmqUtil.consumeUri()).to("log:foo");
+        from(ironmqUtil.consumeUri())
+                .routeId(consumerUtil.id())
+                .to("log:foo");
     }
 }

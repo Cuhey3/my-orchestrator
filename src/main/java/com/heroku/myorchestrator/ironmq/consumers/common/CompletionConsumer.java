@@ -1,17 +1,19 @@
 package com.heroku.myorchestrator.ironmq.consumers.common;
 
-import com.heroku.myorchestrator.util.IronmqUtil;
-import org.apache.camel.builder.RouteBuilder;
+import com.heroku.myorchestrator.ironmq.consumers.ConsumerRouteBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CompletionConsumer extends RouteBuilder {
+public class CompletionConsumer extends ConsumerRouteBuilder {
 
-    private final IronmqUtil ironmqUtil = new IronmqUtil();
+    public CompletionConsumer() {
+        consumerUtil.completion();
+    }
 
     @Override
     public void configure() throws Exception {
         from(ironmqUtil.completion().consumeUri())
+                .routeId(consumerUtil.id())
                 /*.process((Exchange exchange) -> {
                     Map body = exchange.getIn().getBody(Map.class);
                     String messageType = (String) body.get("message_type");

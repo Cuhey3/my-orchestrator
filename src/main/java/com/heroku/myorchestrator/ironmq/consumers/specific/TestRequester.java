@@ -1,25 +1,30 @@
 package com.heroku.myorchestrator.ironmq.consumers.specific;
 
-import com.heroku.myorchestrator.util.IronmqUtil;
-import org.apache.camel.builder.RouteBuilder;
+import com.heroku.myorchestrator.ironmq.consumers.ConsumerRouteBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TestRequester extends RouteBuilder {
+public class TestRequester extends ConsumerRouteBuilder {
 
-    IronmqUtil ironmqUtil = new IronmqUtil().snapshot();
+    private final String fscm = "female_seiyu_category_members";
+
+    public TestRequester() {
+        ironmqUtil.snapshot();
+        consumerUtil.request();
+    }
 
     @Override
     public void configure() throws Exception {
         from("timer:foo?period=60s")
+                .routeId(consumerUtil.kind("foo").id())
                 .setBody()
                 .constant("{\"kind\":\"foo\"}")
                 .to(ironmqUtil.kind("foo").postUri());
 
         from("timer:female_seiyu_category_members?period=20m&delay=10m")
-                .routeId("request_female_seiyu_category_members")
+                .routeId(consumerUtil.kind(fscm).id())
                 .setBody()
                 .constant("{\"kind\":\"female_seiyu_category_members\"}")
-                .to(ironmqUtil.kind("female_seiyu_category_members").postUri());
+                .to(ironmqUtil.kind(fscm).postUri());
     }
 }

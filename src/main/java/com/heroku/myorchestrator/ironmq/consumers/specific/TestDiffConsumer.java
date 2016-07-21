@@ -1,25 +1,29 @@
 package com.heroku.myorchestrator.ironmq.consumers.specific;
 
-import com.heroku.myorchestrator.util.IronmqUtil;
+import com.heroku.myorchestrator.ironmq.consumers.ConsumerRouteBuilder;
 import com.heroku.myorchestrator.util.actions.DiffUtil;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.actions.SnapshotUtil;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.camel.Exchange;
-import org.apache.camel.builder.RouteBuilder;
 import org.bson.Document;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TestDiffConsumer extends RouteBuilder {
+public class TestDiffConsumer extends ConsumerRouteBuilder {
 
-    IronmqUtil ironmqUtil = new IronmqUtil().kind("foo");
+    public TestDiffConsumer() {
+        kind = "foo";
+        ironmqUtil.kind(kind);
+        consumerUtil.diff().kind(kind);
+    }
 
     @Override
     public void configure() throws Exception {
         from(ironmqUtil.diff().consumeUri())
-                .filter(simple("${exchangeProperty.CamelBatchComplete}"))
+                .routeId(consumerUtil.id())
+                .filter(consumerUtil.camelBatchComplete())
                 .filter((Exchange exchange) -> {
                     try {
                         Optional<Document> snapshotOptional
@@ -62,8 +66,7 @@ public class TestDiffConsumer extends RouteBuilder {
         System.out.println("comparing... " + master + " to " + snapshot);
         Integer snapshotMinuteThree
                 = snapshot.get("minute_three", Integer.class);
-        if (!Objects.equals(
-                master.get("minute_three", Integer.class),
+        if (!Objects.equals(master.get("minute_three", Integer.class),
                 snapshotMinuteThree)) {
             System.out.println("updated!" + snapshot);
             Document diff = new Document()

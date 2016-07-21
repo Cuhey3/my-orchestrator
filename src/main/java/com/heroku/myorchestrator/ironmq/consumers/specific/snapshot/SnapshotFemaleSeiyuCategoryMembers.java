@@ -1,37 +1,37 @@
 package com.heroku.myorchestrator.ironmq.consumers.specific.snapshot;
 
-import com.heroku.myorchestrator.util.IronmqUtil;
+import com.heroku.myorchestrator.ironmq.consumers.ConsumerRouteBuilder;
 import com.heroku.myorchestrator.util.MediawikiApiRequest;
 import com.heroku.myorchestrator.util.actions.SnapshotUtil;
 import java.util.List;
 import java.util.Map;
 import org.apache.camel.Exchange;
-import org.apache.camel.builder.RouteBuilder;
 import org.bson.Document;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SnapshotFemaleSeiyuCategoryMembers extends RouteBuilder {
+public class SnapshotFemaleSeiyuCategoryMembers extends ConsumerRouteBuilder {
 
-    private final String kind = "female_seiyu_category_members";
-    private final IronmqUtil ironmqUtil = new IronmqUtil().kind(kind);
+    public SnapshotFemaleSeiyuCategoryMembers() {
+        kind = "female_seiyu_category_members";
+        ironmqUtil.kind(kind);
+        consumerUtil.snapshot().kind(kind);
+    }
 
     @Override
     public void configure() throws Exception {
         from(ironmqUtil.snapshot().consumeUri())
-                .routeId("snapshot_" + kind)
-                .filter(simple("${exchangeProperty.CamelBatchComplete}"))
+                .routeId(consumerUtil.id())
+                .filter(consumerUtil.camelBatchComplete())
                 .process((Exchange exchange) -> {
-                    Document document = new Document();
-                    doSnapshot(document);
-                    new SnapshotUtil(exchange)
-                            .saveDocument(document)
+                    Document document = doSnapshot(new Document());
+                    new SnapshotUtil(exchange).saveDocument(document)
                             .updateMessage(document);
                 })
                 .to(ironmqUtil.diff().postUri());
     }
 
-    private void doSnapshot(Document document) throws Exception {
+    private Document doSnapshot(Document document) throws Exception {
         List<Map<String, Object>> mapList
                 = new MediawikiApiRequest()
                 .setApiParam("action=query&list=categorymembers"
@@ -47,5 +47,6 @@ public class SnapshotFemaleSeiyuCategoryMembers extends RouteBuilder {
                 .getResultByMapList();
         mapList.forEach((m) -> m.put("gender", "f"));
         document.append("data", mapList);
+        return document;
     }
 }
