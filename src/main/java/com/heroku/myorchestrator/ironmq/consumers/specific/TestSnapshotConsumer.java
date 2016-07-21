@@ -18,16 +18,20 @@ public class TestSnapshotConsumer extends RouteBuilder {
         from(consumeQueueUri("test_snapshot", 60))
                 .filter(simple("${exchangeProperty.CamelBatchComplete}"))
                 .process((Exchange exchange) -> {
-                    Document document
-                            = new Document().append("foo", "bar");
-                    document.append("minute_three",
-                            Math.round(Integer.parseInt(
-                                    new SimpleDateFormat("mm")
-                                    .format(new Date())) / 3));
-                    new SnapshotUtil(exchange, "foo")
+                    Document document = new Document();
+                    doSnapshot(document);
+                    new SnapshotUtil(exchange)
                             .saveDocument(document)
                             .updateMessage(document);
                 })
                 .to(postQueueUri("test_diff"));
+    }
+
+    private void doSnapshot(Document document) {
+        document.append("foo", "bar")
+                .append("minute_three",
+                        Math.round(Integer.parseInt(
+                                new SimpleDateFormat("mm")
+                                .format(new Date())) / 3));
     }
 }

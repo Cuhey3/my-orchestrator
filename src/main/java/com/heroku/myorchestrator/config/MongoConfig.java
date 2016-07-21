@@ -14,8 +14,8 @@ public class MongoConfig {
 
     private static Map mongoSettings;
 
-    public static MongoClientURI getMongoClientURI(String kind) {
-        return new MongoClientURI((String) mongoSettings.get(kind));
+    public static MongoClientURI getMongoClientURI(String type) {
+        return new MongoClientURI((String) mongoSettings.get(type));
     }
 
     private String ownMongodbUri;

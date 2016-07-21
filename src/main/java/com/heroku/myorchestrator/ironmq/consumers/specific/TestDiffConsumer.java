@@ -1,10 +1,10 @@
 package com.heroku.myorchestrator.ironmq.consumers.specific;
 
+import com.heroku.myorchestrator.util.DiffUtil;
 import static com.heroku.myorchestrator.util.IronmqUtil.consumeQueueUri;
 import static com.heroku.myorchestrator.util.IronmqUtil.postQueueUri;
-import com.heroku.myorchestrator.util.MessageUtil;
-import com.heroku.myorchestrator.util.MongoUtil;
-import java.util.Map;
+import com.heroku.myorchestrator.util.MasterUtil;
+import com.heroku.myorchestrator.util.SnapshotUtil;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.camel.Exchange;
@@ -20,32 +20,34 @@ public class TestDiffConsumer extends RouteBuilder {
         from(consumeQueueUri("test_diff", 60))
                 .filter(simple("${exchangeProperty.CamelBatchComplete}"))
                 .filter((Exchange exchange) -> {
-                    MessageUtil messageUtil = new MessageUtil(exchange);
-                    Map body = messageUtil.getMessage();
-                    MongoUtil mongoUtil
-                            = new MongoUtil(exchange).collection("foo");
-                    Document snapshot
-                            = mongoUtil.kind("snapshot")
-                            .findById(body).orElse(new Document());
-                    Document master
-                            = mongoUtil.kind("master")
-                            .findLatest().orElse(new Document());
-                    if (snapshot.isEmpty()) {
+                    try {
+                        Optional<Document> snapshotOptional
+                                = new SnapshotUtil(exchange).loadDocument();
+                        Optional<Document> masterOptional
+                                = new MasterUtil(exchange).loadLatestDocument();
+                        if (!snapshotOptional.isPresent()) {
+                            return false;
+                        }
+                        if (!masterOptional.isPresent()) {
+                            masterIsEmptyLogic();
+                            //return false;
+                        }
+                        Document snapshot = snapshotOptional.orElse(new Document());
+                        Document master = masterOptional.orElse(new Document());
+                        //messageUtil.writeObjectId("compared_master_id", master);
+                        Document diff = compareLogic(master, snapshot).get();
+                        if (diff == null) {
+                            System.out.println("not updated...");
+                            return false;
+                        } else {
+                            new DiffUtil(exchange)
+                                    .saveDocument(diff)
+                                    .updateMessage(diff);
+                            return true;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                         return false;
-                    }
-                    if (master.isEmpty()) {
-                        masterIsEmptyLogic();
-                        //return false;
-                    }
-                    //messageUtil.writeObjectId("compared_master_id", master);
-                    Document diff = compareLogic(master, snapshot).get();
-                    if (diff == null) {
-                        System.out.println("not updated...");
-                        return false;
-                    } else {
-                        mongoUtil.kind("diff").insertOne(diff);
-                        messageUtil.writeObjectId("diff_id", diff);
-                        return true;
                     }
                 })
                 .to(postQueueUri("test_complete"));

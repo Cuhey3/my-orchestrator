@@ -16,12 +16,12 @@ public class IronmqUtil {
                 queue, IRONMQ_CLIENT_BEAN_NAME, timeout);
     }
 
-    public static String consumeQueueUri(String kind, String collectionKind, int timeout) {
+    public static String consumeQueueUri(String type, String kind, int timeout) {
         return String.format("ironmq:%s"
                 + "?client=%s"
                 + "&timeout=%s"
                 + "&maxMessagesPerPoll=100",
-                kind + "_" + collectionKind, IRONMQ_CLIENT_BEAN_NAME, timeout);
+                type + "_" + kind, IRONMQ_CLIENT_BEAN_NAME, timeout);
     }
 
     public static String postQueueUri(String queue) {
@@ -29,9 +29,9 @@ public class IronmqUtil {
                 queue, IRONMQ_CLIENT_BEAN_NAME);
     }
 
-    public static String postQueueUri(String kind, String collectionKind) {
+    public static String postQueueUri(String type, String kind) {
         return String.format("ironmq:%s?client=%s",
-                kind + "_" + collectionKind, IRONMQ_CLIENT_BEAN_NAME);
+                type + "_" + kind, IRONMQ_CLIENT_BEAN_NAME);
     }
 
     public static Expression defaultPostQueueUri() {
