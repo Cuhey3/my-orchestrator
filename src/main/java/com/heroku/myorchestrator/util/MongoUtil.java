@@ -2,6 +2,7 @@ package com.heroku.myorchestrator.util;
 
 import com.heroku.myorchestrator.config.MongoConfig;
 import com.heroku.myorchestrator.config.enumerate.ActionType;
+import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.exceptions.MongoUtilTypeNotSetException;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
@@ -28,6 +29,11 @@ public class MongoUtil {
     public MongoUtil(Exchange exchange) {
         this.registry = exchange.getContext().getRegistry();
         this.kind = MessageUtil.getKind(exchange);
+    }
+
+    public MongoUtil(Exchange exchange, Kind kind) {
+        this.registry = exchange.getContext().getRegistry();
+        this.kind = kind.expression();
     }
 
     public MongoUtil type(String type) {
