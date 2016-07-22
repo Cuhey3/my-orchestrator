@@ -7,6 +7,10 @@ import org.bson.Document;
 
 public abstract class SnapshotRouteBuilder extends ConsumerRouteBuilder {
 
+    public SnapshotRouteBuilder() {
+        routeUtil.snapshot();
+    }
+
     @Override
     public void configure() throws Exception {
         from(ironmqUtil.snapshot().consumeUri())
