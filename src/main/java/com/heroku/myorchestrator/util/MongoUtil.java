@@ -40,6 +40,21 @@ public class MongoUtil {
         return this;
     }
 
+    public MongoUtil snapshot() {
+        this.type = ActionType.SNAPSHOT.expression();
+        return this;
+    }
+
+    public MongoUtil diff() {
+        this.type = ActionType.DIFF.expression();
+        return this;
+    }
+
+    public MongoUtil master() {
+        this.type = ActionType.MASTER.expression();
+        return this;
+    }
+
     public MongoCollection<Document> getCollection() throws Exception {
         if (this.type == null) {
             throw new MongoUtilTypeNotSetException();
@@ -80,6 +95,14 @@ public class MongoUtil {
         return document.get("_id", ObjectId.class).toHexString();
     }
 
+    public String replaceOne(Document document) throws Exception {
+        document.append("creationDate", new Date());
+        this.getCollection()
+                .replaceOne(new Document()
+                        .append("_id", document.get("_id")), document);
+        return document.get("_id", ObjectId.class).toHexString();
+    }
+
     private String getCollectionName() {
         return type + "_" + kind;
     }
@@ -91,5 +114,8 @@ public class MongoUtil {
         } else {
             return Optional.empty();
         }
+    }
+
+    public void disableDocument() {
     }
 }

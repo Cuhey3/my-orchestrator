@@ -22,7 +22,7 @@ public class JsonResourceUtil {
                             new InputStreamReader(resourceAsStream, "UTF-8"));
             map = new Gson().fromJson(reader, Map.class);
         } catch (NullPointerException e) {
-            System.out.println("resource: " + path + " is not find.");
+            System.out.println("resource: " + path + " is not found.");
         }
     }
 

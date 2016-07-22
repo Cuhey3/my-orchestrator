@@ -1,6 +1,13 @@
 package com.heroku.myorchestrator.consumers.common;
 
+import com.heroku.myorchestrator.config.enumerate.SenseType;
 import com.heroku.myorchestrator.consumers.ConsumerRouteBuilder;
+import com.heroku.myorchestrator.util.MessageUtil;
+import com.heroku.myorchestrator.util.MongoUtil;
+import java.util.Optional;
+import org.apache.camel.Exchange;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,40 +21,89 @@ public class CompletionConsumer extends ConsumerRouteBuilder {
     public void configure() throws Exception {
         from(ironmqUtil.completion().consumeUri())
                 .routeId(routeUtil.id())
-                /*.process((Exchange exchange) -> {
-                    Map body = exchange.getIn().getBody(Map.class);
-                    String messageType = (String) body.get("message_type");
-                    String comparedMasterId = (String) body.get("compared_master_id");
-                    String snapshotId = (String) body.get("snapshot_id");
-                    String diffId = (String) body.get("diff_id");
-                    if (masterIsValid(messageType, comparedMasterId)
-                            && snapshotSaveToMaster(messageType, snapshotId)
-                            && saveDiff(messageType, diffId)) {
-                        pushChanging(messageType);
-                    } else {
-                        cleanUpDiff(messageType);
+                .filter((Exchange exchange) -> {
+                    MongoUtil mongoUtil = new MongoUtil(exchange);
+                    MessageUtil messageUtil = new MessageUtil(exchange);
+                    try {
+                        if (masterIsEmpty(messageUtil)) {
+                            return snapshotSaveToMaster(exchange);
+                        } else if (masterIsValid(exchange)
+                                && snapshotSaveToMaster(exchange)
+                                && enableDiff(exchange)) {
+                            return true;
+                        } else {
+                            mongoUtil.disableDocument();
+                            return false;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        mongoUtil.disableDocument();
+                        return false;
                     }
-                })*/
+                })
                 .to(ironmqUtil.changed().postUri());
     }
 
-    public boolean masterIsValid(String messageType, String comparedMasterId) {
-        return true;
+    public boolean masterIsEmpty(MessageUtil messageUtil) {
+        String comparedMasterId = messageUtil.get("compared_master_id");
+        return comparedMasterId.equals(SenseType.EMPTY.expression());
     }
 
-    public boolean snapshotSaveToMaster(String messageType, String snapshotId) {
-        return true;
+    public boolean masterIsValid(Exchange exchange) throws Exception {
+        MessageUtil messageUtil = new MessageUtil(exchange);
+        MongoUtil mongoUtil = new MongoUtil(exchange);
+        String comparedMasterId = messageUtil.get("compared_master_id");
+        Optional<Document> findLatest = mongoUtil.master().findLatest();
+        if (findLatest.isPresent()) {
+            ObjectId objectId = findLatest.get().get("_id", ObjectId.class);
+            boolean equals = objectId.toHexString().equals(comparedMasterId);
+            if (equals) {
+                System.out.println("master is valid.");
+                return true;
+            } else {
+                System.out.println("master is not valid.");
+                return false;
+            }
+        } else {
+            System.out.println("master is not valid.");
+            return false;
+        }
     }
 
-    public boolean saveDiff(String messageType, String diffId) {
-        return true;
+    public boolean snapshotSaveToMaster(Exchange exchange) throws Exception {
+        MessageUtil messageUtil = new MessageUtil(exchange);
+        MongoUtil mongoUtil = new MongoUtil(exchange);
+        String snapshotId = messageUtil.get("snapshot_id");
+        Optional<Document> snapshotOptional
+                = mongoUtil.snapshot().findById(snapshotId);
+        if (snapshotOptional.isPresent()) {
+            String masterId
+                    = mongoUtil.master().insertOne(snapshotOptional.get());
+            messageUtil.updateMessage("master_id", masterId);
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public void cleanUpDiff(String messageType) {
-
-    }
-
-    public void pushChanging(String messageType) {
-
+    public boolean enableDiff(Exchange exchange) throws Exception {
+        MessageUtil messageUtil = new MessageUtil(exchange);
+        MongoUtil mongoUtil = new MongoUtil(exchange).diff();
+        String diffId = messageUtil.get("diff_id");
+        Optional<Document> findById = mongoUtil.findById(diffId);
+        if (findById.isPresent()) {
+            Document diff = findById.get();
+            if (diff.containsKey("enable")) {
+                System.out.println("diff is already enabled.");
+                return false;
+            } else {
+                diff.append("enable", true);
+                mongoUtil.replaceOne(diff);
+                return true;
+            }
+        } else {
+            System.out.println("diff is not found.");
+            return false;
+        }
     }
 }
