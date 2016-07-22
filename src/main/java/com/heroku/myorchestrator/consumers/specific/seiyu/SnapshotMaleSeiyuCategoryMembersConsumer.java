@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class SnapshotMaleSeiyuCategoryMembersConsumer extends SnapshotRouteBuilder {
 
     public SnapshotMaleSeiyuCategoryMembersConsumer() {
-        setKind(Kind.female_seiyu_category_members);
+        setKind(Kind.male_seiyu_category_members);
     }
 
     @Override
