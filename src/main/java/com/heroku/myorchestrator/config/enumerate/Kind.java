@@ -2,7 +2,9 @@ package com.heroku.myorchestrator.config.enumerate;
 
 public enum Kind {
 
-    foo, female_seiyu_category_members;
+    foo,
+    female_seiyu_category_members,
+    male_seiyu_category_members;
 
     private String timerUri;
 
