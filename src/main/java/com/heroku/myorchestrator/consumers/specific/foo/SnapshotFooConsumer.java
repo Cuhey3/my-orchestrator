@@ -4,6 +4,7 @@ import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import org.apache.camel.Exchange;
 import org.bson.Document;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +16,7 @@ public class SnapshotFooConsumer extends SnapshotRouteBuilder {
     }
 
     @Override
-    protected Document doSnapshot(Document document) throws Exception {
+    protected Document doSnapshot(Exchange exchange, Document document) throws Exception {
         document.append("foo", "bar")
                 .append("minute_three",
                         Math.round(Integer.parseInt(new SimpleDateFormat("mm")

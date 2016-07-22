@@ -22,13 +22,13 @@ public abstract class SnapshotRouteBuilder extends ConsumerRouteBuilder {
 
     protected Processor defaultProcessor() {
         return (Exchange exchange) -> {
-            Document document = doSnapshot(new Document());
+            Document document = doSnapshot(exchange, new Document());
             new SnapshotUtil(exchange)
                     .saveDocument(document)
                     .updateMessage(document);
         };
     }
 
-    protected abstract Document doSnapshot(Document document) throws Exception;
+    protected abstract Document doSnapshot(Exchange exchange, Document document) throws Exception;
 
 }

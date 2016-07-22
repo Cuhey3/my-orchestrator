@@ -5,6 +5,7 @@ import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
 import com.heroku.myorchestrator.util.content.MediawikiApiRequest;
 import java.util.List;
 import java.util.Map;
+import org.apache.camel.Exchange;
 import org.bson.Document;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,7 @@ public class SnapshotMaleSeiyuCategoryMembersConsumer extends SnapshotRouteBuild
     }
 
     @Override
-    protected Document doSnapshot(Document document) throws Exception {
+    protected Document doSnapshot(Exchange exchange, Document document) throws Exception {
         List<Map<String, Object>> mapList
                 = new MediawikiApiRequest()
                 .setApiParam("action=query&list=categorymembers"
