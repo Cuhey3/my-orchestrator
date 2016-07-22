@@ -1,7 +1,7 @@
-package com.heroku.myorchestrator.ironmq.consumers.specific;
+package com.heroku.myorchestrator.consumers.specific.foo;
 
 import com.heroku.myorchestrator.config.enumerate.Kind;
-import com.heroku.myorchestrator.ironmq.consumers.ConsumerRouteBuilder;
+import com.heroku.myorchestrator.consumers.ConsumerRouteBuilder;
 import com.heroku.myorchestrator.util.actions.DiffUtil;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.actions.SnapshotUtil;
@@ -12,9 +12,9 @@ import org.bson.Document;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TestDiffConsumer extends ConsumerRouteBuilder {
+public class DiffFooConsumer extends ConsumerRouteBuilder {
 
-    public TestDiffConsumer() {
+    public DiffFooConsumer() {
         setKind(Kind.foo);
         routeUtil.diff();
     }

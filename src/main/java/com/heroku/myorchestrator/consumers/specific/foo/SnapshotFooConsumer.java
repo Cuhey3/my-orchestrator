@@ -1,7 +1,7 @@
-package com.heroku.myorchestrator.ironmq.consumers.specific.snapshot;
+package com.heroku.myorchestrator.consumers.specific.foo;
 
-import com.heroku.myorchestrator.ironmq.consumers.SnapshotRouteBuilder;
 import com.heroku.myorchestrator.config.enumerate.Kind;
+import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.bson.Document;

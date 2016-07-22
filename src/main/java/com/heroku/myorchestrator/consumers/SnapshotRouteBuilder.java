@@ -1,4 +1,4 @@
-package com.heroku.myorchestrator.ironmq.consumers;
+package com.heroku.myorchestrator.consumers;
 
 import com.heroku.myorchestrator.util.actions.SnapshotUtil;
 import org.apache.camel.Exchange;

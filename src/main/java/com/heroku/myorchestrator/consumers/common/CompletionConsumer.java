@@ -1,6 +1,6 @@
-package com.heroku.myorchestrator.ironmq.consumers.common;
+package com.heroku.myorchestrator.consumers.common;
 
-import com.heroku.myorchestrator.ironmq.consumers.ConsumerRouteBuilder;
+import com.heroku.myorchestrator.consumers.ConsumerRouteBuilder;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -9,6 +9,18 @@ import org.apache.camel.Expression;
 public class IronmqUtil {
 
     private static final String IRONMQ_CLIENT_BEAN_NAME = "myironmq";
+
+    public static Expression defaultPostQueueUri() {
+        return new Expression() {
+            @Override
+            public <T> T evaluate(Exchange exchange, Class<T> type) {
+                Map body = exchange.getIn().getBody(Map.class);
+                return (T) String.format("ironmq:%s?client=%s",
+                        body.get("queue"), IRONMQ_CLIENT_BEAN_NAME);
+            }
+        };
+    }
+
     private String type;
     private String kind;
     private int timeout;
@@ -67,14 +79,4 @@ public class IronmqUtil {
                 type + "_" + kind, IRONMQ_CLIENT_BEAN_NAME);
     }
 
-    public static Expression defaultPostQueueUri() {
-        return new Expression() {
-            @Override
-            public <T> T evaluate(Exchange exchange, Class<T> type) {
-                Map body = exchange.getIn().getBody(Map.class);
-                return (T) String.format("ironmq:%s?client=%s",
-                        body.get("queue"), IRONMQ_CLIENT_BEAN_NAME);
-            }
-        };
-    }
 }

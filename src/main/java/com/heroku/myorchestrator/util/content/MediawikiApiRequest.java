@@ -82,8 +82,8 @@ public class MediawikiApiRequest {
         Document get
                 = Jsoup.connect(requestUrl).timeout(Integer.MAX_VALUE).get();
         HashSet<String> resultSet = new HashSet<>();
-        get.select(listName).select(mapName).stream().map((el) -> el.attr(attr))
-                .forEach(resultSet::add);
+        get.select(listName).select(mapName).stream()
+                .map((el) -> el.attr(attr)).forEach(resultSet::add);
         if (continueElementName != null) {
             while (true) {
                 Elements continueElements

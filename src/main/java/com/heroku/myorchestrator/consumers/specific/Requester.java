@@ -1,7 +1,7 @@
-package com.heroku.myorchestrator.ironmq.consumers.specific;
+package com.heroku.myorchestrator.consumers.specific;
 
 import com.heroku.myorchestrator.config.enumerate.Kind;
-import com.heroku.myorchestrator.ironmq.consumers.ConsumerRouteBuilder;
+import com.heroku.myorchestrator.consumers.ConsumerRouteBuilder;
 import com.heroku.myorchestrator.util.consumers.KindUtil;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Component;

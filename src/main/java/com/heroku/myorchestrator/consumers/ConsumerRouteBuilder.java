@@ -1,8 +1,8 @@
-package com.heroku.myorchestrator.ironmq.consumers;
+package com.heroku.myorchestrator.consumers;
 
 import com.heroku.myorchestrator.config.enumerate.Kind;
-import com.heroku.myorchestrator.util.consumers.RouteUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
+import com.heroku.myorchestrator.util.consumers.RouteUtil;
 import org.apache.camel.builder.RouteBuilder;
 
 public abstract class ConsumerRouteBuilder extends RouteBuilder {
