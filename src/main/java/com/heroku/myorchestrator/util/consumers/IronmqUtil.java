@@ -2,7 +2,6 @@ package com.heroku.myorchestrator.util.consumers;
 
 import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.config.enumerate.QueueType;
-import java.util.Map;
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
 
@@ -10,13 +9,16 @@ public class IronmqUtil {
 
     private static final String IRONMQ_CLIENT_BEAN_NAME = "myironmq";
 
-    public static Expression defaultPostQueueUri() {
+    public static Expression affectQueueUri() {
         return new Expression() {
             @Override
             public <T> T evaluate(Exchange exchange, Class<T> type) {
+                String kindString = exchange.getIn().getBody(String.class);
+                Kind kind = Kind.valueOf(kindString);
+                exchange.getIn()
+                        .setBody(new KindUtil().kind(kind).preMessage());
                 return (T) String.format("ironmq:%s?client=%s",
-                        exchange.getIn().getBody(Map.class).get("queue"),
-                        IRONMQ_CLIENT_BEAN_NAME);
+                        "snapshot_" + kindString, IRONMQ_CLIENT_BEAN_NAME);
             }
         };
     }
