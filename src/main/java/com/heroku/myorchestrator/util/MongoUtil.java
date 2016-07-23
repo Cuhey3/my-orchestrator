@@ -65,11 +65,9 @@ public class MongoUtil {
         if (this.type == null) {
             throw new MongoUtilTypeNotSetException();
         }
-        String collectionName = getCollectionName();
-        MongoClient client
-                = registry.lookupByNameAndType(type, MongoClient.class);
-        String databaseName = MongoConfig.getMongoClientURI(type).getDatabase();
-        return client.getDatabase(databaseName).getCollection(collectionName);
+        return registry.lookupByNameAndType(type, MongoClient.class)
+                .getDatabase(MongoConfig.getMongoClientURI(type).getDatabase())
+                .getCollection(getCollectionName());
     }
 
     public Optional<Document> findFirst() throws Exception {
@@ -84,15 +82,13 @@ public class MongoUtil {
     }
 
     public Optional<Document> findById(String objectIdHexString) throws Exception {
-        ObjectId objectId = new ObjectId(objectIdHexString);
-        MongoCollection<Document> collection = this.getCollection();
-        Document query = new Document().append("_id", objectId);
-        return getNextDocument(collection.find(query));
+        Document query = new Document()
+                .append("_id", new ObjectId(objectIdHexString));
+        return getNextDocument(this.getCollection().find(query));
     }
 
     public Optional<Document> findById(Map map) throws Exception {
-        String objectIdHexString = (String) map.get(type + "_id");
-        return this.findById(objectIdHexString);
+        return this.findById((String) map.get(type + "_id"));
     }
 
     public String insertOne(Document document) throws Exception {
@@ -103,9 +99,8 @@ public class MongoUtil {
 
     public String replaceOne(Document document) throws Exception {
         document.append("creationDate", new Date());
-        this.getCollection()
-                .replaceOne(new Document()
-                        .append("_id", document.get("_id")), document);
+        this.getCollection().replaceOne(new Document()
+                .append("_id", document.get("_id")), document);
         return document.get("_id", ObjectId.class).toHexString();
     }
 

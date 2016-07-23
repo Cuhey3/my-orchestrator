@@ -16,9 +16,9 @@ public class InromqConfig {
     Client getIronmqClient() throws UnsupportedEncodingException, IOException {
         try {
             SettingUtil settingUtil = new SettingUtil(Paths.IRON);
-            String projectId
-                    = settingUtil.get("IRON_MQ_PROJECT_ID", "project_id");
-            String token = settingUtil.get("IRON_MQ_TOKEN", "token");
+            String projectId, token;
+            projectId = settingUtil.get("IRON_MQ_PROJECT_ID", "project_id");
+            token = settingUtil.get("IRON_MQ_TOKEN", "token");
             return new Client(projectId, token, Cloud.ironAWSUSEast);
         } catch (Throwable e) {
             e.printStackTrace();

@@ -6,8 +6,7 @@ import org.apache.camel.builder.SimpleBuilder;
 
 public class RouteUtil {
 
-    private String type;
-    private String kind;
+    private String type, kind;
 
     public RouteUtil type(ActionType type) {
         this.type = type.expression();

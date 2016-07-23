@@ -3,6 +3,7 @@ package com.heroku.myorchestrator.consumers.specific.seiyu;
 import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
 import com.heroku.myorchestrator.util.MongoUtil;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.apache.camel.Exchange;
@@ -18,15 +19,18 @@ public class SnapshotSeiyuCategoryMembersConsumer extends SnapshotRouteBuilder {
 
     @Override
     protected Document doSnapshot(Exchange exchange, Document document) throws Exception {
-        Optional<Document> femaleSeiyuOptional
-                = new MongoUtil(exchange, Kind.female_seiyu_category_members).master().findLatest();
-        Optional<Document> maleSeiyuOptional
-                = new MongoUtil(exchange, Kind.male_seiyu_category_members).master().findLatest();
-        if (femaleSeiyuOptional.isPresent() && maleSeiyuOptional.isPresent()) {
-            List femaleSeiyuList = femaleSeiyuOptional.get().get("data", List.class);
-            List maleSeiyuList = maleSeiyuOptional.get().get("data", List.class);
-            femaleSeiyuList.addAll(maleSeiyuList);
-            document.append("data", femaleSeiyuList);
+        Optional<Document> optFemaleSeiyu, optMaleSeiyu;
+        optFemaleSeiyu
+                = new MongoUtil(exchange, Kind.female_seiyu_category_members)
+                .master().findLatest();
+        optMaleSeiyu
+                = new MongoUtil(exchange, Kind.male_seiyu_category_members)
+                .master().findLatest();
+        if (optFemaleSeiyu.isPresent() && optMaleSeiyu.isPresent()) {
+            List result = new ArrayList<>();
+            result.addAll(optFemaleSeiyu.get().get("data", List.class));
+            result.addAll(optMaleSeiyu.get().get("data", List.class));
+            document.append("data", result);
         }
         return document;
     }

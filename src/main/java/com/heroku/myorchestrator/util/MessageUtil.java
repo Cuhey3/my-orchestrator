@@ -37,27 +37,22 @@ public class MessageUtil {
     }
 
     public void writeObjectId(String key, Document document) {
-        String objectIdHexString = MongoUtil.getObjectIdHexString(document);
-        updateMessage(key, objectIdHexString);
+        updateMessage(key, MongoUtil.getObjectIdHexString(document));
     }
 
     public static void writeObjectId(Exchange exchange, String key, Document document) {
-        String objectIdHexString = MongoUtil.getObjectIdHexString(document);
-        updateMessage(exchange, key, objectIdHexString);
+        updateMessage(exchange, key, MongoUtil.getObjectIdHexString(document));
     }
 
     public static <T> T get(Exchange exchange, String key, Class<T> clazz) {
-        Map message = MessageUtil.getMessage(exchange);
-        return (T) message.get(key);
+        return (T) MessageUtil.getMessage(exchange).get(key);
     }
 
     public <T> T get(String key, Class<T> clazz) {
-        Map message = getMessage();
-        return (T) message.get(key);
+        return (T) getMessage().get(key);
     }
 
     public String get(String key) {
-        Map message = getMessage();
-        return (String) message.get(key);
+        return (String) getMessage().get(key);
     }
 }

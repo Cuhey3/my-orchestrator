@@ -17,7 +17,8 @@ public class MyConverters implements TypeConverters {
 
     @Converter
     public Client toClient(String beanName) {
-        return context.getRegistry().lookupByNameAndType(beanName, Client.class);
+        return context.getRegistry()
+                .lookupByNameAndType(beanName, Client.class);
     }
 
     @Converter

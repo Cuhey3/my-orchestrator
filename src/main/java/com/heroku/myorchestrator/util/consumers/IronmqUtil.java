@@ -14,15 +14,14 @@ public class IronmqUtil {
         return new Expression() {
             @Override
             public <T> T evaluate(Exchange exchange, Class<T> type) {
-                Map body = exchange.getIn().getBody(Map.class);
                 return (T) String.format("ironmq:%s?client=%s",
-                        body.get("queue"), IRONMQ_CLIENT_BEAN_NAME);
+                        exchange.getIn().getBody(Map.class).get("queue"),
+                        IRONMQ_CLIENT_BEAN_NAME);
             }
         };
     }
 
-    private String type;
-    private String kind;
+    private String type, kind;
     private int timeout;
 
     public IronmqUtil() {

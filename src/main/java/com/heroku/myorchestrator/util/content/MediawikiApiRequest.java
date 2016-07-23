@@ -16,11 +16,8 @@ import org.jsoup.select.Elements;
 public class MediawikiApiRequest {
 
     private final String apiUrl = "https://ja.wikipedia.org/w/api.php";
-    private String apiParam;
-    private String listName;
-    private String mapName;
+    private String apiParam, listName, mapName, continueElementName;
     private final List<String> ignoreFieldNameList = new ArrayList<>();
-    private String continueElementName;
 
     public MediawikiApiRequest setApiParam(String apiParam) {
         this.apiParam = apiParam;
