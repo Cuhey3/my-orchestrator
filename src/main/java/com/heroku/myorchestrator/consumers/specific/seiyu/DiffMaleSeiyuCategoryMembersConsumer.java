@@ -5,6 +5,7 @@ import com.heroku.myorchestrator.consumers.DiffRouteBuilder;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.bson.Document;
 import org.springframework.stereotype.Component;
@@ -29,18 +30,24 @@ public class DiffMaleSeiyuCategoryMembersConsumer extends DiffRouteBuilder {
     }
 
     public Optional<Document> foo(Document master, Document snapshot) {
-        List<Map<String, String>> prev = master.get("data", List.class);
-        List<Map<String, String>> next = snapshot.get("data", List.class);
+        List<Map<String, String>> prev, next, collect;
+        prev = master.get("data", List.class);
+        next = snapshot.get("data", List.class);
         prev.forEach((map) -> map.put("type", "remove"));
         next.forEach((map) -> map.put("type", "add"));
-        List<Map<String, String>> collect = prev.stream().filter((map1) -> {
-            final String map1Title = map1.get("title");
-            return !next.stream().anyMatch((map2) -> map2.get("title").equals(map1Title));
-        }).collect(Collectors.toList());
-        next.stream().filter((map2) -> {
-            final String map2Title = map2.get("title");
-            return !prev.stream().anyMatch((map1) -> map1.get("title").equals(map2Title));
-        }).forEach(collect::add);
+        Set<String> prevTitleSet, nextTitleSet;
+        prevTitleSet = prev.stream()
+                .map((Map<String, String> map) -> map.get("title"))
+                .collect(Collectors.toSet());
+        nextTitleSet = next.stream()
+                .map((Map<String, String> map) -> map.get("title"))
+                .collect(Collectors.toSet());
+        collect = prev.stream()
+                .filter((map) -> !nextTitleSet.contains(map.get("title")))
+                .collect(Collectors.toList());
+        next.stream()
+                .filter((map) -> !prevTitleSet.contains(map.get("title")))
+                .forEach(collect::add);
         if (collect.size() > 0) {
             Document document = new Document();
             document.append("diff", collect);
