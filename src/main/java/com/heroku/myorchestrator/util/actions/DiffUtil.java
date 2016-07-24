@@ -1,9 +1,11 @@
 package com.heroku.myorchestrator.util.actions;
 
 import com.heroku.myorchestrator.config.enumerate.ActionType;
+import com.heroku.myorchestrator.util.MongoUtil;
 import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 public class DiffUtil extends ActionUtil {
 
@@ -20,8 +22,11 @@ public class DiffUtil extends ActionUtil {
                 System.out.println("diff is already enabled.");
                 return false;
             } else {
-                diff.append("enable", true);
-                this.replaceOne(diff);
+                ObjectId objectId
+                        = new ObjectId(MongoUtil.getObjectIdHexString(diff));
+                this.collection().updateOne(
+                        new Document().append("_id", objectId),
+                        new Document().append("enable", true));
                 return true;
             }
         } else {
