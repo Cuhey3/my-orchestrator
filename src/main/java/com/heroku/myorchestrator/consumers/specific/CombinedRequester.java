@@ -8,18 +8,19 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CombinedRequester extends ConsumerRouteBuilder {
-
+    
     public CombinedRequester() {
-        ironmq().snapshot().kind(Kind.seiyu_category_members);
+        kind(Kind.seiyu_category_members);
+        ironmq().snapshot();
     }
-
+    
     @Override
     public void configure() throws Exception {
         from("timer:initialize_seiyu_category_members?repeatCount=1")
                 .filter((Exchange exchange) -> {
                     boolean flag;
                     try {
-                        flag = !new MasterUtil(exchange)
+                        flag = !new MasterUtil(exchange).kind(kind)
                                 .findLatest().isPresent();
                     } catch (Exception e) {
                         flag = true;
