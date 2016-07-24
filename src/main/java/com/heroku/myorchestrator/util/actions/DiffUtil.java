@@ -16,7 +16,7 @@ public class DiffUtil extends ActionUtil {
         Optional<Document> findById = loadDocument();
         if (findById.isPresent()) {
             Document diff = findById.get();
-            if (diff.containsKey("enable")) {
+            if (!diff.get("enable", boolean.class)) {
                 System.out.println("diff is already enabled.");
                 return false;
             } else {

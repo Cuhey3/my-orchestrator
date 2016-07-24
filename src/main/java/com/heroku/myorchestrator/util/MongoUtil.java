@@ -92,7 +92,6 @@ public class MongoUtil {
     }
 
     public String replaceOne(Document document) throws Exception {
-        document.append("creationDate", new Date());
         collection().replaceOne(new Document()
                 .append("_id", document.get("_id")), document);
         return getObjectIdHexString(document);
