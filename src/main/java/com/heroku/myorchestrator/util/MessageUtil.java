@@ -13,7 +13,12 @@ public class MessageUtil {
     }
 
     public static String getKind(Exchange ex) {
-        return (String) getMessage(ex).get("kind");
+        Map message = getMessage(ex);
+        if (message == null || !message.containsKey("kind")) {
+            return null;
+        } else {
+            return (String) getMessage(ex).get("kind");
+        }
     }
 
     private final Exchange exchange;
@@ -61,8 +66,12 @@ public class MessageUtil {
     public static Predicate loadAffect() {
         return (Exchange ex) -> {
             List affect = MessageUtil.get(ex, "affect", List.class);
-            ex.getIn().setBody(affect);
-            return !affect.isEmpty();
+            if (affect == null) {
+                return false;
+            } else {
+                ex.getIn().setBody(affect);
+                return !affect.isEmpty();
+            }
         };
     }
 }

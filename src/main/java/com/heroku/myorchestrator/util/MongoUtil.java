@@ -28,7 +28,10 @@ public class MongoUtil {
 
     public MongoUtil(Exchange exchange) {
         this.registry = exchange.getContext().getRegistry();
-        this.kind = Kind.valueOf(MessageUtil.getKind(exchange));
+        String kindString = MessageUtil.getKind(exchange);
+        if (kindString != null) {
+            this.kind = Kind.valueOf(kindString);
+        }
     }
 
     public final MongoUtil type(ActionType type) {
