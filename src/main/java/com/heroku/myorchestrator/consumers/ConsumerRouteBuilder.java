@@ -8,12 +8,28 @@ import org.apache.camel.builder.RouteBuilder;
 public abstract class ConsumerRouteBuilder extends RouteBuilder {
 
     protected Kind kind;
-    protected IronmqUtil ironmqUtil = new IronmqUtil();
-    protected RouteUtil routeUtil = new RouteUtil();
+    private IronmqUtil ironmqUtil;
+    //do not let have mongoUtil
+    // protected MongoUtil mongoUtil;
+    private RouteUtil routeUtil;
 
-    public final void setKind(Kind kind) {
+    public final void kind(Kind kind) {
         this.kind = kind;
-        ironmqUtil.kind(kind);
-        routeUtil.kind(kind);
+        ironmq().kind(kind);
+        route().kind(kind);
+    }
+
+    public final IronmqUtil ironmq() {
+        if (ironmqUtil == null) {
+            ironmqUtil = new IronmqUtil();
+        }
+        return ironmqUtil;
+    }
+
+    public final RouteUtil route() {
+        if (routeUtil == null) {
+            routeUtil = new RouteUtil();
+        }
+        return routeUtil;
     }
 }

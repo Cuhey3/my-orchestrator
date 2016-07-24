@@ -11,27 +11,26 @@ import java.util.Objects;
 import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.bson.Document;
-import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class DiffFooConsumer extends ConsumerRouteBuilder {
 
     public DiffFooConsumer() {
-        setKind(Kind.foo);
-        routeUtil.diff();
+        kind(Kind.foo);
+        route().diff();
     }
 
     @Override
     public void configure() throws Exception {
-        from(ironmqUtil.diff().consumeUri())
-                .routeId(routeUtil.id())
-                .filter(routeUtil.camelBatchComplete())
+        from(ironmq().diff().consumeUri())
+                .routeId(route().id())
+                .filter(route().camelBatchComplete())
                 .filter((Exchange exchange) -> {
                     try {
                         Optional<Document> snapshotOptional
                                 = new SnapshotUtil(exchange).loadDocument();
                         Optional<Document> masterOptional
-                                = new MasterUtil(exchange).loadLatestDocument();
+                                = new MasterUtil(exchange).findLatest();
                         if (!snapshotOptional.isPresent()) {
                             return false;
                         }
@@ -52,7 +51,7 @@ public class DiffFooConsumer extends ConsumerRouteBuilder {
                             MessageUtil.writeObjectId(exchange,
                                     "compared_master_id", master);
                             new DiffUtil(exchange)
-                                    .saveDocument(diff)
+                                    .insert(diff)
                                     .updateMessage(diff);
                             return true;
                         }
@@ -61,7 +60,7 @@ public class DiffFooConsumer extends ConsumerRouteBuilder {
                         return false;
                     }
                 })
-                .to(ironmqUtil.completion().postUri());
+                .to(ironmq().completion().postUri());
     }
 
     public void masterIsEmptyLogic(Exchange exchange) {

@@ -1,5 +1,6 @@
 package com.heroku.myorchestrator.config;
 
+import com.heroku.myorchestrator.config.enumerate.ActionType;
 import com.heroku.myorchestrator.config.enumerate.Paths;
 import com.heroku.myorchestrator.util.SettingUtil;
 import com.mongodb.MongoClient;
@@ -14,8 +15,9 @@ public class MongoConfig {
 
     private static Map mongoSettings;
 
-    public static MongoClientURI getMongoClientURI(String type) {
-        return new MongoClientURI((String) mongoSettings.get(type));
+    public static MongoClientURI getMongoClientURI(ActionType type) {
+        return new MongoClientURI(
+                (String) mongoSettings.get(type.expression()));
     }
 
     private String ownMongodbUri;
@@ -45,16 +47,16 @@ public class MongoConfig {
 
     @Bean(name = "master")
     public MongoClient getMongoClientMaster() {
-        return new MongoClient(getMongoClientURI("master"));
+        return new MongoClient(getMongoClientURI(ActionType.MASTER));
     }
 
     @Bean(name = "snapshot")
     public MongoClient getMongoClientSnapshot() {
-        return new MongoClient(getMongoClientURI("snapshot"));
+        return new MongoClient(getMongoClientURI(ActionType.SNAPSHOT));
     }
 
     @Bean(name = "diff")
     public MongoClient getMongoClientDiff() {
-        return new MongoClient(getMongoClientURI("diff"));
+        return new MongoClient(getMongoClientURI(ActionType.DIFF));
     }
 }

@@ -7,14 +7,13 @@ import java.io.InputStreamReader;
 import java.util.stream.Collectors;
 
 public class KindUtil {
-    
-    private Kind kind;
-    
-    public KindUtil kind(Kind kind) {
+
+    private final Kind kind;
+
+    public KindUtil(Kind kind) {
         this.kind = kind;
-        return this;
     }
-    
+
     public String preMessage() {
         InputStream resourceAsStream = ClassLoader.class
                 .getResourceAsStream("/message/" + kind.expression() + ".json");

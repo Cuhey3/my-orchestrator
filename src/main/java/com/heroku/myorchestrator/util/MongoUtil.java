@@ -23,92 +23,90 @@ public class MongoUtil {
     }
 
     private final Registry registry;
-    private String type;
-    private final String kind;
+    protected ActionType type;
+    protected Kind kind;
 
     public MongoUtil(Exchange exchange) {
         this.registry = exchange.getContext().getRegistry();
-        this.kind = MessageUtil.getKind(exchange);
+        this.kind = Kind.valueOf(MessageUtil.getKind(exchange));
     }
 
-    public MongoUtil(Exchange exchange, Kind kind) {
-        this.registry = exchange.getContext().getRegistry();
-        this.kind = kind.expression();
-    }
-
-    public MongoUtil type(String type) {
+    public final MongoUtil type(ActionType type) {
         this.type = type;
         return this;
     }
 
-    public MongoUtil type(ActionType type) {
-        this.type = type.expression();
+    public final MongoUtil kind(Kind kind) {
+        this.kind = kind;
         return this;
     }
 
     public MongoUtil snapshot() {
-        this.type = ActionType.SNAPSHOT.expression();
+        this.type = ActionType.SNAPSHOT;
         return this;
     }
 
     public MongoUtil diff() {
-        this.type = ActionType.DIFF.expression();
+        this.type = ActionType.DIFF;
         return this;
     }
 
     public MongoUtil master() {
-        this.type = ActionType.MASTER.expression();
+        this.type = ActionType.MASTER;
         return this;
     }
 
-    public MongoCollection<Document> getCollection() throws Exception {
+    public MongoCollection<Document> collection() throws Exception {
         if (this.type == null) {
             throw new MongoUtilTypeNotSetException();
         }
-        return registry.lookupByNameAndType(type, MongoClient.class)
+        return registry
+                .lookupByNameAndType(type.expression(), MongoClient.class)
                 .getDatabase(MongoConfig.getMongoClientURI(type).getDatabase())
-                .getCollection(getCollectionName());
+                .getCollection(collectionName());
     }
 
     public Optional<Document> findFirst() throws Exception {
-        FindIterable<Document> find = this.getCollection().find().limit(1);
-        return getNextDocument(find);
+        FindIterable<Document> find = collection().find().limit(1);
+        return nextDocument(find);
     }
 
     public Optional<Document> findLatest() throws Exception {
-        FindIterable<Document> find = this.getCollection()
-                .find().sort(new Document("creationDate", -1)).limit(1);
-        return getNextDocument(find);
+        return nextDocument(collection().find()
+                .sort(new Document("creationDate", -1)).limit(1));
     }
 
     public Optional<Document> findById(String objectIdHexString) throws Exception {
-        Document query = new Document()
-                .append("_id", new ObjectId(objectIdHexString));
-        return getNextDocument(this.getCollection().find(query));
+        return nextDocument(collection().find(new Document()
+                .append("_id", new ObjectId(objectIdHexString))));
     }
 
     public Optional<Document> findById(Map map) throws Exception {
-        return this.findById((String) map.get(type + "_id"));
+        return findById((String) map.get(typeIdKey()));
     }
 
     public String insertOne(Document document) throws Exception {
         document.append("creationDate", new Date());
-        this.getCollection().insertOne(document);
-        return document.get("_id", ObjectId.class).toHexString();
+        collection().insertOne(document);
+        return getObjectIdHexString(document);
     }
 
     public String replaceOne(Document document) throws Exception {
         document.append("creationDate", new Date());
-        this.getCollection().replaceOne(new Document()
+        collection().replaceOne(new Document()
                 .append("_id", document.get("_id")), document);
-        return document.get("_id", ObjectId.class).toHexString();
+        return getObjectIdHexString(document);
     }
 
-    private String getCollectionName() {
-        return type + "_" + kind;
+    private String collectionName() {
+        return type.expression() + "_" + kind;
     }
 
-    private Optional<Document> getNextDocument(FindIterable<Document> iterable) {
+    private String typeIdKey() {
+        return type.expression() + "_id";
+    }
+
+    private Optional<Document> nextDocument(FindIterable<Document> iterable) {
         MongoCursor<Document> iterator = iterable.iterator();
         if (iterator.hasNext()) {
             return Optional.ofNullable(iterator.next());

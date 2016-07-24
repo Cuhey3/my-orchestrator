@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class SnapshotMaleSeiyuCategoryMembersConsumer extends SnapshotRouteBuilder {
 
     public SnapshotMaleSeiyuCategoryMembersConsumer() {
-        setKind(Kind.male_seiyu_category_members);
+        kind(Kind.male_seiyu_category_members);
     }
 
     @Override
@@ -21,7 +21,7 @@ public class SnapshotMaleSeiyuCategoryMembersConsumer extends SnapshotRouteBuild
         List<Map<String, Object>> mapList
                 = new MediawikiApiRequest()
                 .setApiParam("action=query&list=categorymembers"
-                        + "&cmtitle=Category:%E6%97%A5%E6%9C%AC%E3%81%AE%E5%A5%B3%E6%80%A7%E5%A3%B0%E5%84%AA"
+                        + "&cmtitle=Category:%E6%97%A5%E6%9C%AC%E3%81%AE%E7%94%B7%E6%80%A7%E5%A3%B0%E5%84%AA"
                         + "&cmlimit=500"
                         + "&cmnamespace=0"
                         + "&format=xml"

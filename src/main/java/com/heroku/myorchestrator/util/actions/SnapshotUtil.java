@@ -6,7 +6,7 @@ import org.apache.camel.Exchange;
 public class SnapshotUtil extends ActionUtil {
 
     public SnapshotUtil(Exchange exchange) {
-        this.exchange = exchange;
-        this.type = ActionType.SNAPSHOT;
+        super(exchange);
+        this.type(ActionType.SNAPSHOT);
     }
 }

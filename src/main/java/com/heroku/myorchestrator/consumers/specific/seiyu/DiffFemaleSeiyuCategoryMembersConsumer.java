@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 public class DiffFemaleSeiyuCategoryMembersConsumer extends DiffRouteBuilder {
 
     public DiffFemaleSeiyuCategoryMembersConsumer() {
-        setKind(Kind.female_seiyu_category_members);
+        kind(Kind.female_seiyu_category_members);
     }
 
     @Override

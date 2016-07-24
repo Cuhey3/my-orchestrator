@@ -6,13 +6,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.apache.camel.Exchange;
 import org.bson.Document;
-import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class SnapshotFooConsumer extends SnapshotRouteBuilder {
 
     public SnapshotFooConsumer() {
-        setKind(Kind.foo);
+        kind(Kind.foo);
     }
 
     @Override

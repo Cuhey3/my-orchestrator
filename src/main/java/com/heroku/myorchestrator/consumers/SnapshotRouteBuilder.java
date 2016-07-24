@@ -8,24 +8,22 @@ import org.bson.Document;
 public abstract class SnapshotRouteBuilder extends ConsumerRouteBuilder {
 
     public SnapshotRouteBuilder() {
-        routeUtil.snapshot();
+        route().snapshot();
     }
 
     @Override
     public void configure() throws Exception {
-        from(ironmqUtil.snapshot().consumeUri())
-                .routeId(routeUtil.id())
-                .filter(routeUtil.camelBatchComplete())
+        from(ironmq().snapshot().consumeUri())
+                .routeId(route().id())
+                .filter(route().camelBatchComplete())
                 .process(defaultProcessor())
-                .to(ironmqUtil.diff().postUri());
+                .to(ironmq().diff().postUri());
     }
 
     protected Processor defaultProcessor() {
         return (Exchange exchange) -> {
-            Document document = doSnapshot(exchange, new Document());
             new SnapshotUtil(exchange)
-                    .saveDocument(document)
-                    .updateMessage(document);
+                    .write(doSnapshot(exchange, new Document()));
         };
     }
 

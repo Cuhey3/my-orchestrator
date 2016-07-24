@@ -15,8 +15,7 @@ public class IronmqUtil {
             public <T> T evaluate(Exchange exchange, Class<T> type) {
                 String kindString = exchange.getIn().getBody(String.class);
                 Kind kind = Kind.valueOf(kindString);
-                exchange.getIn()
-                        .setBody(new KindUtil().kind(kind).preMessage());
+                exchange.getIn().setBody(new KindUtil(kind).preMessage());
                 return (T) String.format("ironmq:%s?client=%s",
                         "snapshot_" + kindString, IRONMQ_CLIENT_BEAN_NAME);
             }

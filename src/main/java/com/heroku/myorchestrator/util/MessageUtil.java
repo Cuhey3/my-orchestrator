@@ -1,7 +1,9 @@
 package com.heroku.myorchestrator.util;
 
+import java.util.List;
 import java.util.Map;
 import org.apache.camel.Exchange;
+import org.apache.camel.Predicate;
 import org.bson.Document;
 
 public class MessageUtil {
@@ -54,5 +56,13 @@ public class MessageUtil {
 
     public String get(String key) {
         return (String) getMessage().get(key);
+    }
+
+    public static Predicate loadAffect() {
+        return (Exchange ex) -> {
+            List affect = MessageUtil.get(ex, "affect", List.class);
+            ex.getIn().setBody(affect);
+            return !affect.isEmpty();
+        };
     }
 }
