@@ -1,6 +1,7 @@
 package com.heroku.myorchestrator.util.actions;
 
 import com.heroku.myorchestrator.config.enumerate.ActionType;
+import com.heroku.myorchestrator.util.MessageUtil;
 import com.heroku.myorchestrator.util.MongoUtil;
 import java.util.Optional;
 import org.apache.camel.Exchange;
@@ -15,23 +16,27 @@ public class DiffUtil extends ActionUtil {
     }
 
     public boolean enableDiff() throws Exception {
-        Optional<Document> findById = loadDocument();
-        if (findById.isPresent()) {
-            Document diff = findById.get();
-            if (!diff.get("enable", boolean.class)) {
-                System.out.println("diff is already enabled.");
-                return false;
+        if (diffIdIsValid()) {
+            Optional<Document> findById = loadDocument();
+            if (findById.isPresent()) {
+                Document diff = findById.get();
+                if (!diff.get("enable", boolean.class)) {
+                    System.out.println("diff is already enabled.");
+                    return false;
+                } else {
+                    ObjectId objectId
+                            = new ObjectId(MongoUtil.getObjectIdHexString(diff));
+                    this.collection().updateOne(
+                            new Document().append("_id", objectId),
+                            new Document().append("enable", true));
+                    return true;
+                }
             } else {
-                ObjectId objectId
-                        = new ObjectId(MongoUtil.getObjectIdHexString(diff));
-                this.collection().updateOne(
-                        new Document().append("_id", objectId),
-                        new Document().append("enable", true));
-                return true;
+                System.out.println("diff is not found.");
+                return false;
             }
         } else {
-            System.out.println("diff is not found.");
-            return false;
+            return true;
         }
     }
 
@@ -43,5 +48,9 @@ public class DiffUtil extends ActionUtil {
     public DiffUtil updateMessageComparedId(Document document) {
         message().writeObjectId("compared_master_id", document);
         return this;
+    }
+
+    public boolean diffIdIsValid() {
+        return MessageUtil.get(exchange, "diff_id", String.class) != null;
     }
 }

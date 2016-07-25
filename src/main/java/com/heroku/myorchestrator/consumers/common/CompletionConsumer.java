@@ -3,6 +3,8 @@ package com.heroku.myorchestrator.consumers.common;
 import com.heroku.myorchestrator.consumers.ConsumerRouteBuilder;
 import com.heroku.myorchestrator.util.actions.DiffUtil;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.camel.Exchange;
 import org.springframework.stereotype.Component;
 
@@ -17,22 +19,34 @@ public class CompletionConsumer extends ConsumerRouteBuilder {
     public void configure() throws Exception {
         from(ironmq().completion().consumeUri())
                 .routeId(route().id())
+                .choice()
+                .when((Exchange exchange) -> new MasterUtil(exchange).comparedIsEmpty())
+                .to("direct:snapshotSaveToMaster")
+                .otherwise()
                 .filter((Exchange exchange) -> {
-                    MasterUtil masterUtil = new MasterUtil(exchange);
                     try {
-                        if (masterUtil.comparedIsEmpty()) {
-                            return masterUtil.snapshotSaveToMaster();
-                        } else if (masterUtil.comparedIsValid()
-                                && masterUtil.snapshotSaveToMaster()
-                                && new DiffUtil(exchange).enableDiff()) {
-                            return true;
-                        } else {
-                            //new MongoUtil(exchange).disableDocument();
-                            return false;
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        //new MongoUtil(exchange).disableDocument();
+                        return new MasterUtil(exchange).comparedIsValid();
+                    } catch (Exception ex) {
+                        Logger.getLogger(CompletionConsumer.class.getName()).log(Level.SEVERE, null, ex);
+                        return false;
+                    }
+                })
+                .to("direct:snapshotSaveToMaster");
+
+        from("direct:snapshotSaveToMaster")
+                .filter((Exchange exchange) -> {
+                    try {
+                        return new MasterUtil(exchange).snapshotSaveToMaster();
+                    } catch (Exception ex) {
+                        Logger.getLogger(CompletionConsumer.class.getName()).log(Level.SEVERE, null, ex);
+                        return false;
+                    }
+                })
+                .filter((Exchange exchange) -> {
+                    try {
+                        return new DiffUtil(exchange).enableDiff();
+                    } catch (Exception ex) {
+                        Logger.getLogger(CompletionConsumer.class.getName()).log(Level.SEVERE, null, ex);
                         return false;
                     }
                 })

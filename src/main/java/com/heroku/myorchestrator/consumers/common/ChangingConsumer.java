@@ -20,5 +20,10 @@ public class ChangingConsumer extends ConsumerRouteBuilder {
                 .filter(MessageUtil.loadAffect())
                 .split().body()
                 .routingSlip(IronmqUtil.affectQueueUri());
+
+        from("direct:changing_consumer_test_0")
+                .filter(MessageUtil.loadAffect())
+                .split().body()
+                .to("mock:changing_consumer_test_1");
     }
 }
