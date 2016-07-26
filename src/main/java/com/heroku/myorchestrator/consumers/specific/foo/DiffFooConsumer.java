@@ -50,9 +50,7 @@ public class DiffFooConsumer extends ConsumerRouteBuilder {
                             Document diff = diffOptional.get();
                             MessageUtil.writeObjectId(exchange,
                                     "compared_master_id", master);
-                            new DiffUtil(exchange)
-                                    .insert(diff)
-                                    .updateMessage(diff);
+                            new DiffUtil(exchange).write(diff);
                             return true;
                         }
                     } catch (Exception e) {

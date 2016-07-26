@@ -21,18 +21,14 @@ public abstract class ActionUtil extends MongoUtil {
         return findById(message().getMessage());
     }
 
-    public ActionUtil insert(Document document) throws Exception {
-        this.insertOne(document);
-        return this;
-    }
-
     public ActionUtil updateMessage(Document document) {
         message().writeObjectId(type.expression() + "_id", document);
         return this;
     }
 
     public void write(Document document) throws Exception {
-        this.insert(document).updateMessage(document);
+        this.insertOne(document);
+        this.updateMessage(document);
     }
 
     public MessageUtil message() {

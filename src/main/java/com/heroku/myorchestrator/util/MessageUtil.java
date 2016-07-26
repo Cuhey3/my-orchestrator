@@ -20,6 +20,28 @@ public class MessageUtil {
             return (String) getMessage(ex).get("kind");
         }
     }
+    public static void updateMessage(Exchange exchange, String key, Object value) {
+        Map message = getMessage(exchange);
+        message.put(key, value);
+        exchange.getIn().setBody(message, String.class);
+    }
+    public static void writeObjectId(Exchange exchange, String key, Document document) {
+        updateMessage(exchange, key, MongoUtil.getObjectIdHexString(document));
+    }
+    public static <T> T get(Exchange exchange, String key, Class<T> clazz) {
+        return (T) MessageUtil.getMessage(exchange).get(key);
+    }
+    public static Predicate loadAffect() {
+        return (Exchange ex) -> {
+            List affect = MessageUtil.get(ex, "affect", List.class);
+            if (affect == null) {
+                return false;
+            } else {
+                ex.getIn().setBody(affect);
+                return !affect.isEmpty();
+            }
+        };
+    }
 
     private final Exchange exchange;
 
@@ -33,26 +55,12 @@ public class MessageUtil {
         exchange.getIn().setBody(message, String.class);
     }
 
-    public static void updateMessage(Exchange exchange, String key, Object value) {
-        Map message = getMessage(exchange);
-        message.put(key, value);
-        exchange.getIn().setBody(message, String.class);
-    }
-
     public Map getMessage() {
         return exchange.getIn().getBody(Map.class);
     }
 
     public void writeObjectId(String key, Document document) {
         updateMessage(key, MongoUtil.getObjectIdHexString(document));
-    }
-
-    public static void writeObjectId(Exchange exchange, String key, Document document) {
-        updateMessage(exchange, key, MongoUtil.getObjectIdHexString(document));
-    }
-
-    public static <T> T get(Exchange exchange, String key, Class<T> clazz) {
-        return (T) MessageUtil.getMessage(exchange).get(key);
     }
 
     public <T> T get(String key, Class<T> clazz) {
@@ -63,15 +71,4 @@ public class MessageUtil {
         return (String) getMessage().get(key);
     }
 
-    public static Predicate loadAffect() {
-        return (Exchange ex) -> {
-            List affect = MessageUtil.get(ex, "affect", List.class);
-            if (affect == null) {
-                return false;
-            } else {
-                ex.getIn().setBody(affect);
-                return !affect.isEmpty();
-            }
-        };
-    }
 }

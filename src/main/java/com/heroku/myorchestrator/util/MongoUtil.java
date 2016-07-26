@@ -24,6 +24,7 @@ public class MongoUtil {
 
     private final Registry registry;
     protected ActionType type;
+    protected ActionType useType;
     protected Kind kind;
 
     public MongoUtil(Exchange exchange) {
@@ -36,6 +37,11 @@ public class MongoUtil {
 
     public final MongoUtil type(ActionType type) {
         this.type = type;
+        return this;
+    }
+
+    public final MongoUtil useDummy() {
+        this.useType = ActionType.DUMMY;
         return this;
     }
 
@@ -60,12 +66,17 @@ public class MongoUtil {
     }
 
     public MongoCollection<Document> collection() throws Exception {
-        if (this.type == null) {
+        if (this.type == null && this.useType == null) {
             throw new MongoUtilTypeNotSetException();
         }
-        return registry
-                .lookupByNameAndType(type.expression(), MongoClient.class)
-                .getDatabase(MongoConfig.getMongoClientURI(type).getDatabase())
+        ActionType t;
+        if (this.useType != null) {
+            t = this.useType;
+        } else {
+            t = this.type;
+        }
+        return registry.lookupByNameAndType(t.expression(), MongoClient.class)
+                .getDatabase(MongoConfig.getMongoClientURI(t).getDatabase())
                 .getCollection(collectionName());
     }
 
