@@ -5,7 +5,8 @@ public enum Kind {
     foo,
     female_seiyu_category_members,
     male_seiyu_category_members,
-    seiyu_category_members;
+    seiyu_category_members,
+    test;
 
     private String timerUri;
 

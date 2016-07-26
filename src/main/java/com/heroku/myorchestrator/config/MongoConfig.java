@@ -31,6 +31,7 @@ public class MongoConfig {
                 mongoSettings = mongoClient.getDatabase(database)
                         .getCollection("settings").find().iterator().next()
                         .get("mongodb", Map.class);
+                mongoSettings.put("dummy", ownMongodbUri);
             }
         } catch (Throwable e) {
             e.printStackTrace();
@@ -38,11 +39,6 @@ public class MongoConfig {
                     + "\nSystem is shutting down.");
             System.exit(1);
         }
-    }
-
-    @Bean(name = "own")
-    public MongoClient getMongoClient() {
-        return new MongoClient(new MongoClientURI(ownMongodbUri));
     }
 
     @Bean(name = "master")
@@ -58,5 +54,10 @@ public class MongoConfig {
     @Bean(name = "diff")
     public MongoClient getMongoClientDiff() {
         return new MongoClient(getMongoClientURI(ActionType.DIFF));
+    }
+
+    @Bean(name = "dummy")
+    public MongoClient getMongoClientDummy() {
+        return new MongoClient(getMongoClientURI(ActionType.DUMMY));
     }
 }
