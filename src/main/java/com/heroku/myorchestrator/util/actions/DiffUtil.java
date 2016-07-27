@@ -13,22 +13,28 @@ public class DiffUtil extends ActionUtil {
         type(ActionType.DIFF);
     }
 
-    public boolean enableDiff() throws Exception {
-        if (diffIdIsValid()) {
-            Optional<Document> findById = loadDocument();
-            if (findById.isPresent()) {
-                Document diff = findById.get();
-                if (!diff.get("enable", Boolean.class)) {
-                    this.collection().updateOne(
-                            new Document("_id", diff.get("_id")),
-                            new Document("$set", new Document("enable", true)));
-                    return true;
+    public boolean enableDiff() {
+        try {
+            if (diffIdIsValid()) {
+                Optional<Document> findById = loadDocument();
+                if (findById.isPresent()) {
+                    Document diff = findById.get();
+                    if (!diff.get("enable", Boolean.class)) {
+                        Document query = new Document("_id", diff.get("_id"));
+                        Document updateDocument = new Document(
+                                "$set", new Document("enable", true));
+                        this.collection().updateOne(query, updateDocument);
+                        return true;
+                    }
                 }
+                return false;
+            } else {
+                return true;
             }
+        } catch (Exception e) {
             return false;
-        } else {
-            return true;
         }
+
     }
 
     public DiffUtil updateMessageComparedId(String id) {

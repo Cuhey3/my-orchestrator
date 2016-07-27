@@ -40,7 +40,7 @@ public class MongoUtil {
         return this;
     }
 
-    public final MongoUtil useDummy() {
+    public MongoUtil useDummy() {
         this.useType = ActionType.DUMMY;
         return this;
     }
@@ -100,7 +100,9 @@ public class MongoUtil {
     }
 
     public String insertOne(Document document) throws Exception {
-        document.append("creationDate", new Date());
+        if (!document.containsKey("creationDate")) {
+            document.append("creationDate", new Date());
+        }
         collection().insertOne(document);
         return getObjectIdHexString(document);
     }

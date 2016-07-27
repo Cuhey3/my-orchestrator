@@ -3,7 +3,6 @@ package com.heroku.myorchestrator.util.actions;
 import com.heroku.myorchestrator.config.enumerate.ActionType;
 import com.heroku.myorchestrator.config.enumerate.SenseType;
 import com.heroku.myorchestrator.util.MongoUtil;
-import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.bson.Document;
 
@@ -17,29 +16,32 @@ public class MasterUtil extends ActionUtil {
         snapshotUtil = new SnapshotUtil(exchange);
     }
 
+    @Override
+    public MasterUtil useDummy() {
+        super.useDummy();
+        this.snapshotUtil.useDummy();
+        return this;
+    }
+
     public boolean comparedIsEmpty() {
         return SenseType.EMPTY.expression()
                 .equals(message().get("compared_master_id"));
     }
 
-    public boolean comparedIsValid() throws Exception {
-        Optional<Document> latest = findLatest();
-        if (latest.isPresent()
-                && MongoUtil.getObjectIdHexString(latest.get())
-                .equals(message().get("compared_master_id"))) {
-            System.out.println("master is valid.");
-            return true;
+    public boolean comparedIsValid() {
+        try {
+            return MongoUtil.getObjectIdHexString(findLatest().get())
+                    .equals(message().get("compared_master_id"));
+        } catch (Exception ex) {
+            return false;
         }
-        System.out.println("master is not valid.");
-        return false;
     }
 
-    public boolean snapshotSaveToMaster() throws Exception {
-        Optional<Document> snapshotOptional = snapshotUtil.loadDocument();
-        if (snapshotOptional.isPresent()) {
-            this.writeDocument(snapshotOptional.get());
+    public boolean snapshotSaveToMaster() {
+        try {
+            this.writeDocument(snapshotUtil.loadDocument().get());
             return true;
-        } else {
+        } catch (Exception e) {
             return false;
         }
     }
