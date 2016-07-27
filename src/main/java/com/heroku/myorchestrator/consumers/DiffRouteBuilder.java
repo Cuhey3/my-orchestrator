@@ -48,7 +48,7 @@ public abstract class DiffRouteBuilder extends ConsumerRouteBuilder {
                 optDiff = calculateDiff(master, optSnapshot.get());
                 if (optDiff.isPresent()) {
                     new DiffUtil(exchange).updateMessageComparedId(master)
-                            .write(optDiff.get().append("enable", false));
+                            .writeDocument(optDiff.get());
                     return true;
                 } else {
                     return false;

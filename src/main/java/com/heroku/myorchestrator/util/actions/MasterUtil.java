@@ -37,7 +37,7 @@ public class MasterUtil extends ActionUtil {
     public boolean snapshotSaveToMaster() throws Exception {
         Optional<Document> snapshotOptional = snapshotUtil.loadDocument();
         if (snapshotOptional.isPresent()) {
-            this.write(snapshotOptional.get());
+            this.writeDocument(snapshotOptional.get());
             return true;
         } else {
             return false;

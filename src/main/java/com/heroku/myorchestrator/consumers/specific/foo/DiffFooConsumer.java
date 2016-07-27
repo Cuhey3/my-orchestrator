@@ -50,7 +50,7 @@ public class DiffFooConsumer extends ConsumerRouteBuilder {
                             Document diff = diffOptional.get();
                             MessageUtil.writeObjectId(exchange,
                                     "compared_master_id", master);
-                            new DiffUtil(exchange).write(diff);
+                            new DiffUtil(exchange).writeDocument(diff);
                             return true;
                         }
                     } catch (Exception e) {
@@ -74,8 +74,7 @@ public class DiffFooConsumer extends ConsumerRouteBuilder {
         if (!Objects.equals(master.get("minute_three", Integer.class),
                 snapshotMinuteThree)) {
             System.out.println("updated!" + snapshot);
-            Document diff = new Document()
-                    .append("newValue", snapshotMinuteThree);
+            Document diff = new Document("newValue", snapshotMinuteThree);
             return Optional.ofNullable(diff);
         } else {
             return Optional.empty();

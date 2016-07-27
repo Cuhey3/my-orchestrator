@@ -91,8 +91,8 @@ public class MongoUtil {
     }
 
     public Optional<Document> findById(String objectIdHexString) throws Exception {
-        return nextDocument(collection().find(new Document()
-                .append("_id", new ObjectId(objectIdHexString))));
+        return nextDocument(collection().find(
+                new Document("_id", new ObjectId(objectIdHexString))));
     }
 
     public Optional<Document> findById(Map map) throws Exception {
@@ -106,8 +106,8 @@ public class MongoUtil {
     }
 
     public String replaceOne(Document document) throws Exception {
-        collection().replaceOne(new Document()
-                .append("_id", document.get("_id")), document);
+        collection().replaceOne(
+                new Document("_id", document.get("_id")), document);
         return getObjectIdHexString(document);
     }
 

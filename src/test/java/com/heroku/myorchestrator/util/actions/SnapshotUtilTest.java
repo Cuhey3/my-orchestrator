@@ -1,14 +1,10 @@
 package com.heroku.myorchestrator.util.actions;
 
 import com.heroku.myorchestrator.App;
-import com.heroku.myorchestrator.config.enumerate.ActionType;
 import com.heroku.myorchestrator.config.enumerate.Kind;
-import com.heroku.myorchestrator.util.MongoUtil;
 import com.heroku.myorchestrator.util.consumers.KindUtil;
 import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.camel.CamelContext;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
@@ -45,7 +41,7 @@ public class SnapshotUtilTest extends RouteBuilder {
                 .process((Exchange exchange) -> {
                     SnapshotUtil util = new SnapshotUtil(exchange);
                     util.useDummy();
-                    util.write(new Document());
+                    util.writeDocument(new Document());
                 })
                 .to("mock:snapshot_util_test_1");
     }
@@ -79,7 +75,7 @@ public class SnapshotUtilTest extends RouteBuilder {
     }
 
     @Test
-    public void testLoadDocument() throws Exception {
+    public void testLoadSnapshotDocument() throws Exception {
         producer0.sendBody("");
         consumer1.message(0).body().in((Exchange exchange) -> {
             Map body = exchange.getIn().getBody(Map.class);

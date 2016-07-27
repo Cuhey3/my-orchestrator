@@ -2,11 +2,9 @@ package com.heroku.myorchestrator.util.actions;
 
 import com.heroku.myorchestrator.config.enumerate.ActionType;
 import com.heroku.myorchestrator.util.MessageUtil;
-import com.heroku.myorchestrator.util.MongoUtil;
 import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 
 public class DiffUtil extends ActionUtil {
 
@@ -20,21 +18,14 @@ public class DiffUtil extends ActionUtil {
             Optional<Document> findById = loadDocument();
             if (findById.isPresent()) {
                 Document diff = findById.get();
-                if (!diff.get("enable", boolean.class)) {
-                    System.out.println("diff is already enabled.");
-                    return false;
-                } else {
-                    ObjectId objectId
-                            = new ObjectId(MongoUtil.getObjectIdHexString(diff));
+                if (!diff.get("enable", Boolean.class)) {
                     this.collection().updateOne(
-                            new Document().append("_id", objectId),
-                            new Document().append("enable", true));
+                            new Document("_id", diff.get("_id")),
+                            new Document("$set", new Document("enable", true)));
                     return true;
                 }
-            } else {
-                System.out.println("diff is not found.");
-                return false;
             }
+            return false;
         } else {
             return true;
         }
@@ -52,5 +43,12 @@ public class DiffUtil extends ActionUtil {
 
     public boolean diffIdIsValid() {
         return MessageUtil.get(exchange, "diff_id", String.class) != null;
+    }
+
+    @Override
+    public void writeDocument(Document document) throws Exception {
+        document.append("enable", false);
+        this.insertOne(document);
+        message().writeObjectId(type.expression() + "_id", document);
     }
 }

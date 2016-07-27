@@ -49,8 +49,7 @@ public class DiffFemaleSeiyuCategoryMembersConsumer extends DiffRouteBuilder {
                 .filter((map) -> !prevTitleSet.contains(map.get(("title"))))
                 .forEach(collect::add);
         if (collect.size() > 0) {
-            Document document = new Document();
-            document.append("diff", collect);
+            Document document = new Document("diff", collect);
             return Optional.ofNullable(document);
         } else {
             return Optional.empty();
