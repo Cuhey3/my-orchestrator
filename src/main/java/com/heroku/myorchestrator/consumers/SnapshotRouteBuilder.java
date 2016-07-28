@@ -1,8 +1,9 @@
 package com.heroku.myorchestrator.consumers;
 
 import com.heroku.myorchestrator.util.actions.SnapshotUtil;
+import java.util.Optional;
 import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
+import org.apache.camel.Predicate;
 import org.bson.Document;
 
 public abstract class SnapshotRouteBuilder extends ConsumerRouteBuilder {
@@ -16,17 +17,25 @@ public abstract class SnapshotRouteBuilder extends ConsumerRouteBuilder {
         from(ironmq().snapshot().consumeUri())
                 .routeId(route().id())
                 .filter(route().camelBatchComplete())
-                .process(defaultProcessor())
+                .filter(defaultPredicate())
                 .to(ironmq().diff().postUri());
     }
 
-    protected Processor defaultProcessor() {
+    protected Predicate defaultPredicate() {
         return (Exchange exchange) -> {
-            new SnapshotUtil(exchange)
-                    .writeDocument(doSnapshot(exchange, new Document()));
+            Optional<Document> snapshot = doSnapshot(exchange, new Document());
+            try {
+                if (snapshot.isPresent()) {
+                    new SnapshotUtil(exchange).writeDocument(snapshot.get());
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (Exception e) {
+                return false;
+            }
         };
     }
 
-    protected abstract Document doSnapshot(Exchange exchange, Document document) throws Exception;
-
+    protected abstract Optional<Document> doSnapshot(Exchange exchange, Document document);
 }

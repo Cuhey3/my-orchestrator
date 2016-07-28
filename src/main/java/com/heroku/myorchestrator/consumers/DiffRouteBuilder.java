@@ -1,5 +1,6 @@
 package com.heroku.myorchestrator.consumers;
 
+import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.config.enumerate.SenseType;
 import com.heroku.myorchestrator.util.actions.DiffUtil;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
@@ -15,6 +16,11 @@ public abstract class DiffRouteBuilder extends ConsumerRouteBuilder {
         route().diff();
     }
 
+    public DiffRouteBuilder(Kind kind) {
+        route().diff();
+        kind(kind);
+    }
+
     @Override
     public void configure() throws Exception {
         from(ironmq().diff().consumeUri())
@@ -24,7 +30,9 @@ public abstract class DiffRouteBuilder extends ConsumerRouteBuilder {
                 .to(ironmq().completion().postUri());
     }
 
-    public abstract Optional<Document> calculateDiff(Document master, Document snapshot);
+    public Optional<Document> calculateDiff(Document master, Document snapshot) {
+        return DiffUtil.basicDiff(master, snapshot);
+    }
 
     public void doWhenMasterIsEmpty(Exchange exchange) {
         new DiffUtil(exchange)
@@ -54,7 +62,6 @@ public abstract class DiffRouteBuilder extends ConsumerRouteBuilder {
                     return false;
                 }
             } catch (Exception e) {
-                e.printStackTrace();
                 return false;
             }
         };

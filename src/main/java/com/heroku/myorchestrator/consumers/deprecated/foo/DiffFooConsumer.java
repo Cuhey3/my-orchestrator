@@ -1,4 +1,4 @@
-package com.heroku.myorchestrator.consumers.specific.foo;
+package com.heroku.myorchestrator.consumers.deprecated.foo;
 
 import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.config.enumerate.SenseType;
