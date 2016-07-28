@@ -46,6 +46,7 @@ public class SeiyuUtil {
     public enum SeiyuKind {
         female("日本の女性声優", Kind.female_seiyu_category_members),
         male("日本の男性声優", Kind.male_seiyu_category_members),
+        seiyu_template_include_pages("日本の男性声優", Kind.seiyu_template_include_pages),
         seiyu("none", Kind.seiyu_category_members);
 
         private final String expression, sign;

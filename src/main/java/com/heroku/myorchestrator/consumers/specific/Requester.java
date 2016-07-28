@@ -13,8 +13,9 @@ public class Requester extends ConsumerRouteBuilder {
         ironmq().snapshot();
         route().request();
         //Kind.foo.timerParam("period=60s");
-        Kind.female_seiyu_category_members.timerParam("period=5m&delay=2m");
-        Kind.male_seiyu_category_members.timerParam("period=5m&delay=4m");
+        Kind.female_seiyu_category_members.timerParam("period=5m&delay=1m");
+        Kind.male_seiyu_category_members.timerParam("period=5m&delay=2m");
+        Kind.seiyu_template_include_pages.timerParam("period=5m&delay=3m");
     }
 
     @Override

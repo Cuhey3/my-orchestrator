@@ -6,6 +6,7 @@ public enum Kind {
     female_seiyu_category_members,
     male_seiyu_category_members,
     seiyu_category_members,
+    seiyu_template_include_pages,
     test;
 
     private String timerUri;
