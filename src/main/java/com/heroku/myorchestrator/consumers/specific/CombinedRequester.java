@@ -2,8 +2,6 @@ package com.heroku.myorchestrator.consumers.specific;
 
 import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.consumers.ConsumerRouteBuilder;
-import com.heroku.myorchestrator.util.actions.MasterUtil;
-import org.apache.camel.Exchange;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,6 +14,7 @@ public class CombinedRequester extends ConsumerRouteBuilder {
 
     @Override
     public void configure() throws Exception {
+        /*
         from("timer:initialize_seiyu_category_members?repeatCount=1")
                 .routeId("initialize_seiyu_category_members")
                 .filter((Exchange exchange) -> {
@@ -58,5 +57,6 @@ public class CombinedRequester extends ConsumerRouteBuilder {
                 .to(ironmq()
                         .kind(Kind.seiyu_category_members_include_template)
                         .postUri());
+         */
     }
 }

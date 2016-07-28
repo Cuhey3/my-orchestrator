@@ -18,8 +18,8 @@ public class RouteUtil {
         return this;
     }
 
-    public RouteUtil request() {
-        this.type = "request";
+    public RouteUtil timer() {
+        this.type = "timer";
         return this;
     }
 
