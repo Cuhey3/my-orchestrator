@@ -8,6 +8,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
@@ -63,6 +64,14 @@ public class MongoUtil {
     public MongoUtil master() {
         this.type = ActionType.MASTER;
         return this;
+    }
+
+    public MongoDatabase database() {
+        String database
+                = MongoConfig.getMongoClientURI(this.type).getDatabase();
+        return registry
+                .lookupByNameAndType(this.type.expression(), MongoClient.class)
+                .getDatabase(database);
     }
 
     public MongoCollection<Document> collection() throws Exception {

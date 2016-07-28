@@ -50,7 +50,8 @@ public class SeiyuUtil {
         seiyu_template_include_pages("none", Kind.seiyu_template_include_pages),
         seiyu_category_members_include_template(
                 "none", Kind.seiyu_category_members_include_template),
-        koepota_seiyu("none", Kind.koepota_seiyu);
+        koepota_seiyu("none", Kind.koepota_seiyu),
+        seiyu_has_recentchanges("none", Kind.seiyu_has_recentchanges);
 
         private final String expression, sign;
 

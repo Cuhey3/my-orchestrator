@@ -60,13 +60,13 @@ public class CombinedRequester extends ConsumerRouteBuilder {
                         .kind(Kind.seiyu_category_members_include_template)
                         .postUri());
          */
-        from("timer:initialize_koepota_seiyu?repeatCount=1")
-                .routeId("initialize_koepota_seiyu")
+        from("timer:initialize_seiyu_has_recentchanges?repeatCount=1")
+                .routeId("initialize_seiyu_has_recentchanges")
                 .filter((Exchange exchange) -> {
                     boolean flag;
                     try {
                         flag = !new MasterUtil(exchange)
-                                .kind(Kind.koepota_seiyu)
+                                .kind(Kind.seiyu_has_recentchanges)
                                 .findLatest().isPresent();
                     } catch (Exception e) {
                         flag = true;
@@ -77,9 +77,9 @@ public class CombinedRequester extends ConsumerRouteBuilder {
                     return flag;
                 })
                 .setBody()
-                .constant("{\"kind\":\"koepota_seiyu\"}")
+                .constant("{\"kind\":\"seiyu_has_recentchanges\"}")
                 .to(ironmq()
-                        .kind(Kind.koepota_seiyu)
+                        .kind(Kind.seiyu_has_recentchanges)
                         .postUri());
     }
 }

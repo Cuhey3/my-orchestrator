@@ -2,7 +2,7 @@ package com.heroku.myorchestrator.config.enumerate;
 
 public enum ActionType {
 
-    SNAPSHOT, DIFF, MASTER, DUMMY;
+    SNAPSHOT, DIFF, MASTER, DUMMY, SEIYULAB;
 
     private final String expression;
 

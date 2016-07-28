@@ -60,4 +60,9 @@ public class MongoConfig {
     public MongoClient getMongoClientDummy() {
         return new MongoClient(getMongoClientURI(ActionType.DUMMY));
     }
+
+    @Bean(name = "seiyulab")
+    public MongoClient getMongoClientSeiyulab() {
+        return new MongoClient(getMongoClientURI(ActionType.SEIYULAB));
+    }
 }
