@@ -17,6 +17,7 @@ public class CombinedRequester extends ConsumerRouteBuilder {
     @Override
     public void configure() throws Exception {
         from("timer:initialize_seiyu_category_members?repeatCount=1")
+                .routeId("initialize_seiyu_category_members")
                 .filter((Exchange exchange) -> {
                     boolean flag;
                     try {
