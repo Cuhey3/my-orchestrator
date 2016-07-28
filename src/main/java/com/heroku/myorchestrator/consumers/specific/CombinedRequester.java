@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CombinedRequester extends ConsumerRouteBuilder {
-    
+
     public CombinedRequester() {
         kind(Kind.seiyu_category_members);
         ironmq().snapshot();
     }
-    
+
     @Override
     public void configure() throws Exception {
         from("timer:initialize_seiyu_category_members?repeatCount=1")
@@ -21,7 +21,8 @@ public class CombinedRequester extends ConsumerRouteBuilder {
                 .filter((Exchange exchange) -> {
                     boolean flag;
                     try {
-                        flag = !new MasterUtil(exchange).kind(kind)
+                        flag = !new MasterUtil(exchange)
+                                .kind(Kind.seiyu_category_members)
                                 .findLatest().isPresent();
                     } catch (Exception e) {
                         flag = true;
@@ -32,6 +33,30 @@ public class CombinedRequester extends ConsumerRouteBuilder {
                     return flag;
                 })
                 .setBody().constant("{\"kind\":\"seiyu_category_members\"}")
-                .to(ironmq().postUri());
+                .to(ironmq()
+                        .kind(Kind.seiyu_category_members)
+                        .postUri());
+
+        from("timer:initialize_seiyu_category_members_include_template?repeatCount=1")
+                .routeId("initialize_seiyu_category_members_include_template")
+                .filter((Exchange exchange) -> {
+                    boolean flag;
+                    try {
+                        flag = !new MasterUtil(exchange)
+                                .kind(Kind.seiyu_category_members_include_template)
+                                .findLatest().isPresent();
+                    } catch (Exception e) {
+                        flag = true;
+                    }
+                    if (flag) {
+                        System.out.println("initialize...");
+                    }
+                    return flag;
+                })
+                .setBody()
+                .constant("{\"kind\":\"seiyu_category_members_include_template\"}")
+                .to(ironmq()
+                        .kind(Kind.seiyu_category_members_include_template)
+                        .postUri());
     }
 }

@@ -46,10 +46,13 @@ public class SeiyuUtil {
     public enum SeiyuKind {
         female("日本の女性声優", Kind.female_seiyu_category_members),
         male("日本の男性声優", Kind.male_seiyu_category_members),
-        seiyu_template_include_pages("日本の男性声優", Kind.seiyu_template_include_pages),
-        seiyu("none", Kind.seiyu_category_members);
+        seiyu("none", Kind.seiyu_category_members),
+        seiyu_template_include_pages("none", Kind.seiyu_template_include_pages),
+        seiyu_category_members_include_template(
+                "none", Kind.seiyu_category_members_include_template);
 
         private final String expression, sign;
+
         private final Kind kind;
 
         private SeiyuKind(String expression, Kind kind) {
