@@ -8,6 +8,7 @@ public enum Kind {
     seiyu_category_members,
     seiyu_template_include_pages,
     seiyu_category_members_include_template,
+    koepota_events,
     test;
 
     private String timerUri;
