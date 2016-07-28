@@ -2,7 +2,7 @@ package com.heroku.myorchestrator.config.enumerate;
 
 public enum QueueType {
 
-    SNAPSHOT, DIFF, COMPLETION, CHANGED;
+    SNAPSHOT, DIFF, COMPLETION, CHANGED, EXCEPTION;
 
     private final String expression;
 

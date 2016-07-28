@@ -1,6 +1,7 @@
 package com.heroku.myorchestrator.consumers;
 
 import com.heroku.myorchestrator.util.actions.SnapshotUtil;
+import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
@@ -32,6 +33,7 @@ public abstract class SnapshotRouteBuilder extends ConsumerRouteBuilder {
                     return false;
                 }
             } catch (Exception e) {
+                IronmqUtil.sendError(this.getClass(), "defaultPredicate", exchange, e);
                 return false;
             }
         };

@@ -7,6 +7,7 @@ import com.heroku.myorchestrator.util.MessageUtil;
 import com.heroku.myorchestrator.util.actions.DiffUtil;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.actions.SnapshotUtil;
+import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.camel.Exchange;
@@ -54,7 +55,7 @@ public class DiffFooConsumer extends ConsumerRouteBuilder {
                             return true;
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        IronmqUtil.sendError(this.getClass(), "configure", exchange, e);
                         return false;
                     }
                 })

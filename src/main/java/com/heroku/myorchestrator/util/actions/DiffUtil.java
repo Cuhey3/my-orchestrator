@@ -2,6 +2,7 @@ package com.heroku.myorchestrator.util.actions;
 
 import com.heroku.myorchestrator.config.enumerate.ActionType;
 import com.heroku.myorchestrator.util.MessageUtil;
+import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -66,6 +67,7 @@ public class DiffUtil extends ActionUtil {
                 return true;
             }
         } catch (Exception e) {
+            IronmqUtil.sendError(this.getClass(), "enableDiff", exchange, e);
             return false;
         }
 

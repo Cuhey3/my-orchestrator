@@ -19,6 +19,6 @@ public class SnapshotMaleSeiyuCategoryMembersConsumer extends SnapshotRouteBuild
 
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange, Document document) {
-        return SeiyuUtil.defaultSnapshot(seiyuKind, document);
+        return new SeiyuUtil(exchange).defaultSnapshot(seiyuKind, document);
     }
 }

@@ -4,6 +4,7 @@ import com.heroku.myorchestrator.config.enumerate.ActionType;
 import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.config.enumerate.SenseType;
 import com.heroku.myorchestrator.util.MongoUtil;
+import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +37,8 @@ public class MasterUtil extends ActionUtil {
         try {
             return MongoUtil.getObjectIdHexString(findLatest().get())
                     .equals(message().get("compared_master_id"));
-        } catch (Exception ex) {
+        } catch (Exception e) {
+            IronmqUtil.sendError(this.getClass(), "comparedIsValid", exchange, e);
             return false;
         }
     }
@@ -46,6 +48,7 @@ public class MasterUtil extends ActionUtil {
             this.writeDocument(snapshotUtil.loadDocument().get());
             return true;
         } catch (Exception e) {
+            IronmqUtil.sendError(this.getClass(), "snapshotSaveToMaster", exchange, e);
             return false;
         }
     }
@@ -64,6 +67,7 @@ public class MasterUtil extends ActionUtil {
                 return Optional.empty();
             }
         } catch (Exception e) {
+            IronmqUtil.sendError(this.getClass(), "latestJoinAll", exchange, e);
             return Optional.empty();
         } finally {
             this.kind(kind0);

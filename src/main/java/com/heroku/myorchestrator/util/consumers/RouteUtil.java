@@ -45,8 +45,14 @@ public class RouteUtil {
         return this;
     }
 
+    public RouteUtil exception() {
+        this.type = "exception";
+        this.kind = "in";
+        return this;
+    }
+
     public String id() {
-        return type + "_ " + kind;
+        return type + "_" + kind;
     }
 
     public SimpleBuilder camelBatchComplete() {

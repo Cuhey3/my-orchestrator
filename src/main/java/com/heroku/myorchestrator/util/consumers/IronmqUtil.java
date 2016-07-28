@@ -2,6 +2,9 @@ package com.heroku.myorchestrator.util.consumers;
 
 import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.config.enumerate.QueueType;
+import io.iron.ironmq.Client;
+import java.io.IOException;
+import java.util.Date;
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
 
@@ -22,6 +25,20 @@ public class IronmqUtil {
         };
     }
 
+    public static void sendError(Class clazz, String method, Exchange exchange, Exception ex) {
+        try {
+            Client client = exchange.getContext().getRegistry()
+                    .lookupByNameAndType(IRONMQ_CLIENT_BEAN_NAME, Client.class);
+            client.queue("exception_in").push(
+                    new Date().toString()
+                    + "\nClass: " + clazz.getName()
+                    + "\nmethod: " + method
+                    + "\nException class: " + ex.getClass().getName()
+                    + "\nmessage: " + ex.getMessage());
+        } catch (IOException ex1) {
+        }
+    }
+
     private String type, kind;
     private int timeout;
 
@@ -36,6 +53,11 @@ public class IronmqUtil {
 
     public IronmqUtil kind(Kind kind) {
         this.kind = kind.expression();
+        return this;
+    }
+
+    public IronmqUtil kind(String kind) {
+        this.kind = kind;
         return this;
     }
 
@@ -63,6 +85,11 @@ public class IronmqUtil {
     public IronmqUtil changed() {
         this.type = QueueType.CHANGED.expression();
         this.kind = "all";
+        return this;
+    }
+
+    public IronmqUtil exception() {
+        this.type = QueueType.EXCEPTION.expression();
         return this;
     }
 

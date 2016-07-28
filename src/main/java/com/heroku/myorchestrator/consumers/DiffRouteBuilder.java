@@ -5,6 +5,7 @@ import com.heroku.myorchestrator.config.enumerate.SenseType;
 import com.heroku.myorchestrator.util.actions.DiffUtil;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.actions.SnapshotUtil;
+import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
@@ -62,6 +63,7 @@ public abstract class DiffRouteBuilder extends ConsumerRouteBuilder {
                     return false;
                 }
             } catch (Exception e) {
+                IronmqUtil.sendError(this.getClass(), "comparePredicate", exchange, e);
                 return false;
             }
         };

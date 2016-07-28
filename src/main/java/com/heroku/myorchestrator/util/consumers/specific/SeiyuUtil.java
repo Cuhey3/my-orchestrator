@@ -1,6 +1,7 @@
 package com.heroku.myorchestrator.util.consumers.specific;
 
 import com.heroku.myorchestrator.config.enumerate.Kind;
+import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import com.heroku.myorchestrator.util.content.MediawikiApiRequest;
 import java.net.URLEncoder;
 import java.util.List;
@@ -11,7 +12,13 @@ import org.bson.Document;
 
 public class SeiyuUtil {
 
-    public static Optional<Document> defaultSnapshot(SeiyuKind seiyuKind, Document document) {
+    private final Exchange exchange;
+
+    public SeiyuUtil(Exchange exchange) {
+        this.exchange = exchange;
+    }
+
+    public Optional<Document> defaultSnapshot(SeiyuKind seiyuKind, Document document) {
         try {
             List<Map<String, Object>> mapList
                     = new MediawikiApiRequest()
@@ -31,14 +38,9 @@ public class SeiyuUtil {
             document.append("data", mapList);
             return Optional.ofNullable(document);
         } catch (Exception e) {
+            IronmqUtil.sendError(this.getClass(), "defaultSnapshot", exchange, e);
             return Optional.empty();
         }
-    }
-
-    private final Exchange exchange;
-
-    public SeiyuUtil(Exchange exchange) {
-        this.exchange = exchange;
     }
 
     public enum SeiyuKind {
