@@ -15,6 +15,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class SnapshotKoepotaSeiyuConsumer extends SnapshotRouteBuilder {
 
+    public SnapshotKoepotaSeiyuConsumer() {
+        kind(Kind.koepota_seiyu);
+    }
+
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange, Document document) {
         try {
