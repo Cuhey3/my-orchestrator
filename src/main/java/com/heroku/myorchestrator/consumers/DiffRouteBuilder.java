@@ -6,6 +6,7 @@ import com.heroku.myorchestrator.util.actions.DiffUtil;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.actions.SnapshotUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
+import com.heroku.myorchestrator.util.consumers.KindUtil;
 import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
@@ -15,6 +16,7 @@ public abstract class DiffRouteBuilder extends ConsumerRouteBuilder {
 
     public DiffRouteBuilder() {
         route().diff();
+        kind(KindUtil.findKindByClassName(this));
     }
 
     public DiffRouteBuilder(Kind kind) {
