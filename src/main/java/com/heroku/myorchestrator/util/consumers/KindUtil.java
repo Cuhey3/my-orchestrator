@@ -8,6 +8,20 @@ import java.util.stream.Collectors;
 
 public class KindUtil {
 
+    public static Kind findKindByClassName(Object object) {
+        try {
+            String kindCamel = object.getClass().getSimpleName()
+                    .replace("Snapshot", "").replace("Diff", "")
+                    .replace("Consumer", "");
+            String kindSnake
+                    = String.join("_", kindCamel.split("(?=[\\p{Upper}])"))
+                    .toLowerCase();
+            return Kind.valueOf(kindSnake);
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
     private final Kind kind;
 
     public KindUtil(Kind kind) {

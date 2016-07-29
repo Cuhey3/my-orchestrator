@@ -8,11 +8,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CompletionConsumer extends ConsumerRouteBuilder {
-    
+
     public CompletionConsumer() {
         route().completion();
     }
-    
+
     @Override
     public void configure() throws Exception {
         from(ironmq().completion().consumeUri())
@@ -25,7 +25,7 @@ public class CompletionConsumer extends ConsumerRouteBuilder {
                 .filter((Exchange exchange)
                         -> new MasterUtil(exchange).comparedIsValid())
                 .to("direct:snapshotSaveToMaster");
-        
+
         from("direct:snapshotSaveToMaster")
                 .routeId("snapshot_save_to_master")
                 .filter((Exchange exchange)

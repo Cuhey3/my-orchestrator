@@ -1,6 +1,6 @@
 package com.heroku.myorchestrator.config;
 
-import com.heroku.myorchestrator.config.enumerate.ActionType;
+import com.heroku.myorchestrator.config.enumerate.MongoTarget;
 import com.heroku.myorchestrator.config.enumerate.Paths;
 import com.heroku.myorchestrator.util.SettingUtil;
 import com.mongodb.MongoClient;
@@ -15,7 +15,7 @@ public class MongoConfig {
 
     private static Map mongoSettings;
 
-    public static MongoClientURI getMongoClientURI(ActionType type) {
+    public static MongoClientURI getMongoClientURI(MongoTarget type) {
         return new MongoClientURI(
                 (String) mongoSettings.get(type.expression()));
     }
@@ -26,9 +26,9 @@ public class MongoConfig {
         try {
             ownMongodbUri = new SettingUtil(Paths.SETTINGS).get("MONGODB_URI");
             MongoClientURI mongoClientURI = new MongoClientURI(ownMongodbUri);
-            String database = mongoClientURI.getDatabase();
             try (MongoClient mongoClient = new MongoClient(mongoClientURI)) {
-                mongoSettings = mongoClient.getDatabase(database)
+                mongoSettings = mongoClient
+                        .getDatabase(mongoClientURI.getDatabase())
                         .getCollection("settings").find().iterator().next()
                         .get("mongodb", Map.class);
                 mongoSettings.put("dummy", ownMongodbUri);
@@ -43,26 +43,26 @@ public class MongoConfig {
 
     @Bean(name = "master")
     public MongoClient getMongoClientMaster() {
-        return new MongoClient(getMongoClientURI(ActionType.MASTER));
+        return new MongoClient(getMongoClientURI(MongoTarget.MASTER));
     }
 
     @Bean(name = "snapshot")
     public MongoClient getMongoClientSnapshot() {
-        return new MongoClient(getMongoClientURI(ActionType.SNAPSHOT));
+        return new MongoClient(getMongoClientURI(MongoTarget.SNAPSHOT));
     }
 
     @Bean(name = "diff")
     public MongoClient getMongoClientDiff() {
-        return new MongoClient(getMongoClientURI(ActionType.DIFF));
-    }
-
-    @Bean(name = "dummy")
-    public MongoClient getMongoClientDummy() {
-        return new MongoClient(getMongoClientURI(ActionType.DUMMY));
+        return new MongoClient(getMongoClientURI(MongoTarget.DIFF));
     }
 
     @Bean(name = "seiyulab")
     public MongoClient getMongoClientSeiyulab() {
-        return new MongoClient(getMongoClientURI(ActionType.SEIYULAB));
+        return new MongoClient(getMongoClientURI(MongoTarget.SEIYULAB));
+    }
+
+    @Bean(name = "dummy")
+    public MongoClient getMongoClientDummy() {
+        return new MongoClient(getMongoClientURI(MongoTarget.DUMMY));
     }
 }

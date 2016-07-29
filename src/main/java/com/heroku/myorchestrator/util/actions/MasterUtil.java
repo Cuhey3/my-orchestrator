@@ -1,6 +1,6 @@
 package com.heroku.myorchestrator.util.actions;
 
-import com.heroku.myorchestrator.config.enumerate.ActionType;
+import com.heroku.myorchestrator.config.enumerate.MongoTarget;
 import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.config.enumerate.SenseType;
 import com.heroku.myorchestrator.util.MongoUtil;
@@ -17,7 +17,7 @@ public class MasterUtil extends ActionUtil {
 
     public MasterUtil(Exchange exchange) {
         super(exchange);
-        this.type(ActionType.MASTER);
+        this.target(MongoTarget.MASTER);
         snapshotUtil = new SnapshotUtil(exchange);
     }
 

@@ -27,24 +27,10 @@ public class SnapshotKoepotaEventsConsumer extends SnapshotRouteBuilder {
                     = Jsoup.connect("http://www.koepota.jp/eventschedule/")
                     .maxBodySize(Integer.MAX_VALUE).timeout(Integer.MAX_VALUE)
                     .get();
-
-            final String host = "http://www.koepota.jp/eventschedule/";
             doc.select("#eventschedule tr:eq(0)").remove();
             Elements select = doc.select("#eventschedule tr");
             List<org.bson.Document> collect = select.stream()
-                    .map((el) -> {
-                        int size = el.select("td.day").size();
-                        return new KoepotaEvent(
-                                el.select("td.title a").attr("href")
-                                .replace(host, ""),
-                                size > 0 ? el.select("td.day").get(0).text() : "",
-                                el.select("td.title").text(),
-                                el.select("td.hall").text(),
-                                el.select("td.number").text(),
-                                size > 1 ? el.select("td.day").get(1).text() : "")
-                                .getDocument();
-
-                    })
+                    .map((el) -> new KoepotaEvent(el).getDocument())
                     .collect(Collectors.toList());
             document.append("data", collect);
             return Optional.ofNullable(document);

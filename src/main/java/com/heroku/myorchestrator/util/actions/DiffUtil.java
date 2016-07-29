@@ -1,6 +1,6 @@
 package com.heroku.myorchestrator.util.actions;
 
-import com.heroku.myorchestrator.config.enumerate.ActionType;
+import com.heroku.myorchestrator.config.enumerate.MongoTarget;
 import com.heroku.myorchestrator.util.MessageUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import java.util.List;
@@ -45,7 +45,7 @@ public class DiffUtil extends ActionUtil {
 
     public DiffUtil(Exchange exchange) {
         super(exchange);
-        type(ActionType.DIFF);
+        target(MongoTarget.DIFF);
     }
 
     public boolean enableDiff() {
@@ -91,6 +91,6 @@ public class DiffUtil extends ActionUtil {
     public void writeDocument(Document document) throws Exception {
         document.append("enable", false);
         this.insertOne(document);
-        message().writeObjectId(type.expression() + "_id", document);
+        message().writeObjectId(target.expression() + "_id", document);
     }
 }

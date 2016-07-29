@@ -23,7 +23,7 @@ public abstract class ActionUtil extends MongoUtil {
 
     public void writeDocument(Document document) throws Exception {
         this.insertOne(document);
-        message().writeObjectId(type.expression() + "_id", document);
+        message().writeObjectId(target.expression() + "_id", document);
     }
 
     public MessageUtil message() {

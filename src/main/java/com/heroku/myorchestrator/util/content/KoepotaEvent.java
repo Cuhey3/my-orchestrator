@@ -1,5 +1,7 @@
 package com.heroku.myorchestrator.util.content;
 
+import org.jsoup.nodes.Element;
+
 public class KoepotaEvent {
 
     private String url;
@@ -15,6 +17,43 @@ public class KoepotaEvent {
     private String c2;
     private String p1;
     private String w1;
+
+    public KoepotaEvent(String url, String d1, String t1, String l1, String c1, String d2) {
+        this.url = url;
+        this.d1 = d1;
+        this.t1 = t1;
+        this.l1 = l1;
+        this.c1 = c1;
+        this.d2 = d2;
+    }
+
+    public KoepotaEvent(org.bson.Document doc) {
+        this.url = (String) doc.get("url");
+        this.d1 = (String) doc.get("d1");
+        this.t1 = (String) doc.get("t1");
+        this.l1 = (String) doc.get("l1");
+        this.c1 = (String) doc.get("c1");
+        this.d2 = (String) doc.get("d2");
+        this.t2 = (String) doc.get("t2");
+        this.d3 = (String) doc.get("d3");
+        this.d4 = (String) doc.get("d4");
+        this.l2 = (String) doc.get("l2");
+        this.c2 = (String) doc.get("c2");
+        this.p1 = (String) doc.get("p1");
+        this.w1 = (String) doc.get("w1");
+    }
+
+    public KoepotaEvent(Element el) {
+        this(el.select("td.title a").attr("href")
+                .replace("http://www.koepota.jp/eventschedule/", ""),
+                el.select("td.day")
+                .size() > 0 ? el.select("td.day").get(0).text() : "",
+                el.select("td.title").text(),
+                el.select("td.hall").text(),
+                el.select("td.number").text(),
+                el.select("td.day")
+                .size() > 1 ? el.select("td.day").get(1).text() : "");
+    }
 
     public String getUrl() {
         return url;
@@ -118,34 +157,6 @@ public class KoepotaEvent {
 
     public void setW1(String w1) {
         this.w1 = w1;
-    }
-
-    public KoepotaEvent() {
-    }
-
-    public KoepotaEvent(String url, String d1, String t1, String l1, String c1, String d2) {
-        this.url = url;
-        this.d1 = d1;
-        this.t1 = t1;
-        this.l1 = l1;
-        this.c1 = c1;
-        this.d2 = d2;
-    }
-
-    public KoepotaEvent(org.bson.Document doc) {
-        this.url = (String) doc.get("url");
-        this.d1 = (String) doc.get("d1");
-        this.t1 = (String) doc.get("t1");
-        this.l1 = (String) doc.get("l1");
-        this.c1 = (String) doc.get("c1");
-        this.d2 = (String) doc.get("d2");
-        this.t2 = (String) doc.get("t2");
-        this.d3 = (String) doc.get("d3");
-        this.d4 = (String) doc.get("d4");
-        this.l2 = (String) doc.get("l2");
-        this.c2 = (String) doc.get("c2");
-        this.p1 = (String) doc.get("p1");
-        this.w1 = (String) doc.get("w1");
     }
 
     public org.bson.Document getDocument() {

@@ -15,10 +15,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class SnapshotKoepotaSeiyuConsumer extends SnapshotRouteBuilder {
 
-    public SnapshotKoepotaSeiyuConsumer() {
-        kind(Kind.koepota_seiyu);
-    }
-
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange, Document document) {
         try {
@@ -29,13 +25,14 @@ public class SnapshotKoepotaSeiyuConsumer extends SnapshotRouteBuilder {
                     .findLatest().get();
             koepota = util.kind(Kind.koepota_events).findLatest().get();
             koepotaList = koepota.get("data", List.class);
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder(32768);
             koepotaList.stream().map((map) -> (String) map.get("c1"))
                     .forEach(sb::append);
             String koepotaString = new String(sb);
             scmitList = scmit.get("data", List.class);
             collect = scmitList.stream().filter(
-                    (map) -> koepotaString.contains(((String) map.get("title")).replaceFirst(" \\(.+", "")))
+                    (map) -> koepotaString.contains(((String) map.get("title"))
+                            .replaceFirst(" \\(.+", "")))
                     .collect(Collectors.toList());
             document.append("data", collect);
             return Optional.ofNullable(document);

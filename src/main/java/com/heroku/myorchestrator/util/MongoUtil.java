@@ -1,8 +1,8 @@
 package com.heroku.myorchestrator.util;
 
 import com.heroku.myorchestrator.config.MongoConfig;
-import com.heroku.myorchestrator.config.enumerate.ActionType;
 import com.heroku.myorchestrator.config.enumerate.Kind;
+import com.heroku.myorchestrator.config.enumerate.MongoTarget;
 import com.heroku.myorchestrator.exceptions.MongoUtilTypeNotSetException;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
@@ -24,8 +24,8 @@ public class MongoUtil {
     }
 
     private final Registry registry;
-    protected ActionType type;
-    protected ActionType useType;
+    protected MongoTarget target;
+    protected MongoTarget customTarget;
     protected Kind kind;
 
     public MongoUtil(Exchange exchange) {
@@ -36,13 +36,13 @@ public class MongoUtil {
         }
     }
 
-    public final MongoUtil type(ActionType type) {
-        this.type = type;
+    public final MongoUtil target(MongoTarget type) {
+        this.target = type;
         return this;
     }
 
     public MongoUtil useDummy() {
-        this.useType = ActionType.DUMMY;
+        this.customTarget = MongoTarget.DUMMY;
         return this;
     }
 
@@ -52,37 +52,37 @@ public class MongoUtil {
     }
 
     public MongoUtil snapshot() {
-        this.type = ActionType.SNAPSHOT;
+        this.target = MongoTarget.SNAPSHOT;
         return this;
     }
 
     public MongoUtil diff() {
-        this.type = ActionType.DIFF;
+        this.target = MongoTarget.DIFF;
         return this;
     }
 
     public MongoUtil master() {
-        this.type = ActionType.MASTER;
+        this.target = MongoTarget.MASTER;
         return this;
     }
 
     public MongoDatabase database() {
         String database
-                = MongoConfig.getMongoClientURI(this.type).getDatabase();
+                = MongoConfig.getMongoClientURI(this.target).getDatabase();
         return registry
-                .lookupByNameAndType(this.type.expression(), MongoClient.class)
+                .lookupByNameAndType(target.expression(), MongoClient.class)
                 .getDatabase(database);
     }
 
     public MongoCollection<Document> collection() throws Exception {
-        if (this.type == null && this.useType == null) {
+        if (this.target == null && this.customTarget == null) {
             throw new MongoUtilTypeNotSetException();
         }
-        ActionType t;
-        if (this.useType != null) {
-            t = this.useType;
+        MongoTarget t;
+        if (this.customTarget != null) {
+            t = this.customTarget;
         } else {
-            t = this.type;
+            t = this.target;
         }
         return registry.lookupByNameAndType(t.expression(), MongoClient.class)
                 .getDatabase(MongoConfig.getMongoClientURI(t).getDatabase())
@@ -123,11 +123,11 @@ public class MongoUtil {
     }
 
     private String collectionName() {
-        return type.expression() + "_" + kind;
+        return target.expression() + "_" + kind;
     }
 
     private String typeIdKey() {
-        return type.expression() + "_id";
+        return target.expression() + "_id";
     }
 
     private Optional<Document> nextDocument(FindIterable<Document> iterable) {

@@ -1,7 +1,7 @@
 package com.heroku.myorchestrator.consumers.specific.seiyu;
 
-import com.heroku.myorchestrator.config.enumerate.ActionType;
 import com.heroku.myorchestrator.config.enumerate.Kind;
+import com.heroku.myorchestrator.config.enumerate.MongoTarget;
 import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
 import com.heroku.myorchestrator.util.MongoUtil;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
@@ -20,10 +20,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class SnapshotSeiyuHasRecentchanges extends SnapshotRouteBuilder {
 
-    public SnapshotSeiyuHasRecentchanges() {
-        kind(Kind.seiyu_has_recentchanges);
-    }
-
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange, Document document) {
         try {
@@ -32,8 +28,9 @@ public class SnapshotSeiyuHasRecentchanges extends SnapshotRouteBuilder {
                     .kind(Kind.seiyu_category_members_include_template)
                     .findLatest().get();
             MongoUtil mongoUtil = new MongoUtil(exchange);
-            MongoCursor<Document> iterator = mongoUtil.type(ActionType.SEIYULAB)
-                    .database().getCollection("wikirc").find().iterator();
+            MongoCursor<Document> iterator
+                    = mongoUtil.target(MongoTarget.SEIYULAB).database()
+                    .getCollection("wikirc").find().iterator();
             Set<String> seiyuNames = new HashSet<>();
             while (iterator.hasNext()) {
                 Document next = iterator.next();

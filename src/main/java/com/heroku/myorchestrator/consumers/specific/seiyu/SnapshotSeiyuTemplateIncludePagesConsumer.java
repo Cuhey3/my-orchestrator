@@ -1,6 +1,5 @@
 package com.heroku.myorchestrator.consumers.specific.seiyu;
 
-import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import com.heroku.myorchestrator.util.content.MediawikiApiRequest;
@@ -14,10 +13,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SnapshotSeiyuTemplateIncludePagesConsumer extends SnapshotRouteBuilder {
-
-    public SnapshotSeiyuTemplateIncludePagesConsumer() {
-        kind(Kind.seiyu_template_include_pages);
-    }
 
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange, Document document) {
