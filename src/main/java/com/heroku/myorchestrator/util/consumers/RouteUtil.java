@@ -8,8 +8,8 @@ public class RouteUtil {
 
     private String target, kind;
 
-    public RouteUtil target(MongoTarget type) {
-        this.target = type.expression();
+    public RouteUtil target(MongoTarget target) {
+        this.target = target.expression();
         return this;
     }
 

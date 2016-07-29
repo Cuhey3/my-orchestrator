@@ -36,8 +36,8 @@ public class MongoUtil {
         }
     }
 
-    public final MongoUtil target(MongoTarget type) {
-        this.target = type;
+    public final MongoUtil target(MongoTarget target) {
+        this.target = target;
         return this;
     }
 
