@@ -11,6 +11,7 @@ public enum Kind {
     koepota_events("period=30m&delay=10m"),
     koepota_seiyu("common_diff"),
     seiyu_has_recentchanges("common_diff"),
+    koepota_seiyu_all("common_diff"),
     test;
 
     private Kind(String... token) {

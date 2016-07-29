@@ -2,6 +2,8 @@ package com.heroku.myorchestrator.consumers.specific;
 
 import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.consumers.ConsumerRouteBuilder;
+import com.heroku.myorchestrator.util.actions.MasterUtil;
+import org.apache.camel.Exchange;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -57,14 +59,14 @@ public class CombinedRequester extends ConsumerRouteBuilder {
                 .to(ironmq()
                         .kind(Kind.seiyu_category_members_include_template)
                         .postUri());
-
-        from("timer:initialize_seiyu_has_recentchanges?repeatCount=1")
-                .routeId("initialize_seiyu_has_recentchanges")
+         
+        from("timer:initialize_koepota_seiyu_all?repeatCount=1")
+                .routeId("initialize_koepota_seiyu_all")
                 .filter((Exchange exchange) -> {
                     boolean flag;
                     try {
                         flag = !new MasterUtil(exchange)
-                                .kind(Kind.seiyu_has_recentchanges)
+                                .kind(Kind.koepota_seiyu_all)
                                 .findLatest().isPresent();
                     } catch (Exception e) {
                         flag = true;
@@ -75,10 +77,10 @@ public class CombinedRequester extends ConsumerRouteBuilder {
                     return flag;
                 })
                 .setBody()
-                .constant("{\"kind\":\"seiyu_has_recentchanges\"}")
+                .constant("{\"kind\":\"koepota_seiyu_all\"}")
                 .to(ironmq()
-                        .kind(Kind.seiyu_has_recentchanges)
+                        .kind(Kind.koepota_seiyu_all)
                         .postUri());
-         */
+*/
     }
 }
