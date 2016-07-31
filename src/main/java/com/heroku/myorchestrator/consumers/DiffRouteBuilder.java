@@ -2,6 +2,7 @@ package com.heroku.myorchestrator.consumers;
 
 import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.config.enumerate.SenseType;
+import com.heroku.myorchestrator.util.MessageUtil;
 import com.heroku.myorchestrator.util.actions.DiffUtil;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.actions.SnapshotUtil;
@@ -42,8 +43,16 @@ public abstract class DiffRouteBuilder extends ConsumerRouteBuilder {
                 .updateMessageComparedId(SenseType.EMPTY.expression());
     }
 
+    public void doWhenSkipDiff(Exchange exchange) {
+        // none
+    }
+
     public Predicate comparePredicate() {
         return (Exchange exchange) -> {
+            if (new MessageUtil(exchange).getBool("skip_diff")) {
+                doWhenSkipDiff(exchange);
+                return true;
+            }
             Optional<Document> optSnapshot, optMaster, optDiff;
             try {
                 optSnapshot = new SnapshotUtil(exchange).loadDocument();

@@ -33,6 +33,10 @@ public class MasterUtil extends ActionUtil {
                 .equals(message().get("compared_master_id"));
     }
 
+    public boolean isSkipDiff() {
+        return message().getBool("skip_diff");
+    }
+
     public boolean comparedIsValid() {
         try {
             return MongoUtil.getObjectIdHexString(findLatest().get())
@@ -41,6 +45,10 @@ public class MasterUtil extends ActionUtil {
             IronmqUtil.sendError(this.getClass(), "comparedIsValid", exchange, e);
             return false;
         }
+    }
+
+    public boolean isSkipValidation() {
+        return isSkipDiff() || comparedIsEmpty();
     }
 
     public boolean snapshotSaveToMaster() {

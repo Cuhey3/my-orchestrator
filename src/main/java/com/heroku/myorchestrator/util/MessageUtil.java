@@ -20,17 +20,21 @@ public class MessageUtil {
             return (String) getMessage(ex).get("kind");
         }
     }
+
     public static void updateMessage(Exchange exchange, String key, Object value) {
         Map message = getMessage(exchange);
         message.put(key, value);
         exchange.getIn().setBody(message, String.class);
     }
+
     public static void writeObjectId(Exchange exchange, String key, Document document) {
         updateMessage(exchange, key, MongoUtil.getObjectIdHexString(document));
     }
+
     public static <T> T get(Exchange exchange, String key, Class<T> clazz) {
         return (T) MessageUtil.getMessage(exchange).get(key);
     }
+
     public static Predicate loadAffect() {
         return (Exchange ex) -> {
             List affect = MessageUtil.get(ex, "affect", List.class);
@@ -71,4 +75,12 @@ public class MessageUtil {
         return (String) getMessage().get(key);
     }
 
+    public boolean getBool(String key) {
+        Object get = getMessage().get(key);
+        if (get == null) {
+            return false;
+        } else {
+            return (boolean) get;
+        }
+    }
 }
