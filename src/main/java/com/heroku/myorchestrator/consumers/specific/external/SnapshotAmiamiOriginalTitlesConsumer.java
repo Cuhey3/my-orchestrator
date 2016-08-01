@@ -70,12 +70,6 @@ public class SnapshotAmiamiOriginalTitlesConsumer extends SnapshotRouteBuilder {
                     = new ArrayList<>(gwt.google(amiamiTitle).get());
             map.put("wiki_title", wikiTitles);
         });
-        titles.stream().forEach((map) -> {
-            List<String> wikiTitles = (List<String>) map.get("wiki_title");
-            Set<String> collect = wikiTitles.stream().map((title) -> title.replace("_", " "))
-                    .collect(Collectors.toSet());
-            map.put("wiki_title", collect);
-        });
         document.put("data", titles);
     }
 }
