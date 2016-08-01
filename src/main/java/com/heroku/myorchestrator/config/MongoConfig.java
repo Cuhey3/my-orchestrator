@@ -1,8 +1,6 @@
 package com.heroku.myorchestrator.config;
 
 import com.heroku.myorchestrator.config.enumerate.MongoTarget;
-import com.heroku.myorchestrator.config.enumerate.Paths;
-import com.heroku.myorchestrator.util.SettingUtil;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import java.io.UnsupportedEncodingException;
@@ -24,7 +22,7 @@ public class MongoConfig {
 
     public MongoConfig() throws UnsupportedEncodingException, Exception {
         try {
-            ownMongodbUri = new SettingUtil(Paths.SETTINGS).get("MONGODB_URI");
+            ownMongodbUri = Settings.ENV.get("MONGODB_URI");
             MongoClientURI mongoClientURI = new MongoClientURI(ownMongodbUri);
             try (MongoClient mongoClient = new MongoClient(mongoClientURI)) {
                 mongoSettings = mongoClient

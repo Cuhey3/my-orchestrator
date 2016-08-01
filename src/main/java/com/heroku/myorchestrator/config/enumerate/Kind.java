@@ -1,26 +1,28 @@
 package com.heroku.myorchestrator.config.enumerate;
 
+import static com.heroku.myorchestrator.util.actions.DiffUtil.commonDiff;
+
 public enum Kind {
 
     foo,
-    female_seiyu_category_members("common_diff", "period=5m&delay=1m"),
-    male_seiyu_category_members("common_diff", "period=5m&delay=2m"),
-    seiyu_category_members("common_diff"),
-    seiyu_template_include_pages("common_diff", "period=5m&delay=3m"),
-    seiyu_category_members_include_template("common_diff"),
+    female_seiyu_category_members(commonDiff(), "period=5m&delay=1m"),
+    male_seiyu_category_members(commonDiff(), "period=5m&delay=2m"),
+    seiyu_category_members(commonDiff()),
+    seiyu_template_include_pages(commonDiff(), "period=5m&delay=3m"),
+    seiyu_category_members_include_template(commonDiff()),
     koepota_events("period=30m&delay=10m"),
-    koepota_seiyu("common_diff"),
-    seiyu_has_recentchanges("common_diff"),
-    koepota_seiyu_all("common_diff"),
+    koepota_seiyu(commonDiff()),
+    seiyu_has_recentchanges(commonDiff()),
+    koepota_seiyu_all(commonDiff()),
     amiami_item("period=60m&delay=30m"),
     amiami_original_titles,
     test;
 
     private Kind(String... token) {
         for (String t : token) {
-            if (t.equals("common_diff")) {
+            if (t.equals(commonDiff())) {
                 this.useCommonDiff = true;
-            } else if (t.contains("period") && t.contains("delay")) {
+            } else if (t.contains("period=")) {
                 this.timerUri = String.format("timer:%s?%s", this.name(), t);
             }
         }

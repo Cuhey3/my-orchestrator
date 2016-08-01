@@ -2,3 +2,4 @@ target
 src/main/resources/config/iron.json
 src/main/resources/config/settings.json
 /nbproject/
+/src/main/resources/config/env.json

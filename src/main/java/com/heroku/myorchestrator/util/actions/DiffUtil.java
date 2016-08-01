@@ -13,6 +13,12 @@ import org.bson.Document;
 
 public class DiffUtil extends ActionUtil {
 
+    private static final String COMMON_DIFF = "common_diff";
+
+    public static String commonDiff() {
+        return COMMON_DIFF;
+    }
+
     public static Optional<Document> basicDiff(Document master, Document snapshot) {
         return DiffUtil.basicDiff(master, snapshot, "title");
     }

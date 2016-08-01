@@ -1,5 +1,6 @@
 package com.heroku.myorchestrator.util;
 
+import com.heroku.myorchestrator.config.enumerate.Kind;
 import java.util.List;
 import java.util.Map;
 import org.apache.camel.Exchange;
@@ -82,5 +83,11 @@ public class MessageUtil {
         } else {
             return (boolean) get;
         }
+    }
+
+    public static Predicate messageKindIs(Kind kind) {
+        return (Exchange exchange1)
+                -> new MessageUtil(exchange1).get("kind")
+                .equals(kind.expression());
     }
 }

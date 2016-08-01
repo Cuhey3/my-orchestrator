@@ -1,15 +1,19 @@
-package com.heroku.myorchestrator.util;
+package com.heroku.myorchestrator.config;
 
-import com.heroku.myorchestrator.config.enumerate.Paths;
 import com.heroku.myorchestrator.exceptions.SettingNotFoundException;
+import com.heroku.myorchestrator.util.JsonResourceUtil;
 
-public class SettingUtil {
-
+public enum Settings {
+    ENV, IRON;
+    private final String path;
     private JsonResourceUtil jru;
-    private final Paths paths;
 
-    public SettingUtil(Paths paths) {
-        this.paths = paths;
+    private Settings() {
+        this.path = String.format("/config/%s.json", this.name().toLowerCase());
+        try {
+            this.jru = new JsonResourceUtil(this.path);
+        } catch (Exception e) {
+        }
     }
 
     public String get(String key) throws Exception {
@@ -21,9 +25,6 @@ public class SettingUtil {
         if (value != null) {
             return value;
         } else {
-            if (jru == null) {
-                jru = new JsonResourceUtil(paths);
-            }
             value = jru.get(key2);
             if (value != null) {
                 return value;
