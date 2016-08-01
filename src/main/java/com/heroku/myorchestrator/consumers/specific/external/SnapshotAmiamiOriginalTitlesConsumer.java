@@ -66,7 +66,8 @@ public class SnapshotAmiamiOriginalTitlesConsumer extends SnapshotRouteBuilder {
         titles.stream().filter((map) -> !map.containsKey("wiki_title"))
                 .limit(10).forEach((map) -> {
             String amiamiTitle = (String) map.get("amiami_title");
-            Set<String> wikiTitles = gwt.google(amiamiTitle).get();
+            List<String> wikiTitles
+                    = new ArrayList<>(gwt.google(amiamiTitle).get());
             map.put("wiki_title", wikiTitles);
         });
         titles.stream().forEach((map) -> {
