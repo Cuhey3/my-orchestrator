@@ -90,4 +90,9 @@ public class MessageUtil {
                 -> new MessageUtil(exchange1).get("kind")
                 .equals(kind.expression());
     }
+
+    public static Predicate messageKindContains(String str) {
+        return (Exchange exchange1)
+                -> new MessageUtil(exchange1).get("kind").contains(str);
+    }
 }
