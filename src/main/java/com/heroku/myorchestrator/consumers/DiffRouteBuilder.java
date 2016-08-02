@@ -8,6 +8,7 @@ import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.actions.SnapshotUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import com.heroku.myorchestrator.util.consumers.KindUtil;
+import com.heroku.myorchestrator.util.content.DocumentUtil;
 import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
@@ -71,7 +72,7 @@ public abstract class DiffRouteBuilder extends ConsumerRouteBuilder {
                             .writeDocument(optDiff.get());
                     return true;
                 } else {
-                    return false;
+                    return DocumentUtil.checkNotFilled(exchange, master);
                 }
             } catch (Exception e) {
                 IronmqUtil.sendError(this.getClass(), "comparePredicate", exchange, e);

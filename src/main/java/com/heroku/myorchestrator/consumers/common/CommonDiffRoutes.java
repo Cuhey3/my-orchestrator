@@ -18,8 +18,8 @@ public class CommonDiffRoutes {
                     });
                 }
             }
-        } catch (Throwable e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
             System.out.println("common diff routes initialization failed..."
                     + "\nSystem is shutting down.");
             System.exit(1);

@@ -20,14 +20,14 @@ public class CompletionConsumer extends ConsumerRouteBuilder {
                 .choice()
                 .when((Exchange exchange)
                         -> new MasterUtil(exchange).isSkipValidation())
-                .to("direct:snapshotSaveToMaster")
+                .to("direct:completionSaveToMaster")
                 .otherwise()
                 .filter((Exchange exchange)
                         -> new MasterUtil(exchange).comparedIsValid())
-                .to("direct:snapshotSaveToMaster");
+                .to("direct:completionSaveToMaster");
 
-        from("direct:snapshotSaveToMaster")
-                .routeId("snapshot_save_to_master")
+        from("direct:completionSaveToMaster")
+                .routeId("completion_save_to_master")
                 .filter((Exchange exchange)
                         -> new MasterUtil(exchange).snapshotSaveToMaster())
                 .filter((Exchange exchange)

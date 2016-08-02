@@ -3,7 +3,6 @@ package com.heroku.myorchestrator.config;
 import com.heroku.myorchestrator.config.enumerate.MongoTarget;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +19,7 @@ public class MongoConfig {
 
     private String ownMongodbUri;
 
-    public MongoConfig() throws UnsupportedEncodingException, Exception {
+    public MongoConfig() throws Exception {
         try {
             ownMongodbUri = Settings.ENV.get("MONGODB_URI");
             MongoClientURI mongoClientURI = new MongoClientURI(ownMongodbUri);
@@ -31,8 +30,8 @@ public class MongoConfig {
                         .get("mongodb", Map.class);
                 mongoSettings.put("dummy", ownMongodbUri);
             }
-        } catch (Throwable e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
             System.out.println("mongodb client initialization failed..."
                     + "\nSystem is shutting down.");
             System.exit(1);

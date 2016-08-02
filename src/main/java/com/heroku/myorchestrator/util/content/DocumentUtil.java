@@ -1,12 +1,15 @@
 package com.heroku.myorchestrator.util.content;
 
+import com.heroku.myorchestrator.util.MessageUtil;
+import com.heroku.myorchestrator.util.actions.MasterUtil;
 import java.util.LinkedHashMap;
-import java.util.Optional;
-import org.bson.Document;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.camel.Exchange;
+import org.bson.Document;
 
 public class DocumentUtil {
 
@@ -75,5 +78,19 @@ public class DocumentUtil {
             map.put(key, prefix + map.get(key));
         });
         document.append("data", list);
+    }
+
+    public static boolean checkNotFilled(Exchange exchange, Document document) throws Exception {
+        MessageUtil messageUtil = new MessageUtil(exchange);
+        String fillField = messageUtil.get("fill");
+        if (fillField == null) {
+            return false;
+        } else {
+            if (document == null) {
+                document = new MasterUtil(exchange).loadDocument().get();
+            }
+            List<Map<String, Object>> list = document.get("data", List.class);
+            return list.stream().anyMatch((map) -> !map.containsKey(fillField));
+        }
     }
 }

@@ -93,6 +93,13 @@ public class IronmqUtil {
         return this;
     }
 
+    public void send(Exchange exchange) throws IOException {
+        Client client = exchange.getContext().getRegistry()
+                .lookupByNameAndType(IRONMQ_CLIENT_BEAN_NAME, Client.class);
+        client.queue(this.type + "_" + this.kind)
+                .push(new KindUtil(Kind.valueOf(kind)).preMessage());
+    }
+
     public String consumeUri() {
         return String.format("ironmq:%s"
                 + "?client=%s"
