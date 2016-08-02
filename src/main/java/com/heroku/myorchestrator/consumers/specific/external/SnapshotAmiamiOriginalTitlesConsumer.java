@@ -63,12 +63,12 @@ public class SnapshotAmiamiOriginalTitlesConsumer extends SnapshotRouteBuilder {
     public void updateWikiTitles(Document document) {
         List<Map<String, Object>> titles = document.get("data", List.class);
         final GoogleWikiTitle gwt = new GoogleWikiTitle();
-        titles.stream().filter((map) -> !map.containsKey("wiki_title"))
+        titles.stream().filter((map) -> !map.containsKey("wiki_titles"))
                 .limit(10).forEach((map) -> {
             String amiamiTitle = (String) map.get("amiami_title");
             List<String> wikiTitles
                     = new ArrayList<>(gwt.google(amiamiTitle).get());
-            map.put("wiki_title", wikiTitles);
+            map.put("wiki_titles", wikiTitles);
         });
         document.put("data", titles);
     }
