@@ -1,4 +1,9 @@
-package com.heroku.myorchestrator.consumers.specific.seiyu;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.heroku.myorchestrator.consumers.specific.amiami;
 
 import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
@@ -15,39 +20,27 @@ import org.bson.Document;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SnapshotKoepotaSeiyuAllConsumer extends SnapshotRouteBuilder {
+public class SnapshotAmiamiOriginalTitlesAllConsumer extends SnapshotRouteBuilder {
 
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange, Document document) {
         try {
             MasterUtil util = new MasterUtil(exchange);
-            util.kind(Kind.koepota_seiyu_all);
-            List<Map<String, Object>> allList, koepotaSeiyuList, scmitList;
+            util.kind(Kind.amiami_original_titles_all);
+            List<Map<String, Object>> allList, aotList;
             try {
                 allList = util.findLatest().get().get("data", List.class);
             } catch (Exception ex0) {
                 allList = new ArrayList<>();
             }
-            util.kind(Kind.koepota_seiyu);
-            koepotaSeiyuList
-                    = util.findLatest().get().get("data", List.class);
-            Set<Object> allSet = allList.stream().map((map) -> map.get("title"))
+            util.kind(Kind.amiami_original_titles);
+            aotList = util.findLatest().get().get("data", List.class);
+            Set<Object> allSet = allList.stream()
+                    .map((map) -> map.get("amiami_title"))
                     .collect(Collectors.toSet());
-            koepotaSeiyuList.stream()
-                    .filter((map) -> !allSet.contains(map.get("title")))
+            aotList.stream()
+                    .filter((map) -> !allSet.contains(map.get("amiami_title")))
                     .forEach(allList::add);
-            util.kind(Kind.seiyu_category_members_include_template);
-            scmitList = util.findLatest().get().get("data", List.class);
-            Set<Object> scmitSet = scmitList.stream().map((map) -> map.get(("title")))
-                    .collect(Collectors.toSet());
-            allList.stream()
-                    .forEach((map) -> {
-                        if (scmitSet.contains(map.get("title"))) {
-                            map.remove("inactive");
-                        } else {
-                            map.put("inactive", true);
-                        }
-                    });
             return Optional.ofNullable(document.append("data", allList));
         } catch (Exception ex) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);

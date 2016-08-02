@@ -16,6 +16,7 @@ public enum Kind {
     koepota_seiyu_all(commonDiff()),
     amiami_item("period=60m&delay=30m"),
     amiami_original_titles,
+    amiami_original_titles_all,
     test;
 
     private Kind(String... token) {

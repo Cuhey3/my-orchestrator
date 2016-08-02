@@ -1,4 +1,4 @@
-package com.heroku.myorchestrator.consumers.specific.external;
+package com.heroku.myorchestrator.consumers.specific.amiami;
 
 import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
