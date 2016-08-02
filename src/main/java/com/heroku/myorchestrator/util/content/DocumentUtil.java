@@ -87,7 +87,7 @@ public class DocumentUtil {
             return false;
         } else {
             if (document == null) {
-                document = new MasterUtil(exchange).loadDocument().get();
+                document = new MasterUtil(exchange).findLatest().get();
             }
             List<Map<String, Object>> list = document.get("data", List.class);
             return list.stream().anyMatch((map) -> !map.containsKey(fillField));
