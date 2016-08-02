@@ -71,8 +71,11 @@ public abstract class DiffRouteBuilder extends ConsumerRouteBuilder {
                     new DiffUtil(exchange).updateMessageComparedId(master)
                             .writeDocument(optDiff.get());
                     return true;
+                } else if (DocumentUtil.checkNotFilled(exchange, master)) {
+                    new DiffUtil(exchange).updateMessageComparedId(master);
+                    return true;
                 } else {
-                    return DocumentUtil.checkNotFilled(exchange, master);
+                    return false;
                 }
             } catch (Exception e) {
                 IronmqUtil.sendError(this.getClass(), "comparePredicate", exchange, e);
