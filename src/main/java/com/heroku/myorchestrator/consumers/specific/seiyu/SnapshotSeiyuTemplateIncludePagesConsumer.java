@@ -2,6 +2,7 @@ package com.heroku.myorchestrator.consumers.specific.seiyu;
 
 import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
+import com.heroku.myorchestrator.util.content.DocumentUtil;
 import com.heroku.myorchestrator.util.content.MediawikiApiRequest;
 import java.io.IOException;
 import java.util.List;
@@ -15,17 +16,16 @@ import org.springframework.stereotype.Component;
 public class SnapshotSeiyuTemplateIncludePagesConsumer extends SnapshotRouteBuilder {
 
     @Override
-    protected Optional<Document> doSnapshot(Exchange exchange, Document document) {
+    protected Optional<Document> doSnapshot(Exchange exchange) {
         try {
-            List<Map<String, Object>> resultByMapList = new MediawikiApiRequest()
+            List<Map<String, Object>> result = new MediawikiApiRequest()
                     .setApiParam("action=query&list=backlinks&bltitle=Template:%E5%A3%B0%E5%84%AA&format=xml&bllimit=500&blnamespace=0&continue=")
                     .setListName("backlinks")
                     .setMapName("bl")
                     .setContinueElementName("blcontinue")
                     .setIgnoreFields("ns")
                     .getResultByMapList();
-            document.append("data", resultByMapList);
-            return Optional.ofNullable(document);
+            return new DocumentUtil().setData(result).nullable();
         } catch (IOException ex) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
             return Optional.empty();

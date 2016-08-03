@@ -2,6 +2,7 @@ package com.heroku.myorchestrator.util.content;
 
 import com.heroku.myorchestrator.util.MessageUtil;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,49 +24,8 @@ public class DocumentUtil {
         return new DocumentUtil().setData(collect).nullable();
     }
 
-    public static void addNewByKey(Document oldDoc, Document newDoc, final String key) {
-        List<Map<String, Object>> oldList = getData(oldDoc);
-        Set oldSet = oldList.stream().map((map) -> map.get(key))
-                .collect(Collectors.toSet());
-        getData(newDoc).stream().filter((map) -> !oldSet.contains(map.get(key)))
-                .forEach(oldList::add);
-        oldDoc.append("data", oldList);
-    }
-
     public static Optional<Document> productSetByTitle(Document sieved, Document filter) {
         return productSetByKey(sieved, filter, "title");
-    }
-
-    public static void createPrefix(Document document, String... keys) {
-        document.append("prefix", new LinkedHashMap());
-        for (String key : keys) {
-            createPrefixSpecific(document, key);
-        }
-    }
-
-    private static void createPrefixSpecific(Document document, String key) {
-        List<Map<String, Object>> list = getData(document);
-        String firstValue = (String) list.get(0).get(key);
-        int len = firstValue.length();
-        String prefix = null;
-        for (int i = len; i > 10; i--) {
-            String prefixSuggest = firstValue.substring(0, i);
-            if (list.stream().allMatch((map)
-                    -> ((String) map.get(key)).startsWith(prefixSuggest))) {
-                prefix = prefixSuggest;
-                int length = prefix.length();
-                list.stream().forEach((map) -> {
-                    map.put(key, ((String) map.get(key))
-                            .substring(length));
-                });
-                break;
-            }
-        }
-        if (prefix != null) {
-            Map prefixs = document.get("prefix", Map.class);
-            prefixs.put(key, prefix);
-            document.put("prefix", prefixs);
-        }
     }
 
     public static Document restorePrefix(Document document) {
@@ -105,10 +65,6 @@ public class DocumentUtil {
         return document.get("data", List.class);
     }
 
-    public static void setData(Document document, List list) {
-        document.append("data", list);
-    }
-
     private final Document document;
 
     public DocumentUtil(Document document) {
@@ -117,6 +73,54 @@ public class DocumentUtil {
 
     public DocumentUtil() {
         this.document = new Document();
+    }
+
+    public DocumentUtil addNewByKey(Document oldDoc, Document newDoc, final String key) {
+        List<Map<String, Object>> oldList;
+        if (oldDoc == null || getData(oldDoc) == null) {
+            oldList = new ArrayList<>();
+        } else {
+            oldList = getData(oldDoc);
+        }
+        Set oldSet = oldList.stream().map((map) -> map.get(key))
+                .collect(Collectors.toSet());
+        getData(newDoc).stream().filter((map) -> !oldSet.contains(map.get(key)))
+                .forEach(oldList::add);
+        setData(oldList);
+        return this;
+    }
+
+    public DocumentUtil createPrefix(String... keys) {
+        document.append("prefix", new LinkedHashMap());
+        for (String key : keys) {
+            createPrefixSpecific(key);
+        }
+        return this;
+    }
+
+    private void createPrefixSpecific(String key) {
+        List<Map<String, Object>> list = getData(document);
+        String firstValue = (String) list.get(0).get(key);
+        int len = firstValue.length();
+        String prefix = null;
+        for (int i = len; i > 10; i--) {
+            String prefixSuggest = firstValue.substring(0, i);
+            if (list.stream().allMatch((map)
+                    -> ((String) map.get(key)).startsWith(prefixSuggest))) {
+                prefix = prefixSuggest;
+                int length = prefix.length();
+                list.stream().forEach((map) -> {
+                    map.put(key, ((String) map.get(key))
+                            .substring(length));
+                });
+                break;
+            }
+        }
+        if (prefix != null) {
+            Map prefixs = document.get("prefix", Map.class);
+            prefixs.put(key, prefix);
+            document.put("prefix", prefixs);
+        }
     }
 
     public List<Map<String, Object>> getData() {

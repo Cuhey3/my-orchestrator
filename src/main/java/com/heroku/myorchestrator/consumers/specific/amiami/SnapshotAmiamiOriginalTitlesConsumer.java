@@ -6,7 +6,6 @@ import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import com.heroku.myorchestrator.util.content.DocumentUtil;
 import static com.heroku.myorchestrator.util.content.DocumentUtil.getData;
-import static com.heroku.myorchestrator.util.content.DocumentUtil.setData;
 import com.heroku.myorchestrator.util.content.GoogleWikiTitle;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -23,29 +22,30 @@ import org.springframework.stereotype.Component;
 public class SnapshotAmiamiOriginalTitlesConsumer extends SnapshotRouteBuilder {
 
     @Override
-    protected Optional<Document> doSnapshot(Exchange exchange, Document document) {
+    protected Optional<Document> doSnapshot(Exchange exchange) {
         try {
-            mergeNewTitles(exchange, document);
-            updateWikiTitles(document);
-            return Optional.ofNullable(document);
+            DocumentUtil util = new DocumentUtil();
+            mergeNewTitles(exchange, util);
+            updateWikiTitles(util);
+            return util.nullable();
         } catch (Exception ex) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
             return Optional.empty();
         }
     }
 
-    public void mergeNewTitles(Exchange exchange, Document document) throws Exception {
-        MasterUtil util = new MasterUtil(exchange);
+    public void mergeNewTitles(Exchange exchange, DocumentUtil util) throws Exception {
+        MasterUtil masterUtil = new MasterUtil(exchange);
         List<Map<String, Object>> originalTitlesList;
         try {
-            originalTitlesList = getData(util.findLatest().get());
+            originalTitlesList = getData(masterUtil.findLatest().get());
         } catch (Exception ex0) {
             originalTitlesList = new ArrayList<>();
         }
         Set originalTitlesSet = originalTitlesList
                 .stream().map((map) -> map.get("amiami_title"))
                 .collect(Collectors.toSet());
-        getData(util.getLatest(amiami_item))
+        getData(masterUtil.getLatest(amiami_item))
                 .stream().map((map) -> (String) map.get("orig"))
                 .filter((title) -> title.length() > 0)
                 .collect(Collectors.toSet())
@@ -57,11 +57,10 @@ public class SnapshotAmiamiOriginalTitlesConsumer extends SnapshotRouteBuilder {
                     return map;
                 })
                 .forEach(originalTitlesList::add);
-        setData(document, originalTitlesList);
+        util.setData(originalTitlesList);
     }
 
-    public void updateWikiTitles(Document document) {
-        DocumentUtil util = new DocumentUtil(document);
+    public void updateWikiTitles(DocumentUtil util) {
         List<Map<String, Object>> titles = util.getData();
         final GoogleWikiTitle gwt = new GoogleWikiTitle();
         titles.stream().filter((map) -> !map.containsKey("wiki_titles"))

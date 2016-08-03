@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class SnapshotSeiyuCategoryMembersIncludeTemplateConsumer extends SnapshotRouteBuilder {
 
     @Override
-    protected Optional<Document> doSnapshot(Exchange exchange, Document document) {
+    protected Optional<Document> doSnapshot(Exchange exchange) {
         try {
             MasterUtil util = new MasterUtil(exchange);
             Document scm = util.getLatest(seiyu_category_members);

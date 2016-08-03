@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 public class SnapshotMaleSeiyuCategoryMembersConsumer extends SnapshotRouteBuilder {
 
     @Override
-    protected Optional<Document> doSnapshot(Exchange exchange, Document document) {
+    protected Optional<Document> doSnapshot(Exchange exchange) {
         try {
             List<Map<String, Object>> mapList
                     = new MediawikiApiRequest()
@@ -33,7 +33,7 @@ public class SnapshotMaleSeiyuCategoryMembersConsumer extends SnapshotRouteBuild
                     .setIgnoreFields("ns")
                     .getResultByMapList();
             mapList.forEach((m) -> m.put("gender", "m"));
-            return new DocumentUtil(document).setData(mapList).nullable();
+            return new DocumentUtil().setData(mapList).nullable();
         } catch (Exception e) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, e);
             return Optional.empty();

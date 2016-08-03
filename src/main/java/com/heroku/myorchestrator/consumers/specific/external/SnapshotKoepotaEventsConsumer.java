@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class SnapshotKoepotaEventsConsumer extends SnapshotRouteBuilder {
 
     @Override
-    protected Optional<Document> doSnapshot(Exchange exchange, Document document) {
+    protected Optional<Document> doSnapshot(Exchange exchange) {
         try {
             org.jsoup.nodes.Document doc
                     = Jsoup.connect("http://www.koepota.jp/eventschedule/")
@@ -28,7 +28,7 @@ public class SnapshotKoepotaEventsConsumer extends SnapshotRouteBuilder {
             List<org.bson.Document> collect = select.stream()
                     .map((el) -> new KoepotaEvent(el).getDocument())
                     .collect(Collectors.toList());
-            return new DocumentUtil(document).setData(collect).nullable();
+            return new DocumentUtil().setData(collect).nullable();
         } catch (Exception e) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, e);
             return Optional.empty();

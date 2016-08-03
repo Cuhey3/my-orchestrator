@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class SnapshotKoepotaSeiyuConsumer extends SnapshotRouteBuilder {
 
     @Override
-    protected Optional<Document> doSnapshot(Exchange exchange, Document document) {
+    protected Optional<Document> doSnapshot(Exchange exchange) {
         try {
             MasterUtil util = new MasterUtil(exchange);
             StringBuilder sb = new StringBuilder(32768);
@@ -32,7 +32,7 @@ public class SnapshotKoepotaSeiyuConsumer extends SnapshotRouteBuilder {
                             -> koepotaStr.contains(((String) map.get("title"))
                                     .replaceFirst(" \\(.+", "")))
                     .collect(Collectors.toList());
-            return new DocumentUtil(document).setData(collect).nullable();
+            return new DocumentUtil().setData(collect).nullable();
         } catch (Exception ex) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
             return Optional.empty();

@@ -26,7 +26,7 @@ public abstract class SnapshotRouteBuilder extends ConsumerRouteBuilder {
 
     protected Predicate defaultPredicate() {
         return (Exchange exchange) -> {
-            Optional<Document> snapshot = doSnapshot(exchange, new Document());
+            Optional<Document> snapshot = doSnapshot(exchange);
             try {
                 if (snapshot.isPresent()) {
                     new SnapshotUtil(exchange).writeDocument(snapshot.get());
@@ -41,5 +41,5 @@ public abstract class SnapshotRouteBuilder extends ConsumerRouteBuilder {
         };
     }
 
-    protected abstract Optional<Document> doSnapshot(Exchange exchange, Document document);
+    protected abstract Optional<Document> doSnapshot(Exchange exchange);
 }

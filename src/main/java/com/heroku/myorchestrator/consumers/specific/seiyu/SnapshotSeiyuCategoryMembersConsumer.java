@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class SnapshotSeiyuCategoryMembersConsumer extends SnapshotRouteBuilder {
 
     @Override
-    protected Optional<Document> doSnapshot(Exchange exchange, Document document) {
+    protected Optional<Document> doSnapshot(Exchange exchange) {
         MasterUtil masterUtil = new MasterUtil(exchange);
         return masterUtil.latestJoinAll(Kind.female_seiyu_category_members,
                 Kind.male_seiyu_category_members);

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class SnapshotAmiamiItemConsumer extends SnapshotRouteBuilder {
 
     @Override
-    protected Optional<Document> doSnapshot(Exchange exchange, Document document) {
+    protected Optional<Document> doSnapshot(Exchange exchange) {
         try {
             String amiamiUrl = "http://www.amiami.jp/top/page/cal/goods.html";
             org.jsoup.nodes.Document doc = Jsoup.connect(amiamiUrl)
@@ -37,9 +37,8 @@ public class SnapshotAmiamiItemConsumer extends SnapshotRouteBuilder {
                         map.put("orig", title);
                         return map;
                     }).collect(Collectors.toList());
-            document.append("data", collect);
-            DocumentUtil.createPrefix(document, "img", "url");
-            return Optional.ofNullable(document);
+            return new DocumentUtil().setData(collect)
+                    .createPrefix("img", "url").nullable();
         } catch (Exception ex) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
             return Optional.empty();

@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 public class SnapshotSeiyuHasRecentchanges extends SnapshotRouteBuilder {
 
     @Override
-    protected Optional<Document> doSnapshot(Exchange exchange, Document document) {
+    protected Optional<Document> doSnapshot(Exchange exchange) {
         try {
             MasterUtil util = new MasterUtil(exchange);
             MongoUtil mongoUtil = new MongoUtil(exchange);
@@ -38,9 +38,8 @@ public class SnapshotSeiyuHasRecentchanges extends SnapshotRouteBuilder {
                 } else {
                     List<Map<String, Object>> changedList
                             = next.get("changed", List.class);
-                    changedList.stream()
-                            .filter((map)
-                                    -> ((String) map.get("type")).equals("add"))
+                    changedList.stream().filter((map)
+                            -> ((String) map.get("type")).equals("add"))
                             .map((map) -> (Map<String, Object>) map.get("data"))
                             .map((map) -> (String) map.get("title"))
                             .forEach(seiyuNames::add);
@@ -51,7 +50,7 @@ public class SnapshotSeiyuHasRecentchanges extends SnapshotRouteBuilder {
                     .stream().filter((map)
                             -> seiyuNames.contains((String) map.get("title")))
                     .collect(Collectors.toList());
-            return new DocumentUtil(document).setData(collect).nullable();
+            return new DocumentUtil().setData(collect).nullable();
         } catch (Exception ex) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
             return Optional.empty();
