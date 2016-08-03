@@ -58,6 +58,7 @@ public final class DocumentUtil {
     }
 
     public DocumentUtil(List list) {
+        this.document = new Document();
         setData(list);
     }
 
