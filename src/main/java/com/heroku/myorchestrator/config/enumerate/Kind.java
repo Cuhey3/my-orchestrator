@@ -17,6 +17,7 @@ public enum Kind {
     amiami_item("period=60m&delay=30m"),
     amiami_original_titles(commonDiff("amiami_title")),
     amiami_original_titles_all(commonDiff("amiami_title")),
+    google_trends_seiyu_all(commonDiff()),
     test;
 
     private Kind(String... token) {

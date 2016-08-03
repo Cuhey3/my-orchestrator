@@ -139,6 +139,10 @@ public final class DocumentUtil {
         return this;
     }
 
+    public Document getDocument() {
+        return this.document;
+    }
+
     public DocumentUtil setDocument(Document document) {
         this.document = document;
         return this;
