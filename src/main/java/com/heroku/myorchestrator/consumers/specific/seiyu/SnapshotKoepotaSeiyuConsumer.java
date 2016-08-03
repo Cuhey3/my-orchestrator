@@ -23,8 +23,7 @@ public class SnapshotKoepotaSeiyuConsumer extends SnapshotRouteBuilder {
             MasterUtil util = new MasterUtil(exchange);
             StringBuilder sb = new StringBuilder(32768);
             DocumentUtil.getData(util.getLatest(koepota_events)).stream()
-                    .map((map) -> (String) map.get("c1"))
-                    .forEach(sb::append);
+                    .map((map) -> (String) map.get("c1")).forEach(sb::append);
             String koepotaStr = new String(sb);
             List<Map<String, Object>> collect = DocumentUtil.getData(
                     util.getLatest(seiyu_category_members_include_template))
@@ -32,7 +31,7 @@ public class SnapshotKoepotaSeiyuConsumer extends SnapshotRouteBuilder {
                             -> koepotaStr.contains(((String) map.get("title"))
                                     .replaceFirst(" \\(.+", "")))
                     .collect(Collectors.toList());
-            return new DocumentUtil().setData(collect).nullable();
+            return new DocumentUtil(collect).nullable();
         } catch (Exception ex) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
             return Optional.empty();

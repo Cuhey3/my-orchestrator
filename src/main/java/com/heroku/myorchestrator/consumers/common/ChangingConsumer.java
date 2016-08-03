@@ -62,8 +62,7 @@ public class ChangingConsumer extends ConsumerRouteBuilder {
                 })
                 .process((Exchange exchange) -> {
                     Kind k = Kind.valueOf(new MessageUtil(exchange).get("kind"));
-                    IronmqUtil ironmqUtil = new IronmqUtil();
-                    ironmqUtil.kind(k).snapshot().send(exchange);
+                    new IronmqUtil().snapshot().postMessage(exchange, k);
                 })
                 .otherwise()
                 .filter(MessageUtil.loadAffect())

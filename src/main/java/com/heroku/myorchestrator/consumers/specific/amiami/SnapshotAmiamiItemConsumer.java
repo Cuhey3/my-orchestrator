@@ -37,8 +37,8 @@ public class SnapshotAmiamiItemConsumer extends SnapshotRouteBuilder {
                         map.put("orig", title);
                         return map;
                     }).collect(Collectors.toList());
-            return new DocumentUtil().setData(collect)
-                    .createPrefix("img", "url").nullable();
+            return new DocumentUtil(collect).createPrefix("img", "url")
+                    .nullable();
         } catch (Exception ex) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
             return Optional.empty();

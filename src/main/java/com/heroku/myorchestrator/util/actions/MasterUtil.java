@@ -69,7 +69,7 @@ public class MasterUtil extends ActionUtil {
             List result = new ArrayList<>();
             result.addAll(getData(getLatest(kind1)));
             result.addAll(getData(getLatest(kind2)));
-            return new DocumentUtil().setData(result).nullable();
+            return new DocumentUtil(result).nullable();
         } catch (Exception e) {
             IronmqUtil.sendError(this.getClass(), "latestJoinAll", exchange, e);
             return Optional.empty();

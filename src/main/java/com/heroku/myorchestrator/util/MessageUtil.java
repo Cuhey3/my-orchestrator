@@ -48,6 +48,17 @@ public class MessageUtil {
         };
     }
 
+    public static Predicate messageKindIs(Kind kind) {
+        return (Exchange exchange1)
+                -> new MessageUtil(exchange1).get("kind")
+                .equals(kind.expression());
+    }
+
+    public static Predicate messageKindContains(String str) {
+        return (Exchange exchange1)
+                -> new MessageUtil(exchange1).get("kind").contains(str);
+    }
+
     private final Exchange exchange;
 
     public MessageUtil(Exchange exchange) {
@@ -83,16 +94,5 @@ public class MessageUtil {
         } else {
             return (boolean) get;
         }
-    }
-
-    public static Predicate messageKindIs(Kind kind) {
-        return (Exchange exchange1)
-                -> new MessageUtil(exchange1).get("kind")
-                .equals(kind.expression());
-    }
-
-    public static Predicate messageKindContains(String str) {
-        return (Exchange exchange1)
-                -> new MessageUtil(exchange1).get("kind").contains(str);
     }
 }

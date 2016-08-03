@@ -12,21 +12,7 @@ import java.util.stream.Collectors;
 import org.apache.camel.Exchange;
 import org.bson.Document;
 
-public class DocumentUtil {
-
-    public static Optional<Document> productSetByKey(Document sieved, Document filter, final String key) {
-        Set<Object> filterSet = getData(filter).stream()
-                .map((map) -> map.get(key))
-                .collect(Collectors.toSet());
-        List<Map<String, Object>> collect = getData(sieved).stream()
-                .filter((map) -> filterSet.contains(map.get(key)))
-                .collect(Collectors.toList());
-        return new DocumentUtil().setData(collect).nullable();
-    }
-
-    public static Optional<Document> productSetByTitle(Document sieved, Document filter) {
-        return productSetByKey(sieved, filter, "title");
-    }
+public final class DocumentUtil {
 
     public static Document restorePrefix(Document document) {
         Map<String, String> prefixs = document.get("prefix", Map.class);
@@ -39,7 +25,7 @@ public class DocumentUtil {
     }
 
     private static void restorePrefixSpecific(Document document, String key, String prefix) {
-        DocumentUtil util = new DocumentUtil(document);
+        DocumentUtil util = new DocumentUtil().setDocument(document);
         List<Map<String, Object>> list = util.getData();
         list.stream().forEach((map) -> {
             map.put(key, prefix + map.get(key));
@@ -65,14 +51,29 @@ public class DocumentUtil {
         return document.get("data", List.class);
     }
 
-    private final Document document;
-
-    public DocumentUtil(Document document) {
-        this.document = document;
-    }
+    private Document document;
 
     public DocumentUtil() {
         this.document = new Document();
+    }
+
+    public DocumentUtil(List list) {
+        setData(list);
+    }
+
+    public DocumentUtil productByKey(Document sieved, Document filter, final String key) {
+        Set<Object> filterSet = getData(filter).stream()
+                .map((map) -> map.get(key))
+                .collect(Collectors.toSet());
+        List<Map<String, Object>> collect = getData(sieved).stream()
+                .filter((map) -> filterSet.contains(map.get(key)))
+                .collect(Collectors.toList());
+        setData(collect);
+        return this;
+    }
+
+    public DocumentUtil productByTitle(Document sieved, Document filter) {
+        return productByKey(sieved, filter, "title");
     }
 
     public DocumentUtil addNewByKey(Document oldDoc, Document newDoc, final String key) {
@@ -134,6 +135,11 @@ public class DocumentUtil {
 
     public DocumentUtil setDiff(List list) {
         document.append("diff", list);
+        return this;
+    }
+
+    public DocumentUtil setDocument(Document document) {
+        this.document = document;
         return this;
     }
 

@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import org.apache.camel.Exchange;
 import org.bson.Document;
 import org.jsoup.Jsoup;
-import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -24,11 +23,10 @@ public class SnapshotKoepotaEventsConsumer extends SnapshotRouteBuilder {
                     .maxBodySize(Integer.MAX_VALUE).timeout(Integer.MAX_VALUE)
                     .get();
             doc.select("#eventschedule tr:eq(0)").remove();
-            Elements select = doc.select("#eventschedule tr");
-            List<org.bson.Document> collect = select.stream()
-                    .map((el) -> new KoepotaEvent(el).getDocument())
+            List<org.bson.Document> collect = doc.select("#eventschedule tr")
+                    .stream().map((el) -> new KoepotaEvent(el).getDocument())
                     .collect(Collectors.toList());
-            return new DocumentUtil().setData(collect).nullable();
+            return new DocumentUtil(collect).nullable();
         } catch (Exception e) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, e);
             return Optional.empty();

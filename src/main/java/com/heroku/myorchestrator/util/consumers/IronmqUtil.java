@@ -93,11 +93,11 @@ public class IronmqUtil {
         return this;
     }
 
-    public void send(Exchange exchange) throws IOException {
+    public void postMessage(Exchange exchange, Kind k) throws IOException {
         Client client = exchange.getContext().getRegistry()
                 .lookupByNameAndType(IRONMQ_CLIENT_BEAN_NAME, Client.class);
-        client.queue(this.type + "_" + this.kind)
-                .push(new KindUtil(Kind.valueOf(kind)).preMessage());
+        client.queue(this.type + "_" + k.expression())
+                .push(new KindUtil(k).preMessage());
     }
 
     public String consumeUri() {
@@ -112,5 +112,4 @@ public class IronmqUtil {
         return String.format("ironmq:%s?client=%s",
                 type + "_" + kind, IRONMQ_CLIENT_BEAN_NAME);
     }
-
 }

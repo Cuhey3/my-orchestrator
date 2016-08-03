@@ -33,7 +33,7 @@ public class SnapshotFemaleSeiyuCategoryMembersConsumer extends SnapshotRouteBui
                     .setIgnoreFields("ns")
                     .getResultByMapList();
             result.forEach((m) -> m.put("gender", "f"));
-            return new DocumentUtil().setData(result).nullable();
+            return new DocumentUtil(result).nullable();
         } catch (Exception e) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, e);
             return Optional.empty();

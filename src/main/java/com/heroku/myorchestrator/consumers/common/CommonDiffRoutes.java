@@ -14,7 +14,7 @@ public class CommonDiffRoutes {
         try {
             for (Kind kind : Kind.values()) {
                 if (kind.useCommonDiffRoute()) {
-                    context.addRoutes(new DiffRouteBuilder(kind, kind.diffKey()) {
+                    context.addRoutes(new DiffRouteBuilder(kind) {
                     });
                 }
             }

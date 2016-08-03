@@ -1,17 +1,12 @@
 package com.heroku.myorchestrator.util.consumers;
 
-import com.heroku.myorchestrator.config.enumerate.MongoTarget;
 import com.heroku.myorchestrator.config.enumerate.Kind;
+import com.heroku.myorchestrator.config.enumerate.MongoTarget;
 import org.apache.camel.builder.SimpleBuilder;
 
 public class RouteUtil {
 
     private String target, kind;
-
-    public RouteUtil target(MongoTarget target) {
-        this.target = target.expression();
-        return this;
-    }
 
     public RouteUtil kind(Kind kind) {
         this.kind = kind.expression();

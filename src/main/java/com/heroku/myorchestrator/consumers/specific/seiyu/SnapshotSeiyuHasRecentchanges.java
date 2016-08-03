@@ -50,7 +50,7 @@ public class SnapshotSeiyuHasRecentchanges extends SnapshotRouteBuilder {
                     .stream().filter((map)
                             -> seiyuNames.contains((String) map.get("title")))
                     .collect(Collectors.toList());
-            return new DocumentUtil().setData(collect).nullable();
+            return new DocumentUtil(collect).nullable();
         } catch (Exception ex) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
             return Optional.empty();

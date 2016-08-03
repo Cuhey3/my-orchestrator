@@ -26,12 +26,7 @@ public abstract class DiffRouteBuilder extends ConsumerRouteBuilder {
     public DiffRouteBuilder(Kind kind) {
         route().diff();
         kind(kind);
-    }
-
-    public DiffRouteBuilder(Kind kind, String diffKey) {
-        route().diff();
-        kind(kind);
-        this.diffKey = diffKey;
+        this.diffKey = kind.diffKey();
     }
 
     @Override

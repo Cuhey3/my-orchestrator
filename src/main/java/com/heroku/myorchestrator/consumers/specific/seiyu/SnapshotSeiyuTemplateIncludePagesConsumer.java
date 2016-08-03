@@ -19,13 +19,15 @@ public class SnapshotSeiyuTemplateIncludePagesConsumer extends SnapshotRouteBuil
     protected Optional<Document> doSnapshot(Exchange exchange) {
         try {
             List<Map<String, Object>> result = new MediawikiApiRequest()
-                    .setApiParam("action=query&list=backlinks&bltitle=Template:%E5%A3%B0%E5%84%AA&format=xml&bllimit=500&blnamespace=0&continue=")
+                    .setApiParam("action=query&list=backlinks"
+                            + "&bltitle=Template:%E5%A3%B0%E5%84%AA"
+                            + "&format=xml&bllimit=500&blnamespace=0&continue=")
                     .setListName("backlinks")
                     .setMapName("bl")
                     .setContinueElementName("blcontinue")
                     .setIgnoreFields("ns")
                     .getResultByMapList();
-            return new DocumentUtil().setData(result).nullable();
+            return new DocumentUtil(result).nullable();
         } catch (IOException ex) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
             return Optional.empty();
