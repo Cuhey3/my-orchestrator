@@ -1,7 +1,6 @@
 package com.heroku.myorchestrator.util;
 
 import com.heroku.myorchestrator.App;
-import com.heroku.myorchestrator.util.MessageUtil;
 import org.apache.camel.CamelContext;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.ProducerTemplate;

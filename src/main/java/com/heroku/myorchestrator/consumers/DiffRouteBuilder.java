@@ -16,6 +16,8 @@ import org.bson.Document;
 
 public abstract class DiffRouteBuilder extends ConsumerRouteBuilder {
 
+    protected String diffKey;
+
     public DiffRouteBuilder() {
         route().diff();
         kind(KindUtil.findKindByClassName(this));
@@ -24,6 +26,12 @@ public abstract class DiffRouteBuilder extends ConsumerRouteBuilder {
     public DiffRouteBuilder(Kind kind) {
         route().diff();
         kind(kind);
+    }
+
+    public DiffRouteBuilder(Kind kind, String diffKey) {
+        route().diff();
+        kind(kind);
+        this.diffKey = diffKey;
     }
 
     @Override
@@ -36,7 +44,7 @@ public abstract class DiffRouteBuilder extends ConsumerRouteBuilder {
     }
 
     public Optional<Document> calculateDiff(Document master, Document snapshot) {
-        return DiffUtil.basicDiff(master, snapshot);
+        return DiffUtil.basicDiff(master, snapshot, diffKey);
     }
 
     public void doWhenMasterIsEmpty(Exchange exchange) {

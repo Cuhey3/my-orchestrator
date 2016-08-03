@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.bson.Document;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class DiffAmiamiOriginalTitlesConsumer extends DiffRouteBuilder {
 
     @Override
