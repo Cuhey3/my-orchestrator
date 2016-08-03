@@ -1,14 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.heroku.myorchestrator.consumers.specific.amiami;
 
-import com.heroku.myorchestrator.config.enumerate.Kind;
+import static com.heroku.myorchestrator.config.enumerate.Kind.amiami_original_titles;
+import static com.heroku.myorchestrator.config.enumerate.Kind.amiami_original_titles_all;
 import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
+import com.heroku.myorchestrator.util.content.DocumentUtil;
+import static com.heroku.myorchestrator.util.content.DocumentUtil.getData;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,22 +24,18 @@ public class SnapshotAmiamiOriginalTitlesAllConsumer extends SnapshotRouteBuilde
     protected Optional<Document> doSnapshot(Exchange exchange, Document document) {
         try {
             MasterUtil util = new MasterUtil(exchange);
-            util.kind(Kind.amiami_original_titles_all);
-            List<Map<String, Object>> allList, aotList;
+            List<Map<String, Object>> allList;
             try {
-                allList = util.findLatest().get().get("data", List.class);
+                allList = getData(util.getLatest(amiami_original_titles_all));
             } catch (Exception ex0) {
                 allList = new ArrayList<>();
             }
-            util.kind(Kind.amiami_original_titles);
-            aotList = util.findLatest().get().get("data", List.class);
-            Set<Object> allSet = allList.stream()
-                    .map((map) -> map.get("amiami_title"))
+            Set allSet = allList.stream().map((map) -> map.get("amiami_title"))
                     .collect(Collectors.toSet());
-            aotList.stream()
+            getData(util.getLatest(amiami_original_titles)).stream()
                     .filter((map) -> !allSet.contains(map.get("amiami_title")))
                     .forEach(allList::add);
-            return Optional.ofNullable(document.append("data", allList));
+            return new DocumentUtil(document).setData(allList).nullable();
         } catch (Exception ex) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
             return Optional.empty();

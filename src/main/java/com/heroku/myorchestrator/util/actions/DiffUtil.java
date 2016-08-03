@@ -3,6 +3,8 @@ package com.heroku.myorchestrator.util.actions;
 import com.heroku.myorchestrator.config.enumerate.MongoTarget;
 import com.heroku.myorchestrator.util.MessageUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
+import com.heroku.myorchestrator.util.content.DocumentUtil;
+import static com.heroku.myorchestrator.util.content.DocumentUtil.getData;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,26 +26,25 @@ public class DiffUtil extends ActionUtil {
     }
 
     public static Optional<Document> basicDiff(Document master, Document snapshot, String key) {
-        List<Map<String, String>> prev, next, collect;
-        prev = master.get("data", List.class);
-        next = snapshot.get("data", List.class);
+        List<Map<String, Object>> prev, next, collect;
+        prev = getData(master);
+        next = getData(snapshot);
         prev.forEach((map) -> map.put("type", "remove"));
         next.forEach((map) -> map.put("type", "add"));
         Set<String> prevTitleSet = prev.stream()
-                .map((Map<String, String> map) -> map.get(key))
+                .map((map) -> (String) map.get(key))
                 .collect(Collectors.toSet());
         Set<String> nextTitleSet = next.stream()
-                .map((Map<String, String> map) -> map.get(key))
+                .map((map) -> (String) map.get(key))
                 .collect(Collectors.toSet());
         collect = prev.stream()
-                .filter((map) -> !nextTitleSet.contains(map.get(key)))
+                .filter((map) -> !nextTitleSet.contains((String) map.get(key)))
                 .collect(Collectors.toList());
         next.stream()
-                .filter((map) -> !prevTitleSet.contains(map.get(key)))
+                .filter((map) -> !prevTitleSet.contains((String) map.get(key)))
                 .forEach(collect::add);
         if (collect.size() > 0) {
-            Document document = new Document("diff", collect);
-            return Optional.ofNullable(document);
+            return new DocumentUtil().setDiff(collect).nullable();
         } else {
             return Optional.empty();
         }

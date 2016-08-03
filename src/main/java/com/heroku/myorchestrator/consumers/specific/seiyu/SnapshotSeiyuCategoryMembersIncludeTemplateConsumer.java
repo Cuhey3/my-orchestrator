@@ -1,6 +1,7 @@
 package com.heroku.myorchestrator.consumers.specific.seiyu;
 
-import com.heroku.myorchestrator.config.enumerate.Kind;
+import static com.heroku.myorchestrator.config.enumerate.Kind.seiyu_category_members;
+import static com.heroku.myorchestrator.config.enumerate.Kind.seiyu_template_include_pages;
 import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
@@ -16,11 +17,9 @@ public class SnapshotSeiyuCategoryMembersIncludeTemplateConsumer extends Snapsho
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange, Document document) {
         try {
-            MasterUtil masterUtil = new MasterUtil(exchange);
-            Document scm = masterUtil.kind(Kind.seiyu_category_members)
-                    .findLatest().get();
-            Document stip = masterUtil.kind(Kind.seiyu_template_include_pages)
-                    .findLatest().get();
+            MasterUtil util = new MasterUtil(exchange);
+            Document scm = util.getLatest(seiyu_category_members);
+            Document stip = util.getLatest(seiyu_template_include_pages);
             return DocumentUtil.productSetByTitle(scm, stip);
         } catch (Exception ex) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);

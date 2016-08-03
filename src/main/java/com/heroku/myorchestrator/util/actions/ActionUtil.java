@@ -1,5 +1,6 @@
 package com.heroku.myorchestrator.util.actions;
 
+import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.util.MessageUtil;
 import com.heroku.myorchestrator.util.MongoUtil;
 import java.util.Optional;
@@ -28,5 +29,10 @@ public abstract class ActionUtil extends MongoUtil {
 
     public MessageUtil message() {
         return this.messageUtil;
+    }
+
+    public Document getLatest(Kind kind) throws Exception {
+        kind(kind);
+        return this.findLatest().get();
     }
 }

@@ -1,11 +1,13 @@
 package com.heroku.myorchestrator.consumers.specific.seiyu;
 
-import com.heroku.myorchestrator.config.enumerate.Kind;
+import static com.heroku.myorchestrator.config.enumerate.Kind.seiyu_category_members_include_template;
 import com.heroku.myorchestrator.config.enumerate.MongoTarget;
 import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
 import com.heroku.myorchestrator.util.MongoUtil;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
+import com.heroku.myorchestrator.util.content.DocumentUtil;
+import static com.heroku.myorchestrator.util.content.DocumentUtil.getData;
 import com.mongodb.client.MongoCursor;
 import java.util.HashSet;
 import java.util.List;
@@ -23,10 +25,7 @@ public class SnapshotSeiyuHasRecentchanges extends SnapshotRouteBuilder {
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange, Document document) {
         try {
-            MasterUtil masterUtil = new MasterUtil(exchange);
-            Document scmit = masterUtil
-                    .kind(Kind.seiyu_category_members_include_template)
-                    .findLatest().get();
+            MasterUtil util = new MasterUtil(exchange);
             MongoUtil mongoUtil = new MongoUtil(exchange);
             MongoCursor<Document> iterator
                     = mongoUtil.target(MongoTarget.SEIYULAB).database()
@@ -47,13 +46,12 @@ public class SnapshotSeiyuHasRecentchanges extends SnapshotRouteBuilder {
                             .forEach(seiyuNames::add);
                 }
             }
-            List<Map<String, Object>> scmitList = scmit.get("data", List.class);
-            List<Map<String, Object>> collect = scmitList.stream()
-                    .filter((map)
+            List<Map<String, Object>> collect = getData(util
+                    .getLatest(seiyu_category_members_include_template))
+                    .stream().filter((map)
                             -> seiyuNames.contains((String) map.get("title")))
                     .collect(Collectors.toList());
-            document.append("data", collect);
-            return Optional.ofNullable(document);
+            return new DocumentUtil(document).setData(collect).nullable();
         } catch (Exception ex) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
             return Optional.empty();

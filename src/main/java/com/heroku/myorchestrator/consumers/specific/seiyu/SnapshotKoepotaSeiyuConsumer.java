@@ -1,9 +1,11 @@
 package com.heroku.myorchestrator.consumers.specific.seiyu;
 
-import com.heroku.myorchestrator.config.enumerate.Kind;
+import static com.heroku.myorchestrator.config.enumerate.Kind.koepota_events;
+import static com.heroku.myorchestrator.config.enumerate.Kind.seiyu_category_members_include_template;
 import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
+import com.heroku.myorchestrator.util.content.DocumentUtil;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,23 +21,18 @@ public class SnapshotKoepotaSeiyuConsumer extends SnapshotRouteBuilder {
     protected Optional<Document> doSnapshot(Exchange exchange, Document document) {
         try {
             MasterUtil util = new MasterUtil(exchange);
-            Document scmit, koepota;
-            List<Map<String, Object>> scmitList, koepotaList, collect;
-            scmit = util.kind(Kind.seiyu_category_members_include_template)
-                    .findLatest().get();
-            koepota = util.kind(Kind.koepota_events).findLatest().get();
-            koepotaList = koepota.get("data", List.class);
             StringBuilder sb = new StringBuilder(32768);
-            koepotaList.stream().map((map) -> (String) map.get("c1"))
+            DocumentUtil.getData(util.getLatest(koepota_events)).stream()
+                    .map((map) -> (String) map.get("c1"))
                     .forEach(sb::append);
-            String koepotaString = new String(sb);
-            scmitList = scmit.get("data", List.class);
-            collect = scmitList.stream().filter(
-                    (map) -> koepotaString.contains(((String) map.get("title"))
-                            .replaceFirst(" \\(.+", "")))
+            String koepotaStr = new String(sb);
+            List<Map<String, Object>> collect = DocumentUtil.getData(
+                    util.getLatest(seiyu_category_members_include_template))
+                    .stream().filter((map)
+                            -> koepotaStr.contains(((String) map.get("title"))
+                                    .replaceFirst(" \\(.+", "")))
                     .collect(Collectors.toList());
-            document.append("data", collect);
-            return Optional.ofNullable(document);
+            return new DocumentUtil(document).setData(collect).nullable();
         } catch (Exception ex) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
             return Optional.empty();

@@ -2,6 +2,7 @@ package com.heroku.myorchestrator.consumers.specific.seiyu;
 
 import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
+import com.heroku.myorchestrator.util.content.DocumentUtil;
 import com.heroku.myorchestrator.util.content.MediawikiApiRequest;
 import java.net.URLEncoder;
 import java.util.List;
@@ -32,8 +33,7 @@ public class SnapshotFemaleSeiyuCategoryMembersConsumer extends SnapshotRouteBui
                     .setIgnoreFields("ns")
                     .getResultByMapList();
             mapList.forEach((m) -> m.put("gender", "f"));
-            document.append("data", mapList);
-            return Optional.ofNullable(document);
+            return new DocumentUtil(document).setData(mapList).nullable();
         } catch (Exception e) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, e);
             return Optional.empty();

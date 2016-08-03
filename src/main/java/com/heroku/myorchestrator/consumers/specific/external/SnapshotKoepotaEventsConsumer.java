@@ -2,6 +2,7 @@ package com.heroku.myorchestrator.consumers.specific.external;
 
 import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
+import com.heroku.myorchestrator.util.content.DocumentUtil;
 import com.heroku.myorchestrator.util.content.KoepotaEvent;
 import java.util.List;
 import java.util.Optional;
@@ -27,8 +28,7 @@ public class SnapshotKoepotaEventsConsumer extends SnapshotRouteBuilder {
             List<org.bson.Document> collect = select.stream()
                     .map((el) -> new KoepotaEvent(el).getDocument())
                     .collect(Collectors.toList());
-            document.append("data", collect);
-            return Optional.ofNullable(document);
+            return new DocumentUtil(document).setData(collect).nullable();
         } catch (Exception e) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, e);
             return Optional.empty();

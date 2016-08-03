@@ -1,9 +1,13 @@
 package com.heroku.myorchestrator.consumers.specific.seiyu;
 
-import com.heroku.myorchestrator.config.enumerate.Kind;
+import static com.heroku.myorchestrator.config.enumerate.Kind.koepota_seiyu;
+import static com.heroku.myorchestrator.config.enumerate.Kind.koepota_seiyu_all;
+import static com.heroku.myorchestrator.config.enumerate.Kind.seiyu_category_members_include_template;
 import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
+import com.heroku.myorchestrator.util.content.DocumentUtil;
+import static com.heroku.myorchestrator.util.content.DocumentUtil.getData;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,24 +25,20 @@ public class SnapshotKoepotaSeiyuAllConsumer extends SnapshotRouteBuilder {
     protected Optional<Document> doSnapshot(Exchange exchange, Document document) {
         try {
             MasterUtil util = new MasterUtil(exchange);
-            util.kind(Kind.koepota_seiyu_all);
-            List<Map<String, Object>> allList, koepotaSeiyuList, scmitList;
+            List<Map<String, Object>> allList;
             try {
-                allList = util.findLatest().get().get("data", List.class);
+                allList = getData(util.getLatest(koepota_seiyu_all));
             } catch (Exception ex0) {
                 allList = new ArrayList<>();
             }
-            util.kind(Kind.koepota_seiyu);
-            koepotaSeiyuList
-                    = util.findLatest().get().get("data", List.class);
             Set<Object> allSet = allList.stream().map((map) -> map.get("title"))
                     .collect(Collectors.toSet());
-            koepotaSeiyuList.stream()
+            getData(util.getLatest(koepota_seiyu)).stream()
                     .filter((map) -> !allSet.contains(map.get("title")))
                     .forEach(allList::add);
-            util.kind(Kind.seiyu_category_members_include_template);
-            scmitList = util.findLatest().get().get("data", List.class);
-            Set<Object> scmitSet = scmitList.stream().map((map) -> map.get(("title")))
+            Set scmitSet = getData(
+                    util.getLatest(seiyu_category_members_include_template))
+                    .stream().map((map) -> map.get(("title")))
                     .collect(Collectors.toSet());
             allList.stream()
                     .forEach((map) -> {
@@ -48,7 +48,7 @@ public class SnapshotKoepotaSeiyuAllConsumer extends SnapshotRouteBuilder {
                             map.put("inactive", true);
                         }
                     });
-            return Optional.ofNullable(document.append("data", allList));
+            return new DocumentUtil(document).setData(allList).nullable();
         } catch (Exception ex) {
             IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
             return Optional.empty();

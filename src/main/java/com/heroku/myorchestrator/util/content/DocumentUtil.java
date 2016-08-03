@@ -14,16 +14,22 @@ import org.bson.Document;
 public class DocumentUtil {
 
     public static Optional<Document> productSetByKey(Document sieved, Document filter, final String key) {
-        List<Map<String, Object>> sievedList, filterList, collect;
-        sievedList = sieved.get("data", List.class);
-        filterList = filter.get("data", List.class);
-        Set<Object> filterSet = filterList.stream()
+        Set<Object> filterSet = getData(filter).stream()
                 .map((map) -> map.get(key))
                 .collect(Collectors.toSet());
-        collect = sievedList.stream()
+        List<Map<String, Object>> collect = getData(sieved).stream()
                 .filter((map) -> filterSet.contains(map.get(key)))
                 .collect(Collectors.toList());
-        return Optional.ofNullable(new Document("data", collect));
+        return new DocumentUtil().setData(collect).nullable();
+    }
+
+    public static void addNewByKey(Document oldDoc, Document newDoc, final String key) {
+        List<Map<String, Object>> oldList = getData(oldDoc);
+        Set oldSet = oldList.stream().map((map) -> map.get(key))
+                .collect(Collectors.toSet());
+        getData(newDoc).stream().filter((map) -> !oldSet.contains(map.get(key)))
+                .forEach(oldList::add);
+        oldDoc.append("data", oldList);
     }
 
     public static Optional<Document> productSetByTitle(Document sieved, Document filter) {
@@ -38,7 +44,7 @@ public class DocumentUtil {
     }
 
     private static void createPrefixSpecific(Document document, String key) {
-        List<Map<String, Object>> list = document.get("data", List.class);
+        List<Map<String, Object>> list = getData(document);
         String firstValue = (String) list.get(0).get(key);
         int len = firstValue.length();
         String prefix = null;
@@ -73,11 +79,12 @@ public class DocumentUtil {
     }
 
     private static void restorePrefixSpecific(Document document, String key, String prefix) {
-        List<Map<String, Object>> list = document.get("data", List.class);
+        DocumentUtil util = new DocumentUtil(document);
+        List<Map<String, Object>> list = util.getData();
         list.stream().forEach((map) -> {
             map.put(key, prefix + map.get(key));
         });
-        document.append("data", list);
+        util.setData(list);
     }
 
     public static boolean checkNotFilled(Exchange exchange, Document document) throws Exception {
@@ -89,8 +96,44 @@ public class DocumentUtil {
             if (document == null) {
                 document = new MasterUtil(exchange).findLatest().get();
             }
-            List<Map<String, Object>> list = document.get("data", List.class);
+            List<Map<String, Object>> list = DocumentUtil.getData(document);
             return list.stream().anyMatch((map) -> !map.containsKey(fillField));
         }
+    }
+
+    public static List<Map<String, Object>> getData(Document document) {
+        return document.get("data", List.class);
+    }
+
+    public static void setData(Document document, List list) {
+        document.append("data", list);
+    }
+
+    private final Document document;
+
+    public DocumentUtil(Document document) {
+        this.document = document;
+    }
+
+    public DocumentUtil() {
+        this.document = new Document();
+    }
+
+    public List<Map<String, Object>> getData() {
+        return document.get("data", List.class);
+    }
+
+    public DocumentUtil setData(List list) {
+        document.append("data", list);
+        return this;
+    }
+
+    public DocumentUtil setDiff(List list) {
+        document.append("diff", list);
+        return this;
+    }
+
+    public Optional<Document> nullable() {
+        return Optional.ofNullable(document);
     }
 }

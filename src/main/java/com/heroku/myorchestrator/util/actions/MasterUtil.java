@@ -1,10 +1,12 @@
 package com.heroku.myorchestrator.util.actions;
 
-import com.heroku.myorchestrator.config.enumerate.MongoTarget;
 import com.heroku.myorchestrator.config.enumerate.Kind;
+import com.heroku.myorchestrator.config.enumerate.MongoTarget;
 import com.heroku.myorchestrator.config.enumerate.SenseType;
 import com.heroku.myorchestrator.util.MongoUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
+import com.heroku.myorchestrator.util.content.DocumentUtil;
+import static com.heroku.myorchestrator.util.content.DocumentUtil.getData;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -64,16 +66,10 @@ public class MasterUtil extends ActionUtil {
     public Optional<Document> latestJoinAll(Kind kind1, Kind kind2) {
         Kind kind0 = this.kind;
         try {
-            Optional<Document> kind1Optional = this.kind(kind1).findLatest();
-            Optional<Document> kind2Optional = this.kind(kind2).findLatest();
-            if (kind1Optional.isPresent() && kind2Optional.isPresent()) {
-                List result = new ArrayList<>();
-                result.addAll(kind1Optional.get().get("data", List.class));
-                result.addAll(kind2Optional.get().get("data", List.class));
-                return Optional.ofNullable(new Document("data", result));
-            } else {
-                return Optional.empty();
-            }
+            List result = new ArrayList<>();
+            result.addAll(getData(getLatest(kind1)));
+            result.addAll(getData(getLatest(kind2)));
+            return new DocumentUtil().setData(result).nullable();
         } catch (Exception e) {
             IronmqUtil.sendError(this.getClass(), "latestJoinAll", exchange, e);
             return Optional.empty();
