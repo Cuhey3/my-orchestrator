@@ -2,7 +2,6 @@ package com.heroku.myorchestrator.util.actions;
 
 import com.heroku.myorchestrator.App;
 import com.heroku.myorchestrator.config.enumerate.Kind;
-import com.heroku.myorchestrator.util.consumers.KindUtil;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.camel.CamelContext;
@@ -37,7 +36,7 @@ public class SnapshotUtilTest extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         from("direct:snapshot_util_test_0")
-                .setBody().constant(new KindUtil(Kind.test).preMessage())
+                .setBody().constant(Kind.test.preMessage())
                 .process((Exchange exchange) -> {
                     SnapshotUtil util = new SnapshotUtil(exchange);
                     util.useDummy();

@@ -1,6 +1,6 @@
 package com.heroku.myorchestrator.consumers.specific.amiami;
 
-import com.heroku.myorchestrator.consumers.DiffRouteBuilder;
+import com.heroku.myorchestrator.consumers.DiffQueueConsumer;
 import com.heroku.myorchestrator.util.actions.DiffUtil;
 import com.heroku.myorchestrator.util.content.DocumentUtil;
 import java.util.Optional;
@@ -8,7 +8,7 @@ import org.bson.Document;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DiffAmiamiItemConsumer extends DiffRouteBuilder {
+public class DiffAmiamiItemConsumer extends DiffQueueConsumer {
 
     @Override
     public Optional<Document> calculateDiff(Document master, Document snapshot) {

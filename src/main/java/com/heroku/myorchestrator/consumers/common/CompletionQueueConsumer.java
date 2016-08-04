@@ -1,15 +1,15 @@
 package com.heroku.myorchestrator.consumers.common;
 
-import com.heroku.myorchestrator.consumers.ConsumerRouteBuilder;
+import com.heroku.myorchestrator.consumers.QueueConsumer;
 import com.heroku.myorchestrator.util.actions.DiffUtil;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
 import org.apache.camel.Exchange;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CompletionConsumer extends ConsumerRouteBuilder {
+public class CompletionQueueConsumer extends QueueConsumer {
 
-    public CompletionConsumer() {
+    public CompletionQueueConsumer() {
         route().completion();
     }
 

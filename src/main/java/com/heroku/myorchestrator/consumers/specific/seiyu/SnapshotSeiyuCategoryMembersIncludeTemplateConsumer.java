@@ -2,7 +2,7 @@ package com.heroku.myorchestrator.consumers.specific.seiyu;
 
 import static com.heroku.myorchestrator.config.enumerate.Kind.seiyu_category_members;
 import static com.heroku.myorchestrator.config.enumerate.Kind.seiyu_template_include_pages;
-import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
+import com.heroku.myorchestrator.consumers.SnapshotQueueConsumer;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import com.heroku.myorchestrator.util.content.DocumentUtil;
@@ -12,7 +12,7 @@ import org.bson.Document;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SnapshotSeiyuCategoryMembersIncludeTemplateConsumer extends SnapshotRouteBuilder {
+public class SnapshotSeiyuCategoryMembersIncludeTemplateConsumer extends SnapshotQueueConsumer {
 
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {
@@ -26,5 +26,4 @@ public class SnapshotSeiyuCategoryMembersIncludeTemplateConsumer extends Snapsho
             return Optional.empty();
         }
     }
-
 }

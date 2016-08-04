@@ -34,7 +34,7 @@ public class KindUtilTest extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         from("direct:kind_util_test_0")
-                .setBody().constant(new KindUtil(Kind.test).preMessage())
+                .setBody().constant(Kind.test.preMessage())
                 .to("mock:kind_util_test_1");
     }
 

@@ -4,6 +4,7 @@ import com.heroku.myorchestrator.config.MongoConfig;
 import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.config.enumerate.MongoTarget;
 import com.heroku.myorchestrator.exceptions.MongoUtilTypeNotSetException;
+import com.heroku.myorchestrator.util.content.DocumentUtil;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
@@ -18,10 +19,6 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 
 public class MongoUtil {
-
-    public static String getObjectIdHexString(Document document) {
-        return document.get("_id", ObjectId.class).toHexString();
-    }
 
     private final Registry registry;
     protected MongoTarget target;
@@ -66,32 +63,23 @@ public class MongoUtil {
         return this;
     }
 
+    public MongoDatabase database(MongoTarget t) {
+        return registry.lookupByNameAndType(t.expression(), MongoClient.class)
+                .getDatabase(MongoConfig.getMongoClientURI(t).getDatabase());
+    }
+
     public MongoDatabase database() {
-        String database
-                = MongoConfig.getMongoClientURI(this.target).getDatabase();
-        return registry
-                .lookupByNameAndType(target.expression(), MongoClient.class)
-                .getDatabase(database);
+        return database(target);
     }
 
     public MongoCollection<Document> collection() throws Exception {
-        if (this.target == null && this.customTarget == null) {
+        MongoTarget t
+                = Optional.ofNullable(this.customTarget).orElse(this.target);
+        if (t == null) {
             throw new MongoUtilTypeNotSetException();
-        }
-        MongoTarget t;
-        if (this.customTarget != null) {
-            t = this.customTarget;
         } else {
-            t = this.target;
+            return database(t).getCollection(collectionName());
         }
-        return registry.lookupByNameAndType(t.expression(), MongoClient.class)
-                .getDatabase(MongoConfig.getMongoClientURI(t).getDatabase())
-                .getCollection(collectionName());
-    }
-
-    public Optional<Document> findFirst() throws Exception {
-        FindIterable<Document> find = collection().find().limit(1);
-        return nextDocument(find);
     }
 
     public Optional<Document> findLatest() throws Exception {
@@ -104,8 +92,8 @@ public class MongoUtil {
                 new Document("_id", new ObjectId(objectIdHexString))));
     }
 
-    public Optional<Document> findById(Map map) throws Exception {
-        return findById((String) map.get(typeIdKey()));
+    public Optional<Document> findByMessage(Map message) throws Exception {
+        return findById((String) message.get(targetIdKey()));
     }
 
     public String insertOne(Document document) throws Exception {
@@ -113,20 +101,14 @@ public class MongoUtil {
             document.append("creationDate", new Date());
         }
         collection().insertOne(document);
-        return getObjectIdHexString(document);
-    }
-
-    public String replaceOne(Document document) throws Exception {
-        collection().replaceOne(
-                new Document("_id", document.get("_id")), document);
-        return getObjectIdHexString(document);
+        return DocumentUtil.objectIdHexString(document);
     }
 
     private String collectionName() {
         return target.expression() + "_" + kind;
     }
 
-    private String typeIdKey() {
+    private String targetIdKey() {
         return target.expression() + "_id";
     }
 

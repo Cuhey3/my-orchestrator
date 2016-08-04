@@ -1,19 +1,18 @@
 package com.heroku.myorchestrator.config;
 
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 import com.heroku.myorchestrator.exceptions.SettingNotFoundException;
-import com.heroku.myorchestrator.util.JsonResourceUtil;
+import java.io.InputStreamReader;
+import java.util.Map;
 
 public enum Settings {
     ENV, IRON;
     private final String path;
-    private JsonResourceUtil jru;
+    private Map<String, Object> map = null;
 
     private Settings() {
         this.path = String.format("/config/%s.json", this.name().toLowerCase());
-        try {
-            this.jru = new JsonResourceUtil(this.path);
-        } catch (Exception e) {
-        }
     }
 
     public String get(String key) throws Exception {
@@ -25,7 +24,12 @@ public enum Settings {
         if (value != null) {
             return value;
         } else {
-            value = jru.get(key2);
+            if (map == null) {
+                JsonReader reader = new JsonReader(new InputStreamReader(
+                        ClassLoader.class.getResourceAsStream(path), "UTF-8"));
+                map = new Gson().fromJson(reader, Map.class);
+            }
+            value = (String) map.get(key2);
             if (value != null) {
                 return value;
             } else {

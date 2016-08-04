@@ -1,6 +1,6 @@
 package com.heroku.myorchestrator.consumers.specific.seiyu;
 
-import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
+import com.heroku.myorchestrator.consumers.SnapshotQueueConsumer;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import com.heroku.myorchestrator.util.content.DocumentUtil;
 import com.heroku.myorchestrator.util.content.MediawikiApiRequest;
@@ -13,7 +13,7 @@ import org.bson.Document;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SnapshotFemaleSeiyuCategoryMembersConsumer extends SnapshotRouteBuilder {
+public class SnapshotFemaleSeiyuCategoryMembersConsumer extends SnapshotQueueConsumer {
 
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {

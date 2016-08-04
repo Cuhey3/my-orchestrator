@@ -7,26 +7,25 @@ import com.heroku.myorchestrator.util.actions.DiffUtil;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.actions.SnapshotUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
-import com.heroku.myorchestrator.util.consumers.KindUtil;
 import com.heroku.myorchestrator.util.content.DocumentUtil;
 import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.bson.Document;
 
-public abstract class DiffRouteBuilder extends ConsumerRouteBuilder {
+public abstract class DiffQueueConsumer extends QueueConsumer {
 
-    protected String diffKey;
+    protected String commonDiffKey;
 
-    public DiffRouteBuilder() {
+    public DiffQueueConsumer() {
         route().diff();
-        kind(KindUtil.findKindByClassName(this));
+        kind(Kind.findKindByClassName(this));
     }
 
-    public DiffRouteBuilder(Kind kind) {
+    public DiffQueueConsumer(Kind kind) {
         route().diff();
         kind(kind);
-        this.diffKey = kind.diffKey();
+        this.commonDiffKey = kind.commonDiffKey();
     }
 
     @Override
@@ -39,7 +38,7 @@ public abstract class DiffRouteBuilder extends ConsumerRouteBuilder {
     }
 
     public Optional<Document> calculateDiff(Document master, Document snapshot) {
-        return DiffUtil.basicDiff(master, snapshot, diffKey);
+        return DiffUtil.basicDiff(master, snapshot, commonDiffKey);
     }
 
     public void doWhenMasterIsEmpty(Exchange exchange) {

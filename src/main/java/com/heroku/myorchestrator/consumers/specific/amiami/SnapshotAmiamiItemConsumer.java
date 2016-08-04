@@ -1,6 +1,6 @@
 package com.heroku.myorchestrator.consumers.specific.amiami;
 
-import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
+import com.heroku.myorchestrator.consumers.SnapshotQueueConsumer;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import com.heroku.myorchestrator.util.content.DocumentUtil;
 import java.util.HashMap;
@@ -14,7 +14,7 @@ import org.jsoup.Jsoup;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SnapshotAmiamiItemConsumer extends SnapshotRouteBuilder {
+public class SnapshotAmiamiItemConsumer extends SnapshotQueueConsumer {
 
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {

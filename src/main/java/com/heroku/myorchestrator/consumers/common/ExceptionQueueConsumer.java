@@ -1,12 +1,12 @@
 package com.heroku.myorchestrator.consumers.common;
 
-import com.heroku.myorchestrator.consumers.ConsumerRouteBuilder;
+import com.heroku.myorchestrator.consumers.QueueConsumer;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ExceptionConsumer extends ConsumerRouteBuilder {
+public class ExceptionQueueConsumer extends QueueConsumer {
 
-    public ExceptionConsumer() {
+    public ExceptionQueueConsumer() {
         route().exception();
     }
 

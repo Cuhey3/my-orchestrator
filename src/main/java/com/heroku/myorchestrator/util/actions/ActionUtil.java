@@ -19,7 +19,7 @@ public abstract class ActionUtil extends MongoUtil {
     }
 
     public Optional<Document> loadDocument() throws Exception {
-        return findById(message().getMessage());
+        return findByMessage(message().getMessage());
     }
 
     public void writeDocument(Document document) throws Exception {

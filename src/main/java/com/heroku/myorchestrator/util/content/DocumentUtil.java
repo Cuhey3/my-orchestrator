@@ -11,8 +11,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.camel.Exchange;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 public final class DocumentUtil {
+
+    public static String objectIdHexString(Document document) {
+        return document.get("_id", ObjectId.class).toHexString();
+    }
 
     public static Document restorePrefix(Document document) {
         Map<String, String> prefixs = document.get("prefix", Map.class);

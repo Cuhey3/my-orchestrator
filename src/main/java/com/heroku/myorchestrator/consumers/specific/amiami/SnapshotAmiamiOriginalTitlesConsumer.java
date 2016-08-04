@@ -1,7 +1,7 @@
 package com.heroku.myorchestrator.consumers.specific.amiami;
 
 import static com.heroku.myorchestrator.config.enumerate.Kind.amiami_item;
-import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
+import com.heroku.myorchestrator.consumers.SnapshotQueueConsumer;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import com.heroku.myorchestrator.util.content.DocumentUtil;
@@ -19,7 +19,7 @@ import org.bson.Document;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SnapshotAmiamiOriginalTitlesConsumer extends SnapshotRouteBuilder {
+public class SnapshotAmiamiOriginalTitlesConsumer extends SnapshotQueueConsumer {
 
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {

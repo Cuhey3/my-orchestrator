@@ -2,19 +2,17 @@ package com.heroku.myorchestrator.consumers.common;
 
 import com.heroku.myorchestrator.config.enumerate.Kind;
 import static com.heroku.myorchestrator.config.enumerate.Kind.*;
-import com.heroku.myorchestrator.consumers.ConsumerRouteBuilder;
+import com.heroku.myorchestrator.consumers.QueueConsumer;
 import com.heroku.myorchestrator.util.MessageUtil;
 import static com.heroku.myorchestrator.util.MessageUtil.messageKindIs;
+import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
-import com.heroku.myorchestrator.util.content.DocumentUtil;
-import org.apache.camel.Exchange;
-import org.apache.camel.Predicate;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ChangingConsumer extends ConsumerRouteBuilder {
+public class ChangingQueueConsumer extends QueueConsumer {
 
-    public ChangingConsumer() {
+    public ChangingQueueConsumer() {
         ironmq().changed();
         route().changing();
     }
@@ -53,21 +51,8 @@ public class ChangingConsumer extends ConsumerRouteBuilder {
                 .otherwise().to("log:none")
                 .end()
                 .choice()
-                .when(new Predicate() {
-                    @Override
-                    public boolean matches(Exchange exchange) {
-                        try {
-                            return DocumentUtil.checkNotFilled(exchange, null);
-                        } catch (Exception ex) {
-                            IronmqUtil.sendError(this.getClass(), "matches", exchange, ex);
-                            return false;
-                        }
-                    }
-                })
-                .process((Exchange exchange) -> {
-                    Kind k = Kind.valueOf(new MessageUtil(exchange).get("kind"));
-                    new IronmqUtil().snapshot().postMessage(exchange, k);
-                })
+                .when(MasterUtil.isNotFilled())
+                .process(IronmqUtil.requestSnapshotProcess())
                 .otherwise()
                 .filter(MessageUtil.loadAffect())
                 .split().body()

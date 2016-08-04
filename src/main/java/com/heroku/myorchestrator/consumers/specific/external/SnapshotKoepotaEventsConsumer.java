@@ -1,6 +1,6 @@
 package com.heroku.myorchestrator.consumers.specific.external;
 
-import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
+import com.heroku.myorchestrator.consumers.SnapshotQueueConsumer;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import com.heroku.myorchestrator.util.content.DocumentUtil;
 import com.heroku.myorchestrator.util.content.KoepotaEvent;
@@ -13,7 +13,7 @@ import org.jsoup.Jsoup;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SnapshotKoepotaEventsConsumer extends SnapshotRouteBuilder {
+public class SnapshotKoepotaEventsConsumer extends SnapshotQueueConsumer {
 
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {

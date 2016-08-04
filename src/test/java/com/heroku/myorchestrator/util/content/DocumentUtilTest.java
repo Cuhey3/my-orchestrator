@@ -2,7 +2,6 @@ package com.heroku.myorchestrator.util.content;
 
 import com.heroku.myorchestrator.App;
 import com.heroku.myorchestrator.config.enumerate.Kind;
-import com.heroku.myorchestrator.util.consumers.KindUtil;
 import org.apache.camel.CamelContext;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
@@ -33,8 +32,7 @@ public class DocumentUtilTest extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         from("direct:document_util_test_0")
-                .setBody().constant(new KindUtil(Kind.amiami_original_titles)
-                        .preMessage())
+                .setBody().constant(Kind.amiami_original_titles.preMessage())
                 .to("mock:document_util_test_1");
     }
 

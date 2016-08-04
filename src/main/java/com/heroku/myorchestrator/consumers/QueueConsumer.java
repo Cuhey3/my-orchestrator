@@ -5,7 +5,7 @@ import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import com.heroku.myorchestrator.util.consumers.RouteUtil;
 import org.apache.camel.builder.RouteBuilder;
 
-public abstract class ConsumerRouteBuilder extends RouteBuilder {
+public abstract class QueueConsumer extends RouteBuilder {
 
     protected Kind kind;
     private IronmqUtil ironmqUtil;

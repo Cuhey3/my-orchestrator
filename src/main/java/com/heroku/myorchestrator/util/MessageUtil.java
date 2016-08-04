@@ -1,8 +1,10 @@
 package com.heroku.myorchestrator.util;
 
 import com.heroku.myorchestrator.config.enumerate.Kind;
+import com.heroku.myorchestrator.util.content.DocumentUtil;
 import java.util.List;
 import java.util.Map;
+import static java.util.Optional.ofNullable;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.bson.Document;
@@ -22,16 +24,6 @@ public class MessageUtil {
         }
     }
 
-    public static void updateMessage(Exchange exchange, String key, Object value) {
-        Map message = getMessage(exchange);
-        message.put(key, value);
-        exchange.getIn().setBody(message, String.class);
-    }
-
-    public static void writeObjectId(Exchange exchange, String key, Document document) {
-        updateMessage(exchange, key, MongoUtil.getObjectIdHexString(document));
-    }
-
     public static <T> T get(Exchange exchange, String key, Class<T> clazz) {
         return (T) MessageUtil.getMessage(exchange).get(key);
     }
@@ -39,24 +31,23 @@ public class MessageUtil {
     public static Predicate loadAffect() {
         return (Exchange ex) -> {
             List affect = MessageUtil.get(ex, "affect", List.class);
-            if (affect == null) {
-                return false;
-            } else {
+            if (affect != null && !affect.isEmpty()) {
                 ex.getIn().setBody(affect);
-                return !affect.isEmpty();
+                return true;
+            } else {
+                return false;
             }
         };
     }
 
     public static Predicate messageKindIs(Kind kind) {
         return (Exchange exchange1)
-                -> new MessageUtil(exchange1).get("kind")
-                .equals(kind.expression());
+                -> MessageUtil.getKind(exchange1).equals(kind.expression());
     }
 
     public static Predicate messageKindContains(String str) {
         return (Exchange exchange1)
-                -> new MessageUtil(exchange1).get("kind").contains(str);
+                -> MessageUtil.getKind(exchange1).contains(str);
     }
 
     private final Exchange exchange;
@@ -76,7 +67,7 @@ public class MessageUtil {
     }
 
     public void writeObjectId(String key, Document document) {
-        updateMessage(key, MongoUtil.getObjectIdHexString(document));
+        updateMessage(key, DocumentUtil.objectIdHexString(document));
     }
 
     public <T> T get(String key, Class<T> clazz) {
@@ -88,11 +79,6 @@ public class MessageUtil {
     }
 
     public boolean getBool(String key) {
-        Object get = getMessage().get(key);
-        if (get == null) {
-            return false;
-        } else {
-            return (boolean) get;
-        }
+        return ofNullable((Boolean) getMessage().get(key)).orElse(false);
     }
 }

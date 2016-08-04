@@ -2,11 +2,13 @@ package com.heroku.myorchestrator.util.consumers;
 
 import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.config.enumerate.QueueType;
+import com.heroku.myorchestrator.util.MessageUtil;
 import io.iron.ironmq.Client;
 import java.io.IOException;
 import java.util.Date;
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
+import org.apache.camel.Processor;
 
 public class IronmqUtil {
 
@@ -17,8 +19,7 @@ public class IronmqUtil {
             @Override
             public <T> T evaluate(Exchange exchange, Class<T> type) {
                 String kindString = exchange.getIn().getBody(String.class);
-                Kind kind = Kind.valueOf(kindString);
-                exchange.getIn().setBody(new KindUtil(kind).preMessage());
+                exchange.getIn().setBody(Kind.valueOf(kindString).preMessage());
                 return (T) String.format("ironmq:%s?client=%s",
                         "snapshot_" + kindString, IRONMQ_CLIENT_BEAN_NAME);
             }
@@ -37,6 +38,13 @@ public class IronmqUtil {
                     + "\nmessage: " + ex.getMessage());
         } catch (IOException ex1) {
         }
+    }
+
+    public static Processor requestSnapshotProcess() {
+        return (Exchange exchange) -> {
+            Kind k = Kind.valueOf(MessageUtil.getKind(exchange));
+            new IronmqUtil().snapshot().postMessage(exchange, k);
+        };
     }
 
     private String type, kind;
@@ -97,7 +105,7 @@ public class IronmqUtil {
         Client client = exchange.getContext().getRegistry()
                 .lookupByNameAndType(IRONMQ_CLIENT_BEAN_NAME, Client.class);
         client.queue(this.type + "_" + k.expression())
-                .push(new KindUtil(k).preMessage());
+                .push(k.preMessage());
     }
 
     public String consumeUri() {

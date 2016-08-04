@@ -2,12 +2,11 @@ package com.heroku.myorchestrator.consumers.specific.seiyu;
 
 import static com.heroku.myorchestrator.config.enumerate.Kind.seiyu_category_members_include_template;
 import com.heroku.myorchestrator.config.enumerate.MongoTarget;
-import com.heroku.myorchestrator.consumers.SnapshotRouteBuilder;
+import com.heroku.myorchestrator.consumers.SnapshotQueueConsumer;
 import com.heroku.myorchestrator.util.MongoUtil;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import com.heroku.myorchestrator.util.content.DocumentUtil;
-import static com.heroku.myorchestrator.util.content.DocumentUtil.getData;
 import com.mongodb.client.MongoCursor;
 import java.util.HashSet;
 import java.util.List;
@@ -18,9 +17,10 @@ import java.util.stream.Collectors;
 import org.apache.camel.Exchange;
 import org.bson.Document;
 import org.springframework.stereotype.Component;
+import static com.heroku.myorchestrator.util.content.DocumentUtil.getData;
 
 @Component
-public class SnapshotSeiyuHasRecentchanges extends SnapshotRouteBuilder {
+public class SnapshotSeiyuHasRecentchanges extends SnapshotQueueConsumer {
 
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {
