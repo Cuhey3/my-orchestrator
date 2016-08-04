@@ -51,7 +51,7 @@ public class ChangingQueueConsumer extends QueueConsumer {
                 .otherwise().to("log:none")
                 .end()
                 .choice()
-                .when(MasterUtil.isNotFilled())
+                .when(MasterUtil.isNotFilled(this))
                 .process(IronmqUtil.requestSnapshotProcess())
                 .otherwise()
                 .filter(MessageUtil.loadAffect())

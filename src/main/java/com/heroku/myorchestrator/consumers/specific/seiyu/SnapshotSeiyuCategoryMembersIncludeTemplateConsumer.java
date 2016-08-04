@@ -22,7 +22,7 @@ public class SnapshotSeiyuCategoryMembersIncludeTemplateConsumer extends Snapsho
             Document stip = util.getLatest(seiyu_template_include_pages);
             return new DocumentUtil().productByTitle(scm, stip).nullable();
         } catch (Exception ex) {
-            IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
+            IronmqUtil.sendError(this, "doSnapshot", ex);
             return Optional.empty();
         }
     }

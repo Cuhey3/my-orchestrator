@@ -34,8 +34,8 @@ public class SnapshotMaleSeiyuCategoryMembersConsumer extends SnapshotQueueConsu
                     .getResultByMapList();
             mapList.forEach((m) -> m.put("gender", "m"));
             return new DocumentUtil(mapList).nullable();
-        } catch (Exception e) {
-            IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, e);
+        } catch (Exception ex) {
+            IronmqUtil.sendError(this, "doSnapshot", ex);
             return Optional.empty();
         }
     }

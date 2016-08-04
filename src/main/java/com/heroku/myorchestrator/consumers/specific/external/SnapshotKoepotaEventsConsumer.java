@@ -28,7 +28,7 @@ public class SnapshotKoepotaEventsConsumer extends SnapshotQueueConsumer {
                     .collect(Collectors.toList());
             return new DocumentUtil(collect).nullable();
         } catch (Exception e) {
-            IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, e);
+            IronmqUtil.sendError(this, "doSnapshot", e);
             return Optional.empty();
         }
     }

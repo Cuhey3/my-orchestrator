@@ -29,7 +29,7 @@ public class SnapshotAmiamiOriginalTitlesConsumer extends SnapshotQueueConsumer 
             updateWikiTitles(util);
             return util.nullable();
         } catch (Exception ex) {
-            IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
+            IronmqUtil.sendError(this, "doSnapshot", ex);
             return Optional.empty();
         }
     }

@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.camel.Exchange;
+import org.apache.camel.builder.RouteBuilder;
 import org.bson.Document;
 
 public class DiffUtil extends ActionUtil {
@@ -53,7 +54,7 @@ public class DiffUtil extends ActionUtil {
         target(MongoTarget.DIFF);
     }
 
-    public boolean enableDiff() {
+    public boolean enableDiff(RouteBuilder rb) {
         try {
             if (diffIdIsValid()) {
                 Optional<Document> findById = loadDocument();
@@ -72,10 +73,9 @@ public class DiffUtil extends ActionUtil {
                 return true;
             }
         } catch (Exception e) {
-            IronmqUtil.sendError(this.getClass(), "enableDiff", exchange, e);
+            IronmqUtil.sendError(rb, "enableDiff", e);
             return false;
         }
-
     }
 
     public DiffUtil updateMessageComparedId(String id) {

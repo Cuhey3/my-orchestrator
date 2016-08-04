@@ -23,15 +23,15 @@ public class CompletionQueueConsumer extends QueueConsumer {
                 .to("direct:completionSaveToMaster")
                 .otherwise()
                 .filter((Exchange exchange)
-                        -> new MasterUtil(exchange).comparedIsValid())
+                        -> new MasterUtil(exchange).comparedIsValid(this))
                 .to("direct:completionSaveToMaster");
 
         from("direct:completionSaveToMaster")
                 .routeId("completion_save_to_master")
                 .filter((Exchange exchange)
-                        -> new MasterUtil(exchange).snapshotSaveToMaster())
+                        -> new MasterUtil(exchange).snapshotSaveToMaster(this))
                 .filter((Exchange exchange)
-                        -> new DiffUtil(exchange).enableDiff())
+                        -> new DiffUtil(exchange).enableDiff(this))
                 .to(ironmq().changed().postUri());
     }
 }

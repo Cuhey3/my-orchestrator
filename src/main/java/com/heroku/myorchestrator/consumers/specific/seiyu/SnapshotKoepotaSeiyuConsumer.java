@@ -33,7 +33,7 @@ public class SnapshotKoepotaSeiyuConsumer extends SnapshotQueueConsumer {
                     .collect(Collectors.toList());
             return new DocumentUtil(collect).nullable();
         } catch (Exception ex) {
-            IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
+            IronmqUtil.sendError(this, "doSnapshot", ex);
             return Optional.empty();
         }
     }

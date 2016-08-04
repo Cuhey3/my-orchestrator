@@ -40,7 +40,7 @@ public class SnapshotAmiamiItemConsumer extends SnapshotQueueConsumer {
             return new DocumentUtil(collect).createPrefix("img", "url")
                     .nullable();
         } catch (Exception ex) {
-            IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
+            IronmqUtil.sendError(this, "doSnapshot", ex);
             return Optional.empty();
         }
     }

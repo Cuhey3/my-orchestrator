@@ -35,7 +35,7 @@ public class SnapshotFemaleSeiyuCategoryMembersConsumer extends SnapshotQueueCon
             result.forEach((m) -> m.put("gender", "f"));
             return new DocumentUtil(result).nullable();
         } catch (Exception e) {
-            IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, e);
+            IronmqUtil.sendError(this, "doSnapshot", e);
             return Optional.empty();
         }
     }

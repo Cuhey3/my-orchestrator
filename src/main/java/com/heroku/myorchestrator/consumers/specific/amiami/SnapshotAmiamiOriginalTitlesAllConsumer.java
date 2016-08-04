@@ -23,7 +23,7 @@ public class SnapshotAmiamiOriginalTitlesAllConsumer extends SnapshotQueueConsum
                     masterUtil.getLatest(amiami_original_titles),
                     "amiami_title").nullable();
         } catch (Exception ex) {
-            IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
+            IronmqUtil.sendError(this, "doSnapshot", ex);
             return Optional.empty();
         }
     }

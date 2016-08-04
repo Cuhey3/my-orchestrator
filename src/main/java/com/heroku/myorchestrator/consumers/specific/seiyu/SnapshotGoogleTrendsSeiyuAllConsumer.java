@@ -28,7 +28,7 @@ public class SnapshotGoogleTrendsSeiyuAllConsumer extends SnapshotQueueConsumer 
                     .getDocument();
             return util.addNewByKey(findLatest, product, "title").nullable();
         } catch (Exception ex) {
-            IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
+            IronmqUtil.sendError(this, "doSnapshot", ex);
             return Optional.empty();
         }
     }

@@ -42,7 +42,7 @@ public class SnapshotKoepotaSeiyuAllConsumer extends SnapshotQueueConsumer {
             });
             return util.setData(allList).nullable();
         } catch (Exception ex) {
-            IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
+            IronmqUtil.sendError(this, "doSnapshot", ex);
             return Optional.empty();
         }
     }

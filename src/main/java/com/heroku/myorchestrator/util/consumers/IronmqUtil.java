@@ -9,6 +9,7 @@ import java.util.Date;
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
 import org.apache.camel.Processor;
+import org.apache.camel.builder.RouteBuilder;
 
 public class IronmqUtil {
 
@@ -26,13 +27,13 @@ public class IronmqUtil {
         };
     }
 
-    public static void sendError(Class clazz, String method, Exchange exchange, Exception ex) {
+    public static void sendError(RouteBuilder rb, String method, Exception ex) {
         try {
-            Client client = exchange.getContext().getRegistry()
+            Client client = rb.getContext().getRegistry()
                     .lookupByNameAndType(IRONMQ_CLIENT_BEAN_NAME, Client.class);
             client.queue("exception_in").push(
                     new Date().toString()
-                    + "\nClass: " + clazz.getName()
+                    + "\nClass: " + rb.getClass().getName()
                     + "\nmethod: " + method
                     + "\nException class: " + ex.getClass().getName()
                     + "\nmessage: " + ex.getMessage());

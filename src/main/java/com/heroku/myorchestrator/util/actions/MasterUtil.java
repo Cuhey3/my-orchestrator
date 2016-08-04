@@ -12,11 +12,12 @@ import java.util.List;
 import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
+import org.apache.camel.builder.RouteBuilder;
 import org.bson.Document;
 
 public class MasterUtil extends ActionUtil {
 
-    public static Predicate isNotFilled() {
+    public static Predicate isNotFilled(RouteBuilder rb) {
         return (Exchange exchange) -> {
             String fillField = new MessageUtil(exchange).get("fill");
             if (fillField == null) {
@@ -27,8 +28,7 @@ public class MasterUtil extends ActionUtil {
                         .findLatest().get()).stream()
                         .anyMatch((map) -> !map.containsKey(fillField));
             } catch (Exception ex) {
-                IronmqUtil.sendError(MasterUtil.class,
-                        "isNotFilled", exchange, ex);
+                IronmqUtil.sendError(rb, "isNotFilled", ex);
                 return false;
             }
         };
@@ -58,12 +58,12 @@ public class MasterUtil extends ActionUtil {
         return message().getBool("skip_diff");
     }
 
-    public boolean comparedIsValid() {
+    public boolean comparedIsValid(RouteBuilder rb) {
         try {
             return DocumentUtil.objectIdHexString(findLatest().get())
                     .equals(message().get("compared_master_id"));
-        } catch (Exception e) {
-            IronmqUtil.sendError(this.getClass(), "comparedIsValid", exchange, e);
+        } catch (Exception ex) {
+            IronmqUtil.sendError(rb, "comparedIsValid", ex);
             return false;
         }
     }
@@ -72,17 +72,17 @@ public class MasterUtil extends ActionUtil {
         return isSkipDiff() || comparedIsEmpty();
     }
 
-    public boolean snapshotSaveToMaster() {
+    public boolean snapshotSaveToMaster(RouteBuilder rb) {
         try {
             this.writeDocument(snapshotUtil.loadDocument().get());
             return true;
-        } catch (Exception e) {
-            IronmqUtil.sendError(this.getClass(), "snapshotSaveToMaster", exchange, e);
+        } catch (Exception ex) {
+            IronmqUtil.sendError(rb, "snapshotSaveToMaster", ex);
             return false;
         }
     }
 
-    public Optional<Document> latestJoinAll(Kind kind1, Kind kind2) {
+    public Optional<Document> latestJoinAll(Kind kind1, Kind kind2) throws Exception {
         Kind kind0 = this.kind;
         try {
             List result = new ArrayList<>();
@@ -90,8 +90,7 @@ public class MasterUtil extends ActionUtil {
             result.addAll(getData(getLatest(kind2)));
             return new DocumentUtil(result).nullable();
         } catch (Exception e) {
-            IronmqUtil.sendError(this.getClass(), "latestJoinAll", exchange, e);
-            return Optional.empty();
+            throw new Exception();
         } finally {
             this.kind(kind0);
         }

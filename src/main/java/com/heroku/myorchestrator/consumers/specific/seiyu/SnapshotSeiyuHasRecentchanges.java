@@ -7,6 +7,7 @@ import com.heroku.myorchestrator.util.MongoUtil;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import com.heroku.myorchestrator.util.content.DocumentUtil;
+import static com.heroku.myorchestrator.util.content.DocumentUtil.getData;
 import com.mongodb.client.MongoCursor;
 import java.util.HashSet;
 import java.util.List;
@@ -17,7 +18,6 @@ import java.util.stream.Collectors;
 import org.apache.camel.Exchange;
 import org.bson.Document;
 import org.springframework.stereotype.Component;
-import static com.heroku.myorchestrator.util.content.DocumentUtil.getData;
 
 @Component
 public class SnapshotSeiyuHasRecentchanges extends SnapshotQueueConsumer {
@@ -52,7 +52,7 @@ public class SnapshotSeiyuHasRecentchanges extends SnapshotQueueConsumer {
                     .collect(Collectors.toList());
             return new DocumentUtil(collect).nullable();
         } catch (Exception ex) {
-            IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
+            IronmqUtil.sendError(this, "doSnapshot", ex);
             return Optional.empty();
         }
     }

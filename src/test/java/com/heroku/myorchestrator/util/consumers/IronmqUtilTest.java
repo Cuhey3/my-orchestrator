@@ -1,6 +1,7 @@
 package com.heroku.myorchestrator.util.consumers;
 
 import com.heroku.myorchestrator.App;
+import com.heroku.myorchestrator.consumers.common.ChangingQueueConsumer;
 import org.apache.camel.CamelContext;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
@@ -21,6 +22,8 @@ public class IronmqUtilTest extends RouteBuilder {
 
     @Autowired
     protected CamelContext camelContext;
+    @Autowired
+    protected ChangingQueueConsumer changingQueueConsumer;
 
     @EndpointInject(uri = "direct:ironmq_util_test_0")
     private ProducerTemplate producer0;
@@ -41,8 +44,7 @@ public class IronmqUtilTest extends RouteBuilder {
             try {
                 throw new Exception();
             } catch (Exception e) {
-                IronmqUtil.sendError(this.getClass(),
-                        "testSendError", exchange, e);
+                IronmqUtil.sendError(changingQueueConsumer, "testSendError", e);
                 return true; // dummy
             }
         });

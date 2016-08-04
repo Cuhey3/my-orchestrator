@@ -80,7 +80,7 @@ public abstract class DiffQueueConsumer extends QueueConsumer {
                     return false;
                 }
             } catch (Exception e) {
-                IronmqUtil.sendError(this.getClass(), "comparePredicate", exchange, e);
+                IronmqUtil.sendError(this, "comparePredicate", e);
                 return false;
             }
         };

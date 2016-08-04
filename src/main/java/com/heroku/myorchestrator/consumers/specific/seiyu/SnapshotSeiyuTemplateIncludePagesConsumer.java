@@ -29,7 +29,7 @@ public class SnapshotSeiyuTemplateIncludePagesConsumer extends SnapshotQueueCons
                     .getResultByMapList();
             return new DocumentUtil(result).nullable();
         } catch (IOException ex) {
-            IronmqUtil.sendError(this.getClass(), "doSnapshot", exchange, ex);
+            IronmqUtil.sendError(this, "doSnapshot", ex);
             return Optional.empty();
         }
     }

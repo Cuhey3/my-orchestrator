@@ -35,7 +35,7 @@ public abstract class SnapshotQueueConsumer extends QueueConsumer {
                     return false;
                 }
             } catch (Exception e) {
-                IronmqUtil.sendError(this.getClass(), "defaultPredicate", exchange, e);
+                IronmqUtil.sendError(this, "defaultPredicate", e);
                 return false;
             }
         };

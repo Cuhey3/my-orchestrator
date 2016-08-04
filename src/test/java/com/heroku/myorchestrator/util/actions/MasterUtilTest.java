@@ -49,7 +49,7 @@ public class MasterUtilTest extends RouteBuilder {
             MasterUtil util = new MasterUtil(exchange);
             util.useDummy();
             try {
-                return util.snapshotSaveToMaster();
+                return util.snapshotSaveToMaster(this);
             } catch (Exception ex) {
                 ex.printStackTrace();
                 return false;

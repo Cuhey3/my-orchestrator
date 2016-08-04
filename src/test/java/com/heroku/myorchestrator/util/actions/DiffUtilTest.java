@@ -88,7 +88,7 @@ public class DiffUtilTest extends RouteBuilder {
             DiffUtil util = new DiffUtil(exchange);
             util.useDummy();
             try {
-                if (util.enableDiff()) {
+                if (util.enableDiff(this)) {
                     Document diff = util.loadDocument().get();
                     return diff.get("enable", Boolean.class);
                 } else {
