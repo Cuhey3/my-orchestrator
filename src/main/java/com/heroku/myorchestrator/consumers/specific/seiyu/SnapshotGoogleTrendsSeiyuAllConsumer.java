@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SnapshotGoogleTrendsSeiyuAllConsumer extends SnapshotQueueConsumer {
 
-    @Override
+    /*@Override
     public void configure() throws Exception {
         super.configure();
         from("timer:foo?repeatCount=1")
@@ -63,7 +63,7 @@ public class SnapshotGoogleTrendsSeiyuAllConsumer extends SnapshotQueueConsumer 
                             });
                 })
                 .to("log:foo");
-    }
+    }*/
 
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {

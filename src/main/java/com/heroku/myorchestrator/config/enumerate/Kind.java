@@ -38,9 +38,11 @@ public enum Kind {
         try (BufferedReader buffer
                 = new BufferedReader(new InputStreamReader(resourceAsStream))) {
             preMessage = buffer.lines().collect(Collectors.joining("\n"));
+            System.out.println("/message/" + this.name() + ".json");
         } catch (Exception ex) {
             System.out.println("premessage initialization failed..."
                     + "\nSystem is shutting down.");
+            System.out.println("/message/" + this.name() + ".json");
             System.exit(1);
         }
     }
