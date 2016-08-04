@@ -7,7 +7,6 @@ import com.heroku.myorchestrator.util.actions.DiffUtil;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.actions.SnapshotUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
-import com.heroku.myorchestrator.util.content.DocumentUtil;
 import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
@@ -62,7 +61,8 @@ public abstract class DiffQueueConsumer extends QueueConsumer {
                 if (!optSnapshot.isPresent()) {
                     return false;
                 }
-                optMaster = new MasterUtil(exchange).findLatest();
+                MasterUtil masterUtil = new MasterUtil(exchange);
+                optMaster = masterUtil.findLatest();
                 if (!optMaster.isPresent()) {
                     doWhenMasterIsEmpty(exchange);
                     return true;
@@ -73,7 +73,7 @@ public abstract class DiffQueueConsumer extends QueueConsumer {
                     new DiffUtil(exchange).updateMessageComparedId(master)
                             .writeDocument(optDiff.get());
                     return true;
-                } else if (DocumentUtil.checkNotFilled(exchange, master)) {
+                } else if (masterUtil.checkNotFilled(master)) {
                     new DiffUtil(exchange).updateMessageComparedId(master);
                     return true;
                 } else {

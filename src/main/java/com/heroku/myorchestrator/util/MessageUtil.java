@@ -81,4 +81,8 @@ public class MessageUtil {
     public boolean getBool(String key) {
         return ofNullable((Boolean) getMessage().get(key)).orElse(false);
     }
+
+    public boolean contains(String key) {
+        return getMessage().containsKey(key);
+    }
 }

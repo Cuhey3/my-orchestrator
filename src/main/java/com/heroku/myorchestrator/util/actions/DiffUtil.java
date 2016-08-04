@@ -1,7 +1,6 @@
 package com.heroku.myorchestrator.util.actions;
 
 import com.heroku.myorchestrator.config.enumerate.MongoTarget;
-import com.heroku.myorchestrator.util.MessageUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import com.heroku.myorchestrator.util.content.DocumentUtil;
 import static com.heroku.myorchestrator.util.content.DocumentUtil.getData;
@@ -89,7 +88,7 @@ public class DiffUtil extends ActionUtil {
     }
 
     public boolean diffIdIsValid() {
-        return MessageUtil.get(exchange, "diff_id", String.class) != null;
+        return message().get("diff_id", String.class) != null;
     }
 
     @Override

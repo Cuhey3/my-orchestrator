@@ -3,7 +3,6 @@ package com.heroku.myorchestrator.util.actions;
 import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.config.enumerate.MongoTarget;
 import com.heroku.myorchestrator.config.enumerate.SenseType;
-import com.heroku.myorchestrator.util.MessageUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import com.heroku.myorchestrator.util.content.DocumentUtil;
 import static com.heroku.myorchestrator.util.content.DocumentUtil.getData;
@@ -19,14 +18,8 @@ public class MasterUtil extends ActionUtil {
 
     public static Predicate isNotFilled(RouteBuilder rb) {
         return (Exchange exchange) -> {
-            String fillField = new MessageUtil(exchange).get("fill");
-            if (fillField == null) {
-                return false;
-            }
             try {
-                return DocumentUtil.getData(new MasterUtil(exchange)
-                        .findLatest().get()).stream()
-                        .anyMatch((map) -> !map.containsKey(fillField));
+                return new MasterUtil(exchange).checkNotFilled(null);
             } catch (Exception ex) {
                 IronmqUtil.sendError(rb, "isNotFilled", ex);
                 return false;
@@ -93,6 +86,17 @@ public class MasterUtil extends ActionUtil {
             throw new Exception();
         } finally {
             this.kind(kind0);
+        }
+    }
+
+    public boolean checkNotFilled(Document document) throws Exception {
+        if (message().contains("fill")) {
+            String fillField = message().get("fill");
+            return DocumentUtil.getData(Optional.ofNullable(document)
+                    .orElse(findLatest().get())).stream()
+                    .anyMatch((map) -> !map.containsKey(fillField));
+        } else {
+            return false;
         }
     }
 }
