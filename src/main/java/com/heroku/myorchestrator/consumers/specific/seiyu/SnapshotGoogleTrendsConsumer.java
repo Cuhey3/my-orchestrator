@@ -45,7 +45,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                             })
                             .filter((str) -> str.length() > 0)
                             .collect(Collectors.toList());
-                    String body1 = Jsoup.connect("http://www.google.com/trends/fetchComponent?q=" + String.join(",", collect) + "&cid=TIMESERIES_GRAPH_0&export=3").ignoreContentType(true).execute().body();
+                    String body1 = Jsoup.connect("http://www.google.com/trends/fetchComponent?q=" + String.join(",", collect) + "&cid=TIMESERIES_GRAPH_0&export=3&hl=ja").ignoreContentType(true).execute().body();
                     exchange.getIn().setBody(body1);
                 })
                 .setBody().javaScript("resource:classpath:googleTrendsParsing.js")
