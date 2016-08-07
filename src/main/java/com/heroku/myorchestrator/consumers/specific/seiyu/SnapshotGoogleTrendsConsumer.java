@@ -3,6 +3,7 @@ package com.heroku.myorchestrator.consumers.specific.seiyu;
 import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.consumers.SnapshotQueueConsumer;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
+import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import com.heroku.myorchestrator.util.content.DocumentUtil;
 import com.heroku.myorchestrator.util.content.GoogleTrendsParsingUtil;
 import java.io.UnsupportedEncodingException;
@@ -48,6 +49,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                     String body1 = Jsoup.connect("http://www.google.com/trends/fetchComponent?q=" + String.join(",", collect) + "&cid=TIMESERIES_GRAPH_0&export=3&hl=ja").ignoreContentType(true).execute().body();
                     exchange.getIn().setBody(body1);
                 })
+                .choice().when(body().contains("google.visualization.Query.setResponse"))
                 .setBody().javaScript("resource:classpath:googleTrendsParsing.js")
                 .unmarshal().json(JsonLibrary.Gson)
                 .process((Exchange exchange) -> {
@@ -57,7 +59,9 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                     } else {
                         exchange.getIn().setBody(util.createFailedResults());
                     }
-                });
+                })
+                .otherwise()
+                .setBody().constant("");
     }
 
     @Override
@@ -82,28 +86,33 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                 .filter((map) -> !map.containsKey("trends")).limit(4)
                 .map((map) -> (String) map.get("title"))
                 .collect(Collectors.toList());
+        try {
 
-        if (!collect.isEmpty()) {
-            ProducerTemplate pt = context.createProducerTemplate();
-            DefaultExchange ex = new DefaultExchange(context);
-            ex.getIn().setBody(collect);
-            Exchange send = pt.send("direct:google_trends", ex);
-            List<Map<String, Object>> body = send.getIn().getBody(List.class);
-            for (String title : collect) {
-                Optional<Map<String, Object>> findFirst = body.stream().filter((map) -> title.startsWith((String) map.get("name")))
-                        .map((map) -> {
-                            map.put("title", title);
-                            return map;
-                        })
-                        .findFirst();
-                if (findFirst.isPresent()) {
-                    List<Map<String, Object>> data = addNewByKey.getData();
-                    data.stream().filter((map) -> ((String) map.get("title")).equals(title))
-                            .forEach((map) -> map.put("trends", findFirst.get()));
-                    addNewByKey.setData(data);
+            if (!collect.isEmpty()) {
+                ProducerTemplate pt = context.createProducerTemplate();
+                DefaultExchange ex = new DefaultExchange(context);
+                ex.getIn().setBody(collect);
+                Exchange send = pt.send("direct:google_trends", ex);
+                List<Map<String, Object>> body = send.getIn().getBody(List.class);
+                for (String title : collect) {
+                    Optional<Map<String, Object>> findFirst = body.stream().filter((map) -> title.startsWith((String) map.get("name")))
+                            .map((map) -> {
+                                map.put("title", title);
+                                return map;
+                            })
+                            .findFirst();
+                    if (findFirst.isPresent()) {
+                        List<Map<String, Object>> data = addNewByKey.getData();
+                        data.stream().filter((map) -> ((String) map.get("title")).equals(title))
+                                .forEach((map) -> map.put("trends", findFirst.get()));
+                        addNewByKey.setData(data);
+                    }
                 }
             }
+            return addNewByKey.nullable();
+        } catch (Exception e) {
+            IronmqUtil.sendError(this, "doSnapshot", e);
+            return Optional.empty();
         }
-        return addNewByKey.nullable();
     }
 }
