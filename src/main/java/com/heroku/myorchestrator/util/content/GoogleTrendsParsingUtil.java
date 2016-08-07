@@ -47,6 +47,11 @@ public class GoogleTrendsParsingUtil {
     }
 
     private IntStream stream(String name) {
+        return body.get(name).stream()
+                .map((map) -> map.values().iterator().next())
+                .mapToInt(Integer::parseInt);
+    }
+    private IntStream streamFrom(String name) {
         String from = fromMap.get(name);
         return body.get(name).stream().filter((map)
                 -> map.keySet().iterator().next().compareTo(from) >= 0)
@@ -63,7 +68,7 @@ public class GoogleTrendsParsingUtil {
     }
 
     private double average(String name) {
-        return stream(name).average().orElse(0.0);
+        return streamFrom(name).average().orElse(0.0);
     }
 
     private int sum(String name) {
