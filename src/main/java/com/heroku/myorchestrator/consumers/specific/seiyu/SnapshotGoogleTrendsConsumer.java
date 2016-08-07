@@ -8,6 +8,7 @@ import com.heroku.myorchestrator.util.content.DocumentUtil;
 import com.heroku.myorchestrator.util.content.GoogleTrendsParsingUtil;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,7 +37,8 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                 .process((Exchange exchange) -> {
                     List<String> body = exchange.getIn().getBody(List.class);
                     body.add("神谷明");
-                    List<String> collect = body.stream().map((str) -> str.replace(" \\(.+\\)", ""))
+                    List<String> collect = body.stream().map((str) -> str.replaceFirst(" \\(.+\\)$", ""))
+                            .filter((str) -> str.length() > 0)
                             .map((str) -> {
                                 try {
                                     return URLEncoder.encode(str, "UTF-8");
@@ -44,7 +46,6 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                                     return "";
                                 }
                             })
-                            .filter((str) -> str.length() > 0)
                             .collect(Collectors.toList());
                     String body1 = Jsoup.connect("http://www.google.com/trends/fetchComponent?q=" + String.join(",", collect) + "&cid=TIMESERIES_GRAPH_0&export=3&hl=ja").ignoreContentType(true).execute().body();
                     exchange.getIn().setBody(body1);
@@ -61,7 +62,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                     }
                 })
                 .otherwise()
-                .setBody().constant("");
+                .setBody().constant(new ArrayList<>());
     }
 
     @Override
@@ -87,13 +88,15 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                 .map((map) -> (String) map.get("title"))
                 .collect(Collectors.toList());
         try {
-
             if (!collect.isEmpty()) {
                 ProducerTemplate pt = context.createProducerTemplate();
                 DefaultExchange ex = new DefaultExchange(context);
                 ex.getIn().setBody(collect);
                 Exchange send = pt.send("direct:google_trends", ex);
                 List<Map<String, Object>> body = send.getIn().getBody(List.class);
+                if (body.isEmpty()) {
+                    throw new Exception();
+                }
                 for (String title : collect) {
                     Optional<Map<String, Object>> findFirst = body.stream().filter((map) -> title.startsWith((String) map.get("name")))
                             .map((map) -> {
@@ -112,6 +115,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
             return addNewByKey.nullable();
         } catch (Exception e) {
             IronmqUtil.sendError(this, "doSnapshot", e);
+            System.exit(1);
             return Optional.empty();
         }
     }

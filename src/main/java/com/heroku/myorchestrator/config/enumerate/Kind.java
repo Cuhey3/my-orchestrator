@@ -22,7 +22,7 @@ public enum Kind {
     amiami_original_titles(commonDiff("amiami_title")),
     amiami_original_titles_all(commonDiff("amiami_title")),
     google_trends_seiyu_all(commonDiff()),
-    google_trends("period=10m&delay=0m",commonDiff()),
+    google_trends("period=1m&delay=0m",commonDiff()),
     test;
 
     private Kind(String... token) {
