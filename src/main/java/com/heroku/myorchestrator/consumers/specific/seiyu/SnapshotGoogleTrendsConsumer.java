@@ -111,11 +111,12 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                         addNewByKey.setData(data);
                     }
                 }
+                return addNewByKey.nullable();
+            } else {
+                return Optional.empty();
             }
-            return addNewByKey.nullable();
         } catch (Exception e) {
             IronmqUtil.sendError(this, "doSnapshot", e);
-            System.exit(1);
             return Optional.empty();
         }
     }
