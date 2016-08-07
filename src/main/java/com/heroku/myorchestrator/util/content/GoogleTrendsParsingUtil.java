@@ -106,6 +106,7 @@ public class GoogleTrendsParsingUtil {
         result.put("data", body.get(name));
         result.put("size", size);
         result.put("count", count(name));
+        result.put("from", fromMap.get(name));
         result.put("sum", sum(name));
         result.put("max", max(name));
         result.put("avg", average(name));

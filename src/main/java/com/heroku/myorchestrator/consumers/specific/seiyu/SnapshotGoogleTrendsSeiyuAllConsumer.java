@@ -15,30 +15,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class SnapshotGoogleTrendsSeiyuAllConsumer extends SnapshotQueueConsumer {
 
-    /*@Override
-    public void configure() throws Exception {
-        super.configure();
-        from("timer:foo?repeatCount=1")
-                .process((Exchange exchange) -> {
-                    //exchange.getIn().setBody(Jsoup.connect("http://www.google.com/trends/fetchComponent?q=xxx&cid=TIMESERIES_GRAPH_0&export=3").ignoreContentType(true).execute().body());
-                    exchange.getIn().setBody("");
-                })
-                .setBody()
-                .javaScript("resource:classpath:googleTrendsParsing.js")
-                .unmarshal().json(JsonLibrary.Gson)
-                .process((Exchange exchange) -> {
-                    GoogleTrendsParsingUtil util
-                        = new GoogleTrendsParsingUtil(
-                            exchange.getIn().getBody(Map.class, "foo", "1");
-                    if (util.scaleIsValid()) {
-                        System.out.println(util.createSuccessResults());
-                    } else {
-                        System.out.println(util.createFailedResults());
-                    }
-                })
-                .to("log:foo");
-    }*/
-
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {
         try {
