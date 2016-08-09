@@ -19,8 +19,8 @@ public class SnapshotAmiamiOriginalTitlesAllConsumer extends SnapshotQueueConsum
         try {
             MasterUtil masterUtil = new MasterUtil(exchange);
             return new DocumentUtil().addNewByKey(
-                    masterUtil.getLatest(amiami_original_titles_all),
-                    masterUtil.getLatest(amiami_original_titles),
+                    masterUtil.findOrElseThrow(amiami_original_titles_all),
+                    masterUtil.findOrElseThrow(amiami_original_titles),
                     "amiami_title").nullable();
         } catch (Exception ex) {
             IronmqUtil.sendError(this, "doSnapshot", ex);

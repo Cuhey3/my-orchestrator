@@ -38,14 +38,14 @@ public class SnapshotAmiamiOriginalTitlesConsumer extends SnapshotQueueConsumer 
         MasterUtil masterUtil = new MasterUtil(exchange);
         List<Map<String, Object>> originalTitlesList;
         try {
-            originalTitlesList = getData(masterUtil.findLatest().get());
+            originalTitlesList = getData(masterUtil.findOrElseThrow());
         } catch (Exception ex0) {
             originalTitlesList = new ArrayList<>();
         }
         Set originalTitlesSet = originalTitlesList
                 .stream().map((map) -> map.get("amiami_title"))
                 .collect(Collectors.toSet());
-        getData(masterUtil.getLatest(amiami_item))
+        getData(masterUtil.findOrElseThrow(amiami_item))
                 .stream().map((map) -> (String) map.get("orig"))
                 .filter((title) -> title.length() > 0)
                 .collect(Collectors.toSet())

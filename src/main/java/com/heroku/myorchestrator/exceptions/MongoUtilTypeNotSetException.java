@@ -1,5 +1,5 @@
 package com.heroku.myorchestrator.exceptions;
 
-public class MongoUtilTypeNotSetException extends Exception{
+public class MongoUtilTypeNotSetException extends RuntimeException{
     
 }

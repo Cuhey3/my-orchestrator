@@ -4,6 +4,7 @@ import com.heroku.myorchestrator.consumers.SnapshotQueueConsumer;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import com.heroku.myorchestrator.util.content.DocumentUtil;
 import com.heroku.myorchestrator.util.content.MediawikiApiRequest;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class SnapshotMaleSeiyuCategoryMembersConsumer extends SnapshotQueueConsu
                     .getResultByMapList();
             mapList.forEach((m) -> m.put("gender", "m"));
             return new DocumentUtil(mapList).nullable();
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             IronmqUtil.sendError(this, "doSnapshot", ex);
             return Optional.empty();
         }

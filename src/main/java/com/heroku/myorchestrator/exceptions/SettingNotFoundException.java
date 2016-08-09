@@ -1,5 +1,5 @@
 package com.heroku.myorchestrator.exceptions;
 
-public class SettingNotFoundException extends Exception {
+public class SettingNotFoundException extends RuntimeException {
 
 }

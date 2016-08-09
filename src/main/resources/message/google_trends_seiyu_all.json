@@ -1,5 +1,6 @@
 {
     "kind": "google_trends_seiyu_all",
-    "affect": [      
+    "affect": [
+      "google_trends"
     ]
 }

@@ -62,7 +62,7 @@ public abstract class DiffQueueConsumer extends QueueConsumer {
                     return false;
                 }
                 MasterUtil masterUtil = new MasterUtil(exchange);
-                optMaster = masterUtil.findLatest();
+                optMaster = masterUtil.optionalFind();
                 if (!optMaster.isPresent()) {
                     doWhenMasterIsEmpty(exchange);
                     return true;

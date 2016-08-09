@@ -88,11 +88,11 @@ public class DiffUtil extends ActionUtil {
     }
 
     public boolean diffIdIsValid() {
-        return message().get("diff_id", String.class) != null;
+        return message().get("diff_id").isPresent();
     }
 
     @Override
-    public void writeDocument(Document document) throws Exception {
+    public void writeDocument(Document document) {
         document.append("enable", false);
         this.insertOne(document);
         message().writeObjectId(target.expression() + "_id", document);

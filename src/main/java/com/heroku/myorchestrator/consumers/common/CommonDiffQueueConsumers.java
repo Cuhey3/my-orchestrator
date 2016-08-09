@@ -13,7 +13,7 @@ public class CommonDiffQueueConsumers {
     public CommonDiffQueueConsumers(CamelContext context) {
         try {
             for (Kind kind : Kind.values()) {
-                if (kind.useCommonDiffRoute()) {
+                if (kind.isUsedCommonDiffRoute()) {
                     context.addRoutes(new DiffQueueConsumer(kind) {
                     });
                 }

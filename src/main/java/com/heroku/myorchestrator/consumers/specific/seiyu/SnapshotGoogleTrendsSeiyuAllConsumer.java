@@ -19,12 +19,12 @@ public class SnapshotGoogleTrendsSeiyuAllConsumer extends SnapshotQueueConsumer 
     protected Optional<Document> doSnapshot(Exchange exchange) {
         try {
             MasterUtil masterUtil = new MasterUtil(exchange);
-            Document findLatest = masterUtil.findLatest()
+            Document findLatest = masterUtil.optionalFind()
                     .orElse(new Document("data", new ArrayList<>()));
             DocumentUtil util = new DocumentUtil();
             Document product = util.productByTitle(
-                    masterUtil.getLatest(koepota_seiyu_all),
-                    masterUtil.getLatest(seiyu_has_recentchanges))
+                    masterUtil.findOrElseThrow(koepota_seiyu_all),
+                    masterUtil.findOrElseThrow(seiyu_has_recentchanges))
                     .getDocument();
             return util.addNewByKey(findLatest, product, "title").nullable();
         } catch (Exception ex) {

@@ -22,7 +22,7 @@ public enum Kind {
     amiami_original_titles(commonDiff("amiami_title")),
     amiami_original_titles_all(commonDiff("amiami_title")),
     google_trends_seiyu_all(commonDiff()),
-    google_trends("period=70m&delay=5m",commonDiff()),
+    google_trends(commonDiff()),
     test;
 
     private Kind(String... token) {
@@ -34,16 +34,17 @@ public enum Kind {
                 this.timerUri = String.format("timer:%s?%s", this.name(), t);
             }
         }
+        String resourcePath = "/message/" + this.name() + ".json";
         InputStream resourceAsStream = ClassLoader.class
-                .getResourceAsStream("/message/" + this.name() + ".json");
+                .getResourceAsStream(resourcePath);
         try (BufferedReader buffer
                 = new BufferedReader(new InputStreamReader(resourceAsStream))) {
             preMessage = buffer.lines().collect(Collectors.joining("\n"));
-            System.out.println("/message/" + this.name() + ".json");
+            System.out.println("loaded... " + resourcePath);
         } catch (Exception ex) {
             System.out.println("premessage initialization failed..."
                     + "\nSystem is shutting down.");
-            System.out.println("/message/" + this.name() + ".json");
+            System.out.println(resourcePath);
             System.exit(1);
         }
     }
@@ -68,7 +69,7 @@ public enum Kind {
         this.timerUri = String.format("timer:%s?%s", expression(), timerParam);
     }
 
-    public boolean useCommonDiffRoute() {
+    public boolean isUsedCommonDiffRoute() {
         return this.useCommonDiff;
     }
 
@@ -82,7 +83,7 @@ public enum Kind {
                     .toLowerCase();
             return Kind.valueOf(kindSnake);
         } catch (Exception ex) {
-            return null;
+            throw new RuntimeException();
         }
     }
 

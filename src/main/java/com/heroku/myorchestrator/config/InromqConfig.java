@@ -17,8 +17,7 @@ public class InromqConfig {
             return new Client(projectId, token, Cloud.ironAWSUSEast);
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.out.println(
-                    "ironmq client initialization failed..."
+            System.out.println("ironmq client initialization failed..."
                     + "\nSystem is shutting down.");
             System.exit(1);
             return null;

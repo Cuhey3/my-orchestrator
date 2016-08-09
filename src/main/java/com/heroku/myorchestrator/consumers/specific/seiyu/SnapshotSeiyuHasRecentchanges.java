@@ -7,7 +7,6 @@ import com.heroku.myorchestrator.util.MongoUtil;
 import com.heroku.myorchestrator.util.actions.MasterUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import com.heroku.myorchestrator.util.content.DocumentUtil;
-import static com.heroku.myorchestrator.util.content.DocumentUtil.getData;
 import com.mongodb.client.MongoCursor;
 import java.util.HashSet;
 import java.util.List;
@@ -18,6 +17,7 @@ import java.util.stream.Collectors;
 import org.apache.camel.Exchange;
 import org.bson.Document;
 import org.springframework.stereotype.Component;
+import static com.heroku.myorchestrator.util.content.DocumentUtil.getData;
 
 @Component
 public class SnapshotSeiyuHasRecentchanges extends SnapshotQueueConsumer {
@@ -46,7 +46,7 @@ public class SnapshotSeiyuHasRecentchanges extends SnapshotQueueConsumer {
                 }
             }
             List<Map<String, Object>> collect = getData(util
-                    .getLatest(seiyu_category_members_include_template))
+                    .findOrElseThrow(seiyu_category_members_include_template))
                     .stream().filter((map)
                             -> seiyuNames.contains((String) map.get("title")))
                     .collect(Collectors.toList());

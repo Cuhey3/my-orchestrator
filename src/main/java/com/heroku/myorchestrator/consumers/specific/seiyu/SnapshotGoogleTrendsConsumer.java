@@ -70,14 +70,14 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
         MasterUtil masterUtil = new MasterUtil(exchange);
         Document google_trends, google_trends_seiyu_all;
         try {
-            google_trends = masterUtil
-                    .kind(Kind.google_trends).findLatest().get();
+            google_trends
+                    = masterUtil.kind(Kind.google_trends).findOrElseThrow();
         } catch (Exception ex) {
             google_trends = new Document();
         }
         try {
             google_trends_seiyu_all = masterUtil
-                    .kind(Kind.google_trends_seiyu_all).findLatest().get();
+                    .kind(Kind.google_trends_seiyu_all).findOrElseThrow();
         } catch (Exception ex) {
             return Optional.empty();
         }

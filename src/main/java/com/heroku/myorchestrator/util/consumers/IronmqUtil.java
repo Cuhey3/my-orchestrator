@@ -21,8 +21,8 @@ public class IronmqUtil {
             public <T> T evaluate(Exchange exchange, Class<T> type) {
                 String kindString = exchange.getIn().getBody(String.class);
                 exchange.getIn().setBody(Kind.valueOf(kindString).preMessage());
-                return (T) String.format("ironmq:%s?client=%s",
-                        "snapshot_" + kindString, IRONMQ_CLIENT_BEAN_NAME);
+                return type.cast(String.format("ironmq:%s?client=%s",
+                        "snapshot_" + kindString, IRONMQ_CLIENT_BEAN_NAME));
             }
         };
     }
@@ -43,7 +43,7 @@ public class IronmqUtil {
 
     public static Processor requestSnapshotProcess() {
         return (Exchange exchange) -> {
-            Kind k = Kind.valueOf(MessageUtil.getKind(exchange));
+            Kind k = Kind.valueOf(MessageUtil.getKind(exchange).get());
             new IronmqUtil().snapshot().postMessage(exchange, k);
         };
     }

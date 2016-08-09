@@ -21,29 +21,29 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @SpringApplicationConfiguration(classes = App.class)
 @Component
 public class GoogleTrendsParsingUtilTest extends RouteBuilder {
-
+    
     @Autowired
     protected CamelContext camelContext;
-
+    
     @EndpointInject(uri = "direct:google_trends_parsing_util_test_0")
     private ProducerTemplate producer0;
-
+    
     @EndpointInject(uri = "mock:google_trends_parsing_util_test_1")
     private MockEndpoint consumer1;
-
+    
     @Override
     public void configure() throws Exception {
         from("direct:google_trends_parsing_util_test_0")
                 .to("mock:google_trends_parsing_util_test_1");
     }
-
+    
     @Test
     public void testGoogleTrendsValues() throws Exception {
         producer0.sendBody("");
         consumer1.message(0).body().in((Exchange exchange) -> {
             MasterUtil masterUtil = new MasterUtil(exchange);
             try {
-                DocumentUtil.getData(masterUtil.kind(google_trends).findLatest().get())
+                DocumentUtil.getData(masterUtil.findOrElseThrow(google_trends))
                         .stream().filter((map) -> map.containsKey("trends"))
                         .map((map) -> (Map<String, Object>) map.get("trends"))
                         .filter((map) -> map.get("status").equals("success"))

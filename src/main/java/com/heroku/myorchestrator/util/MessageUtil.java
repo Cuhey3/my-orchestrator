@@ -1,9 +1,12 @@
 package com.heroku.myorchestrator.util;
 
 import com.heroku.myorchestrator.config.enumerate.Kind;
+import com.heroku.myorchestrator.exceptions.MessageElementNotFoundException;
+import com.heroku.myorchestrator.exceptions.MessageNotSetException;
 import com.heroku.myorchestrator.util.content.DocumentUtil;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import static java.util.Optional.ofNullable;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
@@ -12,27 +15,23 @@ import org.bson.Document;
 public class MessageUtil {
 
     public static Map getMessage(Exchange ex) {
-        return ex.getIn().getBody(Map.class);
+        return ofNullable(ex.getIn().getBody(Map.class))
+                .orElseThrow(() -> new MessageNotSetException());
     }
 
-    public static String getKind(Exchange ex) {
-        Map message = getMessage(ex);
-        if (message == null || !message.containsKey("kind")) {
-            return null;
-        } else {
-            return (String) getMessage(ex).get("kind");
-        }
+    public static Optional<String> getKind(Exchange ex) {
+        return get(ex, "kind", String.class);
     }
 
-    public static <T> T get(Exchange exchange, String key, Class<T> clazz) {
-        return (T) MessageUtil.getMessage(exchange).get(key);
+    private static <T> Optional<T> get(Exchange ex, String key, Class<T> clazz) {
+        return ofNullable(clazz.cast(getMessage(ex).get(key)));
     }
 
     public static Predicate loadAffect() {
         return (Exchange ex) -> {
-            List affect = MessageUtil.get(ex, "affect", List.class);
-            if (affect != null && !affect.isEmpty()) {
-                ex.getIn().setBody(affect);
+            Optional<List> affect = get(ex, "affect", List.class);
+            if (affect.isPresent() && !affect.get().isEmpty()) {
+                ex.getIn().setBody(affect.get());
                 return true;
             } else {
                 return false;
@@ -41,13 +40,19 @@ public class MessageUtil {
     }
 
     public static Predicate messageKindIs(Kind kind) {
-        return (Exchange exchange1)
-                -> MessageUtil.getKind(exchange1).equals(kind.expression());
+        return (Exchange ex)
+                -> {
+            Optional<String> k = getKind(ex);
+            return k.isPresent() && k.get().equals(kind.expression());
+        };
     }
 
     public static Predicate messageKindContains(String str) {
-        return (Exchange exchange1)
-                -> MessageUtil.getKind(exchange1).contains(str);
+        return (Exchange ex)
+                -> {
+            Optional<String> k = getKind(ex);
+            return k.isPresent() && k.get().contains(str);
+        };
     }
 
     private final Exchange exchange;
@@ -63,26 +68,32 @@ public class MessageUtil {
     }
 
     public Map getMessage() {
-        return exchange.getIn().getBody(Map.class);
+        return ofNullable(exchange.getIn().getBody(Map.class))
+                .orElseThrow(() -> new MessageNotSetException());
     }
 
     public void writeObjectId(String key, Document document) {
         updateMessage(key, DocumentUtil.objectIdHexString(document));
     }
 
-    public <T> T get(String key, Class<T> clazz) {
-        return (T) getMessage().get(key);
+    public <T> Optional<T> get(String key, Class<T> clazz) {
+        return ofNullable(clazz.cast(getMessage().get(key)));
     }
 
-    public String get(String key) {
-        return (String) getMessage().get(key);
+    public <T> T getOrElseThrow(String key, Class<T> clazz) {
+        return get(key, clazz)
+                .orElseThrow(() -> new MessageElementNotFoundException());
+    }
+
+    public Optional<String> get(String key) {
+        return get(key, String.class);
+    }
+
+    public String getOrElseThrow(String key) {
+        return getOrElseThrow(key, String.class);
     }
 
     public boolean getBool(String key) {
-        return ofNullable((Boolean) getMessage().get(key)).orElse(false);
-    }
-
-    public boolean contains(String key) {
-        return getMessage().containsKey(key);
+        return get(key, Boolean.class).orElse(false);
     }
 }

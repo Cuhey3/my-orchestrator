@@ -3,6 +3,7 @@ package com.heroku.myorchestrator.consumers;
 import com.heroku.myorchestrator.config.enumerate.Kind;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import com.heroku.myorchestrator.util.consumers.RouteUtil;
+import java.util.Optional;
 import org.apache.camel.builder.RouteBuilder;
 
 public abstract class QueueConsumer extends RouteBuilder {
@@ -20,16 +21,12 @@ public abstract class QueueConsumer extends RouteBuilder {
     }
 
     public final IronmqUtil ironmq() {
-        if (ironmqUtil == null) {
-            ironmqUtil = new IronmqUtil();
-        }
-        return ironmqUtil;
+        return Optional.ofNullable(ironmqUtil)
+                .orElseGet(() -> ironmqUtil = new IronmqUtil());
     }
 
     public final RouteUtil route() {
-        if (routeUtil == null) {
-            routeUtil = new RouteUtil();
-        }
-        return routeUtil;
+        return Optional.ofNullable(routeUtil)
+                .orElseGet(() -> routeUtil = new RouteUtil());
     }
 }

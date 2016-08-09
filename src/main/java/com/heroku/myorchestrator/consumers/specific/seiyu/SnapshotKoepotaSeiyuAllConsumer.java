@@ -26,10 +26,10 @@ public class SnapshotKoepotaSeiyuAllConsumer extends SnapshotQueueConsumer {
             MasterUtil masterUtil = new MasterUtil(exchange);
             DocumentUtil util = new DocumentUtil();
             List<Map<String, Object>> allList = util.addNewByKey(
-                    masterUtil.getLatest(koepota_seiyu_all),
-                    masterUtil.getLatest(koepota_seiyu),
+                    masterUtil.findOrElseThrow(koepota_seiyu_all),
+                    masterUtil.findOrElseThrow(koepota_seiyu),
                     "title").getData();
-            Set scmitSet = getData(masterUtil.getLatest(
+            Set scmitSet = getData(masterUtil.findOrElseThrow(
                     seiyu_category_members_include_template))
                     .stream().map((map) -> map.get(("title")))
                     .collect(Collectors.toSet());

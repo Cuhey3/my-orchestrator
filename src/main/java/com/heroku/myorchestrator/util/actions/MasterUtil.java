@@ -5,7 +5,6 @@ import com.heroku.myorchestrator.config.enumerate.MongoTarget;
 import com.heroku.myorchestrator.config.enumerate.SenseType;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import com.heroku.myorchestrator.util.content.DocumentUtil;
-import static com.heroku.myorchestrator.util.content.DocumentUtil.getData;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +12,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.builder.RouteBuilder;
 import org.bson.Document;
+import static com.heroku.myorchestrator.util.content.DocumentUtil.getData;
 
 public class MasterUtil extends ActionUtil {
 
@@ -43,8 +43,9 @@ public class MasterUtil extends ActionUtil {
     }
 
     public boolean comparedIsEmpty() {
-        return SenseType.EMPTY.expression()
-                .equals(message().get("compared_master_id"));
+        Optional<String> getOptional = message().get("compared_master_id");
+        return getOptional.isPresent()
+                && SenseType.EMPTY.expression().equals(getOptional.get());
     }
 
     public boolean isSkipDiff() {
@@ -53,8 +54,10 @@ public class MasterUtil extends ActionUtil {
 
     public boolean comparedIsValid(RouteBuilder rb) {
         try {
-            return DocumentUtil.objectIdHexString(findLatest().get())
-                    .equals(message().get("compared_master_id"));
+            Optional<String> getOptional = message().get("compared_master_id");
+            return getOptional.isPresent()
+                    && DocumentUtil.objectIdHexString(optionalFind().get())
+                    .equals(getOptional.get());
         } catch (Exception ex) {
             IronmqUtil.sendError(rb, "comparedIsValid", ex);
             return false;
@@ -75,25 +78,24 @@ public class MasterUtil extends ActionUtil {
         }
     }
 
-    public Optional<Document> latestJoinAll(Kind kind1, Kind kind2) throws Exception {
+    public Optional<Document> latestJoinAll(Kind kind1, Kind kind2) {
         Kind kind0 = this.kind;
         try {
             List result = new ArrayList<>();
-            result.addAll(getData(getLatest(kind1)));
-            result.addAll(getData(getLatest(kind2)));
+            result.addAll(getData(findOrElseThrow(kind1)));
+            result.addAll(getData(findOrElseThrow(kind2)));
             return new DocumentUtil(result).nullable();
-        } catch (Exception e) {
-            throw new Exception();
         } finally {
-            this.kind(kind0);
+            kind(kind0);
         }
     }
 
-    public boolean checkNotFilled(Document document) throws Exception {
-        if (message().contains("fill")) {
-            String fillField = message().get("fill");
+    public boolean checkNotFilled(Document document) {
+        Optional<String> getOptional = message().get("fill");
+        if (getOptional.isPresent()) {
+            String fillField = getOptional.get();
             return DocumentUtil.getData(Optional.ofNullable(document)
-                    .orElse(findLatest().get())).stream()
+                    .orElse(findOrElseThrow())).stream()
                     .anyMatch((map) -> !map.containsKey(fillField));
         } else {
             return false;

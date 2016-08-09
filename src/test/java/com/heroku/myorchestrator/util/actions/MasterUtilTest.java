@@ -60,7 +60,7 @@ public class MasterUtilTest extends RouteBuilder {
             masterUtil.useDummy();
             snapshotUtil.useDummy();
             try {
-                Document master = masterUtil.findLatest().get();
+                Document master = masterUtil.optionalFind().get();
                 Document snapshot = snapshotUtil.loadDocument().get();
                 return master.get("random", Double.class)
                         .equals(snapshot.get("random", Double.class))

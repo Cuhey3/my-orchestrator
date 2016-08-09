@@ -1,5 +1,6 @@
 package com.heroku.myorchestrator.util.content;
 
+import com.heroku.myorchestrator.exceptions.DataNotFoundException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,7 +37,8 @@ public final class DocumentUtil {
     }
 
     public static List<Map<String, Object>> getData(Document document) {
-        return document.get("data", List.class);
+        return Optional.ofNullable(document.get("data", List.class))
+                .orElseThrow(() -> new DataNotFoundException());
     }
 
     private Document document;
@@ -67,7 +69,7 @@ public final class DocumentUtil {
 
     public DocumentUtil addNewByKey(Document oldDoc, Document newDoc, final String key) {
         List<Map<String, Object>> oldList;
-        if (oldDoc == null || getData(oldDoc) == null) {
+        if (oldDoc == null) {
             oldList = new ArrayList<>();
         } else {
             oldList = getData(oldDoc);
@@ -114,7 +116,8 @@ public final class DocumentUtil {
     }
 
     public List<Map<String, Object>> getData() {
-        return document.get("data", List.class);
+        return Optional.ofNullable(document.get("data", List.class))
+                .orElseThrow(() -> new DataNotFoundException());
     }
 
     public DocumentUtil setData(List list) {

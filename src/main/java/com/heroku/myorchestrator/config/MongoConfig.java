@@ -28,7 +28,8 @@ public class MongoConfig {
                         .getDatabase(mongoClientURI.getDatabase())
                         .getCollection("settings").find().iterator().next()
                         .get("mongodb", Map.class);
-                mongoSettings.put("dummy", ownMongodbUri);
+                mongoSettings.put(
+                        MongoTarget.DUMMY.expression(), ownMongodbUri);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
