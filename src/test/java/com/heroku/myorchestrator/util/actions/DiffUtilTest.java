@@ -34,7 +34,7 @@ public class DiffUtilTest extends RouteBuilder {
     private MockEndpoint consumer1;
 
     @Override
-    public void configure() throws Exception {
+    public void configure() {
         from("direct:diff_util_test_0")
                 .setBody().constant(Kind.test.preMessage())
                 .process((Exchange exchange) -> {
@@ -46,7 +46,7 @@ public class DiffUtilTest extends RouteBuilder {
     }
 
     @Test
-    public void testDiffMessageIsValid() throws Exception {
+    public void testDiffMessageIsValid() throws InterruptedException {
         producer0.sendBody("");
         consumer1.message(0).body().in(
                 (Exchange exchange) -> {
@@ -82,7 +82,7 @@ public class DiffUtilTest extends RouteBuilder {
     }
 
     @Test
-    public void testEnableDiff() throws Exception {
+    public void testEnableDiff() throws InterruptedException {
         producer0.sendBody("");
         consumer1.message(0).body().in((Exchange exchange) -> {
             DiffUtil util = new DiffUtil(exchange);

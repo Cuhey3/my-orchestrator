@@ -28,7 +28,7 @@ public abstract class DiffQueueConsumer extends QueueConsumer {
     }
 
     @Override
-    public void configure() throws Exception {
+    public void configure() {
         from(ironmq().diff().consumeUri())
                 .routeId(route().id())
                 .filter(route().camelBatchComplete())

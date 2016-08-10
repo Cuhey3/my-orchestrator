@@ -31,7 +31,7 @@ public class MasterUtilTest extends RouteBuilder {
     private MockEndpoint consumer1;
 
     @Override
-    public void configure() throws Exception {
+    public void configure() {
         from("direct:master_util_test_0")
                 .setBody().constant(Kind.test.preMessage())
                 .process((Exchange exchange) -> {
@@ -43,7 +43,7 @@ public class MasterUtilTest extends RouteBuilder {
     }
 
     @Test
-    public void testSnapshotSaveToMaster() throws Exception {
+    public void testSnapshotSaveToMaster() throws InterruptedException {
         producer0.sendBody("");
         consumer1.message(0).body().in((Exchange exchange) -> {
             MasterUtil util = new MasterUtil(exchange);

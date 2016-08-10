@@ -14,7 +14,7 @@ public class TimerRequester extends QueueConsumer {
     }
 
     @Override
-    public void configure() throws Exception {
+    public void configure() {
 
         Stream.of(Kind.values())
                 .filter((Kind k) -> k.timerUri() != null)

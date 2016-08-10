@@ -16,7 +16,7 @@ public abstract class SnapshotQueueConsumer extends QueueConsumer {
     }
 
     @Override
-    public void configure() throws Exception {
+    public void configure() {
         from(ironmq().snapshot().consumeUri())
                 .routeId(route().id())
                 .filter(route().camelBatchComplete())

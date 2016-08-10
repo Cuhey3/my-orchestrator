@@ -32,14 +32,14 @@ public class KindUtilTest extends RouteBuilder {
     private MockEndpoint consumer1;
 
     @Override
-    public void configure() throws Exception {
+    public void configure() {
         from("direct:kind_util_test_0")
                 .setBody().constant(Kind.test.preMessage())
                 .to("mock:kind_util_test_1");
     }
 
     @Test
-    public void testPreMessageConvertToString() throws Exception {
+    public void testPreMessageConvertToString() throws InterruptedException {
         producer0.sendBody("");
         consumer1.message(0).body().in((Exchange exchange) -> {
             String bodyString = exchange.getIn().getBody(String.class);
@@ -50,7 +50,7 @@ public class KindUtilTest extends RouteBuilder {
     }
 
     @Test
-    public void testPreMessageConvertToMap() throws Exception {
+    public void testPreMessageConvertToMap() throws InterruptedException {
         producer0.sendBody("");
         consumer1.message(0).body().in((Exchange exchange) -> {
             Map bodyMap = exchange.getIn().getBody(Map.class);
@@ -61,7 +61,7 @@ public class KindUtilTest extends RouteBuilder {
     }
 
     @Test
-    public void testPreMessageAffectIsList() throws Exception {
+    public void testPreMessageAffectIsList() throws InterruptedException {
         producer0.sendBody("");
         consumer1.message(0).body().in((Exchange exchange) -> {
             Map bodyMap = exchange.getIn().getBody(Map.class);

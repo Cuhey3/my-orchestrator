@@ -3,6 +3,7 @@ package com.heroku.myorchestrator.config;
 import com.heroku.myorchestrator.config.enumerate.MongoTarget;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,25 +11,25 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MongoConfig {
 
-    private static Map mongoSettings;
+    private static final Map<String, String> MONGO_SETTINGS
+            = new LinkedHashMap();
 
     public static MongoClientURI getMongoClientURI(MongoTarget target) {
-        return new MongoClientURI(
-                (String) mongoSettings.get(target.expression()));
+        return new MongoClientURI(MONGO_SETTINGS.get(target.expression()));
     }
 
     private String ownMongodbUri;
 
-    public MongoConfig() throws Exception {
+    public MongoConfig() {
         try {
             ownMongodbUri = Settings.ENV.get("MONGODB_URI");
             MongoClientURI mongoClientURI = new MongoClientURI(ownMongodbUri);
             try (MongoClient mongoClient = new MongoClient(mongoClientURI)) {
-                mongoSettings = mongoClient
-                        .getDatabase(mongoClientURI.getDatabase())
+                MONGO_SETTINGS.putAll(
+                        mongoClient.getDatabase(mongoClientURI.getDatabase())
                         .getCollection("settings").find().iterator().next()
-                        .get("mongodb", Map.class);
-                mongoSettings.put(
+                        .get("mongodb", Map.class));
+                MONGO_SETTINGS.put(
                         MongoTarget.DUMMY.expression(), ownMongodbUri);
             }
         } catch (Exception ex) {

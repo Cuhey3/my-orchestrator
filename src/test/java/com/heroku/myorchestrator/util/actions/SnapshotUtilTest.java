@@ -34,7 +34,7 @@ public class SnapshotUtilTest extends RouteBuilder {
     private MockEndpoint consumer1;
 
     @Override
-    public void configure() throws Exception {
+    public void configure() {
         from("direct:snapshot_util_test_0")
                 .setBody().constant(Kind.test.preMessage())
                 .process((Exchange exchange) -> {
@@ -46,7 +46,7 @@ public class SnapshotUtilTest extends RouteBuilder {
     }
 
     @Test
-    public void testMessageHasSnapshotId() throws Exception {
+    public void testMessageHasSnapshotId() throws InterruptedException {
         producer0.sendBody("");
         consumer1.message(0).body().in((Exchange exchange) -> {
             Map body = exchange.getIn().getBody(Map.class);
@@ -56,7 +56,7 @@ public class SnapshotUtilTest extends RouteBuilder {
     }
 
     @Test
-    public void testMessageSnapshotIdIsValid() throws Exception {
+    public void testMessageSnapshotIdIsValid() throws InterruptedException {
         producer0.sendBody("");
         consumer1.message(0).body().in((Exchange exchange) -> {
             Map body = exchange.getIn().getBody(Map.class);
@@ -74,7 +74,7 @@ public class SnapshotUtilTest extends RouteBuilder {
     }
 
     @Test
-    public void testLoadSnapshotDocument() throws Exception {
+    public void testLoadSnapshotDocument() throws InterruptedException {
         producer0.sendBody("");
         consumer1.message(0).body().in((Exchange exchange) -> {
             Map body = exchange.getIn().getBody(Map.class);

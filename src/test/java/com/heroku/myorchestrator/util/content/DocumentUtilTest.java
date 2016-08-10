@@ -31,14 +31,14 @@ public class DocumentUtilTest extends RouteBuilder {
     private MockEndpoint consumer1;
 
     @Override
-    public void configure() throws Exception {
+    public void configure() {
         from("direct:document_util_test_0")
                 .setBody().constant(Kind.amiami_original_titles.preMessage())
                 .to("mock:document_util_test_1");
     }
 
     @Test
-    public void testCheckNotFilled() throws Exception {
+    public void testCheckNotFilled() throws InterruptedException {
         producer0.sendBody("");
         consumer1.message(0).body().in((Exchange exchange) -> {
             try {

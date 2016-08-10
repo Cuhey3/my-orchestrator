@@ -65,7 +65,7 @@ public class MongoUtil {
         return this;
     }
 
-    public MongoDatabase database(MongoTarget t) {
+    private MongoDatabase database(MongoTarget t) {
         return registry.lookupByNameAndType(t.expression(), MongoClient.class)
                 .getDatabase(MongoConfig.getMongoClientURI(t).getDatabase());
     }
@@ -75,17 +75,17 @@ public class MongoUtil {
     }
 
     public MongoCollection<Document> collection() {
-        MongoTarget t = ofNullable(
-                ofNullable(this.customTarget).orElse(this.target))
-                .orElseThrow(() -> new MongoUtilTypeNotSetException());
-        return database(t).getCollection(collectionName());
+        return database(ofNullable(ofNullable(
+                this.customTarget).orElse(this.target))
+                .orElseThrow(() -> new MongoUtilTypeNotSetException()))
+                .getCollection(collectionName());
     }
 
     public Optional<Document> optionalFind() {
-        return nextDocument(latest(), false);
+        return nextDocument(latestIterable(), false);
     }
 
-    private FindIterable<Document> latest() {
+    private FindIterable<Document> latestIterable() {
         return collection().find()
                 .sort(new Document("creationDate", -1)).limit(1);
     }
@@ -130,7 +130,7 @@ public class MongoUtil {
     }
 
     public Document findOrElseThrow() {
-        return nextDocument(latest(), true).get();
+        return nextDocument(latestIterable(), true).get();
     }
 
     public Document findOrElseThrow(Kind kind) {

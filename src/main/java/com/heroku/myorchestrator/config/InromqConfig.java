@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class InromqConfig {
 
     @Bean(name = "myironmq")
-    Client getIronmqClient() throws Exception {
+    Client getIronmqClient() {
         try {
             String projectId, token;
             projectId = Settings.IRON.get("IRON_MQ_PROJECT_ID", "project_id");

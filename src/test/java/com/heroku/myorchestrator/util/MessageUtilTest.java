@@ -28,7 +28,7 @@ public class MessageUtilTest extends RouteBuilder {
     private MockEndpoint consumer1;
 
     @Override
-    public void configure() throws Exception {
+    public void configure() {
         from("direct:message_util_test_0")
                 .filter(MessageUtil.loadAffect())
                 .split().body()
@@ -36,7 +36,7 @@ public class MessageUtilTest extends RouteBuilder {
     }
 
     @Test
-    public void testLoadAffect() throws Exception {
+    public void testLoadAffect() throws InterruptedException {
         producer0.sendBody("{\"affect\":[\"foo\",\"bar\"]}");
         consumer1.message(0).body().isEqualTo("foo");
         consumer1.message(1).body().isEqualTo("bar");

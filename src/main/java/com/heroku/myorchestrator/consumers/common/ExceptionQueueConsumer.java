@@ -11,7 +11,7 @@ public class ExceptionQueueConsumer extends QueueConsumer {
     }
 
     @Override
-    public void configure() throws Exception {
+    public void configure() {
         from(ironmq().exception().kind("in").consumeUri())
                 .routeId(route().id())
                 .to(ironmq().exception().kind("out").postUri());

@@ -1,5 +1,7 @@
 package com.heroku.myorchestrator.config.enumerate;
 
+import java.util.Locale;
+
 public enum MongoTarget {
 
     SNAPSHOT, DIFF, MASTER, DUMMY, SEIYULAB;
@@ -7,7 +9,7 @@ public enum MongoTarget {
     private final String expression;
 
     private MongoTarget() {
-        this.expression = this.name().toLowerCase();
+        this.expression = this.name().toLowerCase(Locale.US);
     }
 
     public String expression() {

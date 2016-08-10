@@ -34,7 +34,7 @@ public class SnapshotAmiamiOriginalTitlesConsumer extends SnapshotQueueConsumer 
         }
     }
 
-    public void mergeNewTitles(Exchange exchange, DocumentUtil util) throws Exception {
+    public void mergeNewTitles(Exchange exchange, DocumentUtil util) {
         MasterUtil masterUtil = new MasterUtil(exchange);
         List<Map<String, Object>> originalTitlesList;
         try {

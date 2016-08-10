@@ -14,7 +14,7 @@ public class CompletionQueueConsumer extends QueueConsumer {
     }
 
     @Override
-    public void configure() throws Exception {
+    public void configure() {
         from(ironmq().completion().consumeUri())
                 .routeId(route().id())
                 .choice()

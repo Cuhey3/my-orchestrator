@@ -27,10 +27,10 @@ import org.springframework.stereotype.Component;
 public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
 
     @Autowired
-    CamelContext context;
+    private CamelContext context;
 
     @Override
-    public void configure() throws Exception {
+    public void configure() {
         super.configure();
 
         from("direct:google_trends")
@@ -94,7 +94,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                 ex.getIn().setBody(collect);
                 Exchange send = pt.send("direct:google_trends", ex);
                 List<Map<String, Object>> body = send.getIn().getBody(List.class);
-                if (body.isEmpty()) {
+                if (body == null || body.isEmpty()) {
                     throw new Exception();
                 }
                 for (String title : collect) {

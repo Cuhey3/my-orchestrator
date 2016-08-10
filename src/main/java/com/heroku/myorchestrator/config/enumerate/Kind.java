@@ -4,6 +4,7 @@ import static com.heroku.myorchestrator.util.actions.DiffUtil.commonDiff;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 public enum Kind {
@@ -38,7 +39,7 @@ public enum Kind {
         InputStream resourceAsStream = ClassLoader.class
                 .getResourceAsStream(resourcePath);
         try (BufferedReader buffer
-                = new BufferedReader(new InputStreamReader(resourceAsStream))) {
+                = new BufferedReader(new InputStreamReader(resourceAsStream, "UTF-8"))) {
             preMessage = buffer.lines().collect(Collectors.joining("\n"));
             System.out.println("loaded... " + resourcePath);
         } catch (Exception ex) {
@@ -80,7 +81,7 @@ public enum Kind {
                     .replace("Consumer", "");
             String kindSnake
                     = String.join("_", kindCamel.split("(?=[\\p{Upper}])"))
-                    .toLowerCase();
+                    .toLowerCase(Locale.US);
             return Kind.valueOf(kindSnake);
         } catch (Exception ex) {
             throw new RuntimeException();

@@ -1,5 +1,7 @@
 package com.heroku.myorchestrator.config.enumerate;
 
+import java.util.Locale;
+
 public enum QueueType {
 
     SNAPSHOT, DIFF, COMPLETION, CHANGED, EXCEPTION;
@@ -7,7 +9,7 @@ public enum QueueType {
     private final String expression;
 
     private QueueType() {
-        this.expression = this.name().toLowerCase();
+        this.expression = this.name().toLowerCase(Locale.US);
     }
 
     public String expression() {

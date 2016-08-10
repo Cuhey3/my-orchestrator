@@ -32,13 +32,13 @@ public class GoogleTrendsParsingUtilTest extends RouteBuilder {
     private MockEndpoint consumer1;
     
     @Override
-    public void configure() throws Exception {
+    public void configure() {
         from("direct:google_trends_parsing_util_test_0")
                 .to("mock:google_trends_parsing_util_test_1");
     }
     
     @Test
-    public void testGoogleTrendsValues() throws Exception {
+    public void testGoogleTrendsValues() throws InterruptedException {
         producer0.sendBody("");
         consumer1.message(0).body().in((Exchange exchange) -> {
             MasterUtil masterUtil = new MasterUtil(exchange);
