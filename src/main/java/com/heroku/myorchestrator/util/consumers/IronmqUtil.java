@@ -41,6 +41,19 @@ public class IronmqUtil {
         }
     }
 
+    public static void sendLog(RouteBuilder rb, String method, String message) {
+        try {
+            Client client = rb.getContext().getRegistry()
+                    .lookupByNameAndType(IRONMQ_CLIENT_BEAN_NAME, Client.class);
+            client.queue("log_in").push(
+                    new Date().toString()
+                    + "\nClass: " + rb.getClass().getName()
+                    + "\nmethod: " + method
+                    + "\nmessage: " + message);
+        } catch (IOException ex1) {
+        }
+    }
+
     public static Processor requestSnapshotProcess() {
         return (Exchange exchange) -> {
             Kind k = Kind.valueOf(MessageUtil.getKind(exchange).get());
@@ -85,7 +98,7 @@ public class IronmqUtil {
         return this;
     }
 
-    public IronmqUtil completion() {
+    private IronmqUtil completion() {
         this.type = QueueType.COMPLETION.expression();
         this.kind = "all";
         return this;
@@ -120,5 +133,13 @@ public class IronmqUtil {
     public String postUri() {
         return String.format("ironmq:%s?client=%s",
                 type + "_" + kind, IRONMQ_CLIENT_BEAN_NAME);
+    }
+
+    public String completionPostUri() {
+        return new IronmqUtil().completion().postUri();
+    }
+
+    public String completionConsumeUri() {
+        return new IronmqUtil().completion().consumeUri();
     }
 }

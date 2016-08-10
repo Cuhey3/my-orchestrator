@@ -15,11 +15,11 @@ public class CompletionQueueConsumer extends QueueConsumer {
 
     @Override
     public void configure() {
-        from(ironmq().completion().consumeUri())
+        from(ironmq().completionConsumeUri())
                 .routeId(route().id())
                 .choice()
                 .when((Exchange exchange)
-                        -> new MasterUtil(exchange).isSkipValidation())
+                        -> new MasterUtil(exchange).isSkipComparedValidation())
                 .to("direct:completionSaveToMaster")
                 .otherwise()
                 .filter((Exchange exchange)

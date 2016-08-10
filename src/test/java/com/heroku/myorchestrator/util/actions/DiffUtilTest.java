@@ -60,7 +60,7 @@ public class DiffUtilTest extends RouteBuilder {
                     try {
                         Optional<Document> findById
                         = util.findById((String) body.get("diff_id"));
-                        return util.diffIdIsValid() && findById.isPresent();
+                        return util.diffIdIsExists() && findById.isPresent();
                     } catch (Exception ex) {
                         return false;
                     }

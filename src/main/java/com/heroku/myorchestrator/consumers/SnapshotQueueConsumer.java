@@ -1,6 +1,7 @@
 package com.heroku.myorchestrator.consumers;
 
 import com.heroku.myorchestrator.config.enumerate.Kind;
+import com.heroku.myorchestrator.util.MessageUtil;
 import com.heroku.myorchestrator.util.actions.SnapshotUtil;
 import com.heroku.myorchestrator.util.consumers.IronmqUtil;
 import java.util.Optional;
@@ -21,6 +22,11 @@ public abstract class SnapshotQueueConsumer extends QueueConsumer {
                 .routeId(route().id())
                 .filter(route().camelBatchComplete())
                 .filter(defaultPredicate())
+                .choice()
+                .when((Exchange exchange)
+                        -> new MessageUtil(exchange).getBool("skip_diff"))
+                .to(ironmq().completionPostUri())
+                .otherwise()
                 .to(ironmq().diff().postUri());
     }
 

@@ -10,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -49,6 +50,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                             .collect(Collectors.toList());
                     String body1 = Jsoup.connect("http://www.google.com/trends/fetchComponent?q=" + String.join(",", collect) + "&cid=TIMESERIES_GRAPH_0&export=3&hl=ja").ignoreContentType(true).execute().body();
                     exchange.getIn().setBody(body1);
+                    IronmqUtil.sendLog(this, "process", body1);
                 })
                 .choice().when(body().contains("google.visualization.Query.setResponse"))
                 .setBody().javaScript("resource:classpath:googleTrendsParsing.js")
@@ -82,7 +84,8 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
             return Optional.empty();
         }
         DocumentUtil util = new DocumentUtil();
-        DocumentUtil addNewByKey = util.addNewByKey(google_trends, google_trends_seiyu_all, "title");
+        DocumentUtil addNewByKey = util.addNewByKey(
+                google_trends, google_trends_seiyu_all, "title");
         List<String> collect = addNewByKey.getData().stream()
                 .filter((map) -> !map.containsKey("trends")).limit(4)
                 .map((map) -> (String) map.get("title"))
@@ -93,12 +96,14 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                 DefaultExchange ex = new DefaultExchange(context);
                 ex.getIn().setBody(collect);
                 Exchange send = pt.send("direct:google_trends", ex);
-                List<Map<String, Object>> body = send.getIn().getBody(List.class);
+                List<Map<String, Object>> body
+                        = send.getIn().getBody(List.class);
                 if (body == null || body.isEmpty()) {
                     throw new Exception();
                 }
                 for (String title : collect) {
-                    Optional<Map<String, Object>> findFirst = body.stream().filter((map) -> title.startsWith((String) map.get("name")))
+                    Optional<Map<String, Object>> findFirst = body.stream()
+                            .filter((map) -> nameIsEqualToTitle(map, title))
                             .map((map) -> {
                                 map.put("title", title);
                                 return map;
@@ -106,8 +111,10 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                             .findFirst();
                     if (findFirst.isPresent()) {
                         List<Map<String, Object>> data = addNewByKey.getData();
-                        data.stream().filter((map) -> ((String) map.get("title")).equals(title))
-                                .forEach((map) -> map.put("trends", findFirst.get()));
+                        data.stream().filter((map)
+                                -> ((String) map.get("title")).equals(title))
+                                .forEach((map)
+                                        -> map.put("trends", findFirst.get()));
                         addNewByKey.setData(data);
                     }
                 }
@@ -118,6 +125,16 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
         } catch (Exception e) {
             IronmqUtil.sendError(this, "doSnapshot", e);
             return Optional.empty();
+        }
+    }
+
+    private boolean nameIsEqualToTitle(Map<String, Object> map, String title) {
+        String name = (String) map.get("name");
+        if (title.startsWith(name)
+                || title.toLowerCase(Locale.US).equals(name)) {
+            return true;
+        } else {
+            return false;
         }
     }
 }

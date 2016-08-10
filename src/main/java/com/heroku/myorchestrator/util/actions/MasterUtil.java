@@ -64,7 +64,7 @@ public class MasterUtil extends ActionUtil {
         }
     }
 
-    public boolean isSkipValidation() {
+    public boolean isSkipComparedValidation() {
         return isSkipDiff() || comparedIsEmpty();
     }
 

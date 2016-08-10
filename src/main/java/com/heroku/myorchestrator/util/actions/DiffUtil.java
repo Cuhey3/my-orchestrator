@@ -55,7 +55,7 @@ public class DiffUtil extends ActionUtil {
 
     public boolean enableDiff(RouteBuilder rb) {
         try {
-            if (diffIdIsValid()) {
+            if (diffIdIsExists()) {
                 Optional<Document> findById = loadDocument();
                 if (findById.isPresent()) {
                     Document diff = findById.get();
@@ -87,7 +87,7 @@ public class DiffUtil extends ActionUtil {
         return this;
     }
 
-    public boolean diffIdIsValid() {
+    public boolean diffIdIsExists() {
         return message().get("diff_id").isPresent();
     }
 

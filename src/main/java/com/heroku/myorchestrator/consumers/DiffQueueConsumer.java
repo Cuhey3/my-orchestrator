@@ -33,7 +33,7 @@ public abstract class DiffQueueConsumer extends QueueConsumer {
                 .routeId(route().id())
                 .filter(route().camelBatchComplete())
                 .filter(comparePredicate())
-                .to(ironmq().completion().postUri());
+                .to(ironmq().completionPostUri());
     }
 
     public Optional<Document> calculateDiff(Document master, Document snapshot) {

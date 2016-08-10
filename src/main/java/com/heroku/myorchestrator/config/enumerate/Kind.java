@@ -23,7 +23,7 @@ public enum Kind {
     amiami_original_titles(commonDiff("amiami_title")),
     amiami_original_titles_all(commonDiff("amiami_title")),
     google_trends_seiyu_all(commonDiff()),
-    google_trends(commonDiff()),
+    google_trends("period=65m&delay=10m"),
     test;
 
     private Kind(String... token) {
@@ -33,6 +33,8 @@ public enum Kind {
                 this.commonDiffKey = t.replace("common_diff_key=", "");
             } else if (t.contains("period=")) {
                 this.timerUri = String.format("timer:%s?%s", this.name(), t);
+            } else if (t.equals("develop")) {
+                this.useDevelop = true;
             }
         }
         String resourcePath = "/message/" + this.name() + ".json";
@@ -51,11 +53,16 @@ public enum Kind {
     }
 
     private String timerUri, preMessage;
-    private boolean useCommonDiff;
+    private boolean useCommonDiff = false;
     private String commonDiffKey;
+    private boolean useDevelop = false;
 
     public String expression() {
-        return this.name();
+        if (useDevelop) {
+            return this.name() + "_develop";
+        } else {
+            return this.name();
+        }
     }
 
     public String timerUri() {
