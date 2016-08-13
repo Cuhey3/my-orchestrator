@@ -1,9 +1,9 @@
 package com.heroku.myorchestrator.consumers.specific.external;
 
 import com.heroku.myorchestrator.consumers.SnapshotQueueConsumer;
-import com.heroku.myorchestrator.util.consumers.IronmqUtil;
-import com.heroku.myorchestrator.util.content.DocumentUtil;
-import com.heroku.myorchestrator.util.content.KoepotaEvent;
+import com.heroku.definitions.util.consumers.IronmqUtil;
+import com.heroku.definitions.util.content.DocumentUtil;
+import com.heroku.definitions.util.content.KoepotaEvent;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

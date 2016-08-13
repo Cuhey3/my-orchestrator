@@ -1,6 +1,6 @@
 package com.heroku.myorchestrator;
 
-import com.heroku.myorchestrator.config.Settings;
+import com.heroku.definitions.config.Settings;
 import io.hawt.embedded.Main;
 import org.springframework.stereotype.Component;
 

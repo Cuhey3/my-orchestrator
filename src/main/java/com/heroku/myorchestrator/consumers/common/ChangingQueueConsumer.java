@@ -1,12 +1,11 @@
 package com.heroku.myorchestrator.consumers.common;
 
-import com.heroku.myorchestrator.config.enumerate.Kind;
-import static com.heroku.myorchestrator.config.enumerate.Kind.*;
+import static com.heroku.definitions.config.enumerate.Kind.*;
 import com.heroku.myorchestrator.consumers.QueueConsumer;
-import com.heroku.myorchestrator.util.MessageUtil;
-import static com.heroku.myorchestrator.util.MessageUtil.messageKindIs;
-import com.heroku.myorchestrator.util.actions.MasterUtil;
-import com.heroku.myorchestrator.util.consumers.IronmqUtil;
+import com.heroku.definitions.util.MessageUtil;
+import static com.heroku.definitions.util.MessageUtil.messageKindIs;
+import com.heroku.definitions.util.actions.MasterUtil;
+import com.heroku.definitions.util.consumers.IronmqUtil;
 import org.springframework.stereotype.Component;
 
 @Component

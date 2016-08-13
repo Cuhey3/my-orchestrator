@@ -1,11 +1,11 @@
 package com.heroku.myorchestrator.consumers.specific.seiyu;
 
-import static com.heroku.myorchestrator.config.enumerate.Kind.koepota_seiyu_all;
-import static com.heroku.myorchestrator.config.enumerate.Kind.seiyu_has_recentchanges;
+import static com.heroku.definitions.config.enumerate.Kind.koepota_seiyu_all;
+import static com.heroku.definitions.config.enumerate.Kind.seiyu_has_recentchanges;
 import com.heroku.myorchestrator.consumers.SnapshotQueueConsumer;
-import com.heroku.myorchestrator.util.actions.MasterUtil;
-import com.heroku.myorchestrator.util.consumers.IronmqUtil;
-import com.heroku.myorchestrator.util.content.DocumentUtil;
+import com.heroku.definitions.util.actions.MasterUtil;
+import com.heroku.definitions.util.consumers.IronmqUtil;
+import com.heroku.definitions.util.content.DocumentUtil;
 import java.util.ArrayList;
 import java.util.Optional;
 import org.apache.camel.Exchange;

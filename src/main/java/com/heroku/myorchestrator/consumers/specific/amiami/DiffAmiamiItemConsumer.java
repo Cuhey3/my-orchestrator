@@ -1,8 +1,8 @@
 package com.heroku.myorchestrator.consumers.specific.amiami;
 
 import com.heroku.myorchestrator.consumers.DiffQueueConsumer;
-import com.heroku.myorchestrator.util.actions.DiffUtil;
-import com.heroku.myorchestrator.util.content.DocumentUtil;
+import com.heroku.definitions.util.actions.DiffUtil;
+import com.heroku.definitions.util.content.DocumentUtil;
 import java.util.Optional;
 import org.bson.Document;
 import org.springframework.stereotype.Component;

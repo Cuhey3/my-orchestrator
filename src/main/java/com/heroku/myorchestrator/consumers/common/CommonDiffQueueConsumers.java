@@ -1,6 +1,6 @@
 package com.heroku.myorchestrator.consumers.common;
 
-import com.heroku.myorchestrator.config.enumerate.Kind;
+import com.heroku.definitions.config.enumerate.Kind;
 import com.heroku.myorchestrator.consumers.DiffQueueConsumer;
 import org.apache.camel.CamelContext;
 import org.springframework.beans.factory.annotation.Autowired;

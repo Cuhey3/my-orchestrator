@@ -1,8 +1,8 @@
 package com.heroku.myorchestrator.consumers.common;
 
 import com.heroku.myorchestrator.consumers.QueueConsumer;
-import com.heroku.myorchestrator.util.actions.DiffUtil;
-import com.heroku.myorchestrator.util.actions.MasterUtil;
+import com.heroku.definitions.util.actions.DiffUtil;
+import com.heroku.definitions.util.actions.MasterUtil;
 import org.apache.camel.Exchange;
 import org.springframework.stereotype.Component;
 

@@ -1,9 +1,9 @@
 package com.heroku.myorchestrator.consumers.specific.seiyu;
 
 import com.heroku.myorchestrator.consumers.SnapshotQueueConsumer;
-import com.heroku.myorchestrator.util.consumers.IronmqUtil;
-import com.heroku.myorchestrator.util.content.DocumentUtil;
-import com.heroku.myorchestrator.util.content.MediawikiApiRequest;
+import com.heroku.definitions.util.consumers.IronmqUtil;
+import com.heroku.definitions.util.content.DocumentUtil;
+import com.heroku.definitions.util.content.MediawikiApiRequest;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;

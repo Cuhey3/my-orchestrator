@@ -1,9 +1,9 @@
 package com.heroku.myorchestrator.consumers;
 
-import com.heroku.myorchestrator.config.enumerate.Kind;
-import com.heroku.myorchestrator.util.MessageUtil;
-import com.heroku.myorchestrator.util.actions.SnapshotUtil;
-import com.heroku.myorchestrator.util.consumers.IronmqUtil;
+import com.heroku.definitions.config.enumerate.Kind;
+import com.heroku.definitions.util.MessageUtil;
+import com.heroku.definitions.util.actions.SnapshotUtil;
+import com.heroku.definitions.util.consumers.IronmqUtil;
 import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;

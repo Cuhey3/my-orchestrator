@@ -1,13 +1,13 @@
 package com.heroku.myorchestrator.consumers.specific.seiyu;
 
-import static com.heroku.myorchestrator.config.enumerate.Kind.seiyu_category_members_include_template;
-import com.heroku.myorchestrator.config.enumerate.MongoTarget;
+import static com.heroku.definitions.config.enumerate.Kind.seiyu_category_members_include_template;
+import com.heroku.definitions.config.enumerate.MongoTarget;
 import com.heroku.myorchestrator.consumers.SnapshotQueueConsumer;
-import com.heroku.myorchestrator.util.MongoUtil;
-import com.heroku.myorchestrator.util.actions.MasterUtil;
-import com.heroku.myorchestrator.util.consumers.IronmqUtil;
-import com.heroku.myorchestrator.util.content.DocumentUtil;
-import static com.heroku.myorchestrator.util.content.DocumentUtil.getData;
+import com.heroku.definitions.util.MongoUtil;
+import com.heroku.definitions.util.actions.MasterUtil;
+import com.heroku.definitions.util.consumers.IronmqUtil;
+import com.heroku.definitions.util.content.DocumentUtil;
+import static com.heroku.definitions.util.content.DocumentUtil.getData;
 import com.mongodb.client.MongoCursor;
 import java.util.HashSet;
 import java.util.List;

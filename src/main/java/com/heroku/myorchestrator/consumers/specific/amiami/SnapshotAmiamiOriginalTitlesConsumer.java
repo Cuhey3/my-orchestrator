@@ -1,12 +1,12 @@
 package com.heroku.myorchestrator.consumers.specific.amiami;
 
-import static com.heroku.myorchestrator.config.enumerate.Kind.amiami_item;
+import static com.heroku.definitions.config.enumerate.Kind.amiami_item;
 import com.heroku.myorchestrator.consumers.SnapshotQueueConsumer;
-import com.heroku.myorchestrator.util.actions.MasterUtil;
-import com.heroku.myorchestrator.util.consumers.IronmqUtil;
-import com.heroku.myorchestrator.util.content.DocumentUtil;
-import static com.heroku.myorchestrator.util.content.DocumentUtil.getData;
-import com.heroku.myorchestrator.util.content.GoogleWikiTitle;
+import com.heroku.definitions.util.actions.MasterUtil;
+import com.heroku.definitions.util.consumers.IronmqUtil;
+import com.heroku.definitions.util.content.DocumentUtil;
+import static com.heroku.definitions.util.content.DocumentUtil.getData;
+import com.heroku.definitions.util.content.GoogleWikiTitle;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

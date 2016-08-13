@@ -1,6 +1,6 @@
 package com.heroku.myorchestrator.consumers.specific;
 
-import com.heroku.myorchestrator.config.enumerate.Kind;
+import com.heroku.definitions.config.enumerate.Kind;
 import com.heroku.myorchestrator.consumers.QueueConsumer;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Component;

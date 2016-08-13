@@ -1,11 +1,11 @@
 package com.heroku.myorchestrator.consumers.specific.seiyu;
 
-import static com.heroku.myorchestrator.config.enumerate.Kind.koepota_events;
-import static com.heroku.myorchestrator.config.enumerate.Kind.seiyu_category_members_include_template;
+import static com.heroku.definitions.config.enumerate.Kind.koepota_events;
+import static com.heroku.definitions.config.enumerate.Kind.seiyu_category_members_include_template;
 import com.heroku.myorchestrator.consumers.SnapshotQueueConsumer;
-import com.heroku.myorchestrator.util.actions.MasterUtil;
-import com.heroku.myorchestrator.util.consumers.IronmqUtil;
-import com.heroku.myorchestrator.util.content.DocumentUtil;
+import com.heroku.definitions.util.actions.MasterUtil;
+import com.heroku.definitions.util.consumers.IronmqUtil;
+import com.heroku.definitions.util.content.DocumentUtil;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
