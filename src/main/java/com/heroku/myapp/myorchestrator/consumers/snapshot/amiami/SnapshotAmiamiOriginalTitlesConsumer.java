@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import org.apache.camel.Exchange;
 import org.bson.Document;
 import org.springframework.stereotype.Component;
+import static com.heroku.myapp.commons.util.content.DocumentUtil.getData;
 
 @Component
 public class SnapshotAmiamiOriginalTitlesConsumer extends SnapshotQueueConsumer {

@@ -17,17 +17,9 @@ public class CompletionQueueConsumer extends QueueConsumer {
     public void configure() {
         from(ironmq().completionConsumeUri())
                 .routeId(route().id())
-                .choice()
-                .when((Exchange exchange)
-                        -> new MasterUtil(exchange).isSkipComparedValidation())
-                .to("direct:completionSaveToMaster")
-                .otherwise()
-                .filter((Exchange exchange)
-                        -> new MasterUtil(exchange).comparedIsValid(this))
-                .to("direct:completionSaveToMaster");
-
-        from("direct:completionSaveToMaster")
-                .routeId("completion_save_to_master")
+                .filter((Exchange exchange) -> {
+                    return new MasterUtil(exchange).toCompleteLogic(this);
+                })
                 .filter((Exchange exchange)
                         -> new MasterUtil(exchange).snapshotSaveToMaster(this))
                 .filter((Exchange exchange)
