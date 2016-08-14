@@ -45,6 +45,10 @@
         <repository>
             <id>github</id>
             <url>http://cuhey3.github.io/mvn-repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
         </repository>
     </repositories>
     <properties>
