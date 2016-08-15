@@ -5,7 +5,6 @@ import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.consumers.IronmqUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
-import static com.heroku.myapp.commons.util.content.DocumentUtil.getData;
 import com.heroku.myapp.commons.util.content.GoogleWikiTitle;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
