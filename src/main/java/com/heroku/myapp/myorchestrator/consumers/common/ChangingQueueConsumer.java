@@ -2,10 +2,10 @@ package com.heroku.myapp.myorchestrator.consumers.common;
 
 import static com.heroku.myapp.commons.config.enumerate.Kind.*;
 import com.heroku.myapp.commons.consumers.QueueConsumer;
-import com.heroku.myapp.commons.util.MessageUtil;
-import static com.heroku.myapp.commons.util.MessageUtil.messageKindIs;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.consumers.IronmqUtil;
+import com.heroku.myapp.commons.util.consumers.QueueMessage;
+import static com.heroku.myapp.commons.util.consumers.QueueMessage.messageKindIs;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -53,7 +53,7 @@ public class ChangingQueueConsumer extends QueueConsumer {
                 .when(MasterUtil.isNotFilled(this))
                 .process(IronmqUtil.requestSnapshotProcess())
                 .otherwise()
-                .filter(MessageUtil.loadAffect())
+                .filter(QueueMessage.loadAffectPredicate())
                 .split().body()
                 .routingSlip(IronmqUtil.affectQueueUri());
     }
