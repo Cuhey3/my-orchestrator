@@ -7,6 +7,7 @@ import com.heroku.myapp.commons.util.MongoUtil;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.consumers.IronmqUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
+import static com.heroku.myapp.commons.util.content.DocumentUtil.getData;
 import com.mongodb.client.MongoCursor;
 import java.util.HashSet;
 import java.util.List;
@@ -17,7 +18,6 @@ import java.util.stream.Collectors;
 import org.apache.camel.Exchange;
 import org.bson.Document;
 import org.springframework.stereotype.Component;
-import static com.heroku.myapp.commons.util.content.DocumentUtil.getData;
 
 @Component
 public class SnapshotSeiyuHasRecentchanges extends SnapshotQueueConsumer {

@@ -5,6 +5,7 @@ import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.consumers.IronmqUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
+import static com.heroku.myapp.commons.util.content.DocumentUtil.getData;
 import com.heroku.myapp.commons.util.content.GoogleWikiTitle;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -16,7 +17,6 @@ import java.util.stream.Collectors;
 import org.apache.camel.Exchange;
 import org.bson.Document;
 import org.springframework.stereotype.Component;
-import static com.heroku.myapp.commons.util.content.DocumentUtil.getData;
 
 @Component
 public class SnapshotAmiamiOriginalTitlesConsumer extends SnapshotQueueConsumer {
