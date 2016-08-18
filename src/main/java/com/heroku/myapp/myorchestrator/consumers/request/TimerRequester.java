@@ -8,11 +8,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class TimerRequester extends QueueConsumer {
 
-    public TimerRequester() {
-        ironmq().snapshot();
-        route().timer();
-    }
-
     @Override
     public void configure() {
 
@@ -21,9 +16,9 @@ public class TimerRequester extends QueueConsumer {
                 .forEach((Kind k) -> {
                     kind(k);
                     from(k.timerUri())
-                            .routeId(route().id())
+                            .routeId(route().timer().id())
                             .setBody().constant(k.preMessage())
-                            .to(ironmq().postUri());
+                            .to(route().snapshot().postUri());
                 });
     }
 }

@@ -9,14 +9,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class CompletionQueueConsumer extends QueueConsumer {
 
-    public CompletionQueueConsumer() {
-        route().completion();
-    }
-
     @Override
     public void configure() {
-        from(ironmq().completionConsumeUri())
-                .routeId(route().id())
+        from(route().completionConsumeUri())
+                .routeId(route().completion().id())
                 .filter((Exchange exchange) -> {
                     return new MasterUtil(exchange).toCompleteLogic(this);
                 })
@@ -24,6 +20,6 @@ public class CompletionQueueConsumer extends QueueConsumer {
                         -> new MasterUtil(exchange).snapshotSaveToMaster(this))
                 .filter((Exchange exchange)
                         -> new DiffUtil(exchange).enableDiff(this))
-                .to(ironmq().changed().postUri());
+                .to(route().changed().postUri());
     }
 }

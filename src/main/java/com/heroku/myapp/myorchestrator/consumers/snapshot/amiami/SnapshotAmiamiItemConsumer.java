@@ -1,7 +1,7 @@
 package com.heroku.myapp.myorchestrator.consumers.snapshot.amiami;
 
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
-import com.heroku.myapp.commons.util.consumers.IronmqUtil;
+import com.heroku.myapp.commons.util.consumers.ConsumerUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +40,7 @@ public class SnapshotAmiamiItemConsumer extends SnapshotQueueConsumer {
             return new DocumentUtil(collect).createPrefix("img", "url")
                     .nullable();
         } catch (Exception ex) {
-            IronmqUtil.sendError(this, "doSnapshot", ex);
+            ConsumerUtil.sendError(this, "doSnapshot", ex);
             return Optional.empty();
         }
     }

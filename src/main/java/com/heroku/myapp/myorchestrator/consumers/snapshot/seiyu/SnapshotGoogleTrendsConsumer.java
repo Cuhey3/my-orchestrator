@@ -3,7 +3,7 @@ package com.heroku.myapp.myorchestrator.consumers.snapshot.seiyu;
 import com.heroku.myapp.commons.config.enumerate.Kind;
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
-import com.heroku.myapp.commons.util.consumers.IronmqUtil;
+import com.heroku.myapp.commons.util.consumers.ConsumerUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
 import com.heroku.myapp.commons.util.content.GoogleTrendsParsingUtil;
 import java.io.UnsupportedEncodingException;
@@ -50,7 +50,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                             .collect(Collectors.toList());
                     String body1 = Jsoup.connect("http://www.google.com/trends/fetchComponent?q=" + String.join(",", collect) + "&cid=TIMESERIES_GRAPH_0&export=3&hl=ja").ignoreContentType(true).execute().body();
                     exchange.getIn().setBody(body1);
-                    IronmqUtil.sendLog(this, "process", body1);
+                    ConsumerUtil.sendLog(this, "process", body1);
                 })
                 .choice().when(body().contains("google.visualization.Query.setResponse"))
                 .setBody().javaScript("resource:classpath:googleTrendsParsing.js")
@@ -123,7 +123,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                 return Optional.empty();
             }
         } catch (Exception e) {
-            IronmqUtil.sendError(this, "doSnapshot", e);
+            ConsumerUtil.sendError(this, "doSnapshot", e);
             return Optional.empty();
         }
     }

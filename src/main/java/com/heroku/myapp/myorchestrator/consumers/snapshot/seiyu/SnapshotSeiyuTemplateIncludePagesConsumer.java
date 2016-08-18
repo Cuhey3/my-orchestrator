@@ -1,7 +1,7 @@
 package com.heroku.myapp.myorchestrator.consumers.snapshot.seiyu;
 
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
-import com.heroku.myapp.commons.util.consumers.IronmqUtil;
+import com.heroku.myapp.commons.util.consumers.ConsumerUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
 import com.heroku.myapp.commons.util.content.MediawikiApiRequest;
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class SnapshotSeiyuTemplateIncludePagesConsumer extends SnapshotQueueCons
                     .getResultByMapList();
             return new DocumentUtil(result).nullable();
         } catch (IOException ex) {
-            IronmqUtil.sendError(this, "doSnapshot", ex);
+            ConsumerUtil.sendError(this, "doSnapshot", ex);
             return Optional.empty();
         }
     }

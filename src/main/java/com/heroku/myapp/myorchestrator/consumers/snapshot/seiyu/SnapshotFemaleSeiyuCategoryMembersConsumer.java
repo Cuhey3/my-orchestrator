@@ -1,7 +1,7 @@
 package com.heroku.myapp.myorchestrator.consumers.snapshot.seiyu;
 
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
-import com.heroku.myapp.commons.util.consumers.IronmqUtil;
+import com.heroku.myapp.commons.util.consumers.ConsumerUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
 import com.heroku.myapp.commons.util.content.MediawikiApiRequest;
 import java.net.URLEncoder;
@@ -35,7 +35,7 @@ public class SnapshotFemaleSeiyuCategoryMembersConsumer extends SnapshotQueueCon
             result.forEach((m) -> m.put("gender", "f"));
             return new DocumentUtil(result).nullable();
         } catch (Exception e) {
-            IronmqUtil.sendError(this, "doSnapshot", e);
+            ConsumerUtil.sendError(this, "doSnapshot", e);
             return Optional.empty();
         }
     }

@@ -4,7 +4,7 @@ import static com.heroku.myapp.commons.config.enumerate.Kind.koepota_events;
 import static com.heroku.myapp.commons.config.enumerate.Kind.seiyu_category_members_include_template;
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
-import com.heroku.myapp.commons.util.consumers.IronmqUtil;
+import com.heroku.myapp.commons.util.consumers.ConsumerUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +33,7 @@ public class SnapshotKoepotaSeiyuConsumer extends SnapshotQueueConsumer {
                     .collect(Collectors.toList());
             return new DocumentUtil(collect).nullable();
         } catch (Exception ex) {
-            IronmqUtil.sendError(this, "doSnapshot", ex);
+            ConsumerUtil.sendError(this, "doSnapshot", ex);
             return Optional.empty();
         }
     }

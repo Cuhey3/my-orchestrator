@@ -3,7 +3,7 @@ package com.heroku.myapp.myorchestrator.consumers.snapshot.amiami;
 import static com.heroku.myapp.commons.config.enumerate.Kind.amiami_item;
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
-import com.heroku.myapp.commons.util.consumers.IronmqUtil;
+import com.heroku.myapp.commons.util.consumers.ConsumerUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
 import static com.heroku.myapp.commons.util.content.DocumentUtil.getData;
 import com.heroku.myapp.commons.util.content.GoogleWikiTitle;
@@ -29,7 +29,7 @@ public class SnapshotAmiamiOriginalTitlesConsumer extends SnapshotQueueConsumer 
             updateWikiTitles(util);
             return util.nullable();
         } catch (Exception ex) {
-            IronmqUtil.sendError(this, "doSnapshot", ex);
+            ConsumerUtil.sendError(this, "doSnapshot", ex);
             return Optional.empty();
         }
     }
