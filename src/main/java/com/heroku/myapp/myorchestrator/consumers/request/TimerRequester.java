@@ -17,7 +17,7 @@ public class TimerRequester extends QueueConsumer {
                     from(k.timerUri())
                             .routeId(util().timer().kind(k).id())
                             .setBody().constant(k.preMessage())
-                            .to(util().snapshot().postUri());
+                            .to(util().snapshot().ironmqPostUri());
                 });
     }
 }
