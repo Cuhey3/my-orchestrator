@@ -14,11 +14,10 @@ public class TimerRequester extends QueueConsumer {
         Stream.of(Kind.values())
                 .filter((Kind k) -> k.timerUri() != null)
                 .forEach((Kind k) -> {
-                    kind(k);
                     from(k.timerUri())
-                            .routeId(route().timer().id())
+                            .routeId(util().timer().kind(k).id())
                             .setBody().constant(k.preMessage())
-                            .to(route().snapshot().postUri());
+                            .to(util().snapshot().postUri());
                 });
     }
 }

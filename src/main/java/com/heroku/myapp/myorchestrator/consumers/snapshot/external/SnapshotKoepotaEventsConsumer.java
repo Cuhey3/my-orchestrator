@@ -1,7 +1,6 @@
 package com.heroku.myapp.myorchestrator.consumers.snapshot.external;
 
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
-import com.heroku.myapp.commons.util.consumers.ConsumerUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
 import com.heroku.myapp.commons.util.content.KoepotaEvent;
 import java.util.List;
@@ -28,7 +27,7 @@ public class SnapshotKoepotaEventsConsumer extends SnapshotQueueConsumer {
                     .collect(Collectors.toList());
             return new DocumentUtil(collect).nullable();
         } catch (Exception e) {
-            ConsumerUtil.sendError(this, "doSnapshot", e);
+            util().sendError("doSnapshot", e);
             return Optional.empty();
         }
     }

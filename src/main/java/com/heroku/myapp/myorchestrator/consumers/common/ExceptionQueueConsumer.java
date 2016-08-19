@@ -8,13 +8,13 @@ import org.springframework.stereotype.Component;
 public class ExceptionQueueConsumer extends QueueConsumer {
 
     public ExceptionQueueConsumer() {
-        route().exception();
+        util().exception();
     }
     
     @Override
     public void configure() {
-        from(route().kind(Kind.in).consumeUri())
-                .routeId(route().id())
-                .to(route().kind(Kind.out).postUri());
+        from(util().kind(Kind.in).consumeUri())
+                .routeId(util().id())
+                .to(util().kind(Kind.out).postUri());
     }
 }

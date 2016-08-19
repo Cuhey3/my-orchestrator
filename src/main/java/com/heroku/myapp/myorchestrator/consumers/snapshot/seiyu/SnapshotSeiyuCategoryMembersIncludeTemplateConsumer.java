@@ -4,7 +4,6 @@ import static com.heroku.myapp.commons.config.enumerate.Kind.seiyu_category_memb
 import static com.heroku.myapp.commons.config.enumerate.Kind.seiyu_template_include_pages;
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
-import com.heroku.myapp.commons.util.consumers.ConsumerUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
 import java.util.Optional;
 import org.apache.camel.Exchange;
@@ -22,7 +21,7 @@ public class SnapshotSeiyuCategoryMembersIncludeTemplateConsumer extends Snapsho
             Document stip = util.findOrElseThrow(seiyu_template_include_pages);
             return new DocumentUtil().productByTitle(scm, stip).nullable();
         } catch (Exception ex) {
-            ConsumerUtil.sendError(this, "doSnapshot", ex);
+            util().sendError("doSnapshot", ex);
             return Optional.empty();
         }
     }

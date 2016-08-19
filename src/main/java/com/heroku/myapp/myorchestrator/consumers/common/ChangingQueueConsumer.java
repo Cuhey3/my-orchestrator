@@ -3,18 +3,22 @@ package com.heroku.myapp.myorchestrator.consumers.common;
 import static com.heroku.myapp.commons.config.enumerate.Kind.*;
 import com.heroku.myapp.commons.consumers.QueueConsumer;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
+import com.heroku.myapp.commons.util.consumers.QueueConsumerUtil;
 import com.heroku.myapp.commons.util.consumers.QueueMessage;
 import static com.heroku.myapp.commons.util.consumers.QueueMessage.messageKindIs;
-import com.heroku.myapp.commons.util.consumers.ConsumerUtil;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ChangingQueueConsumer extends QueueConsumer {
 
+    public ChangingQueueConsumer() {
+        util().changing();
+    }
+
     @Override
     public void configure() {
-        from(route().changed().consumeUri())
-                .routeId(route().changing().id())
+        from(util().copy().changed().consumeUri())
+                .routeId(util().id())
                 .choice()
                 .when(messageKindIs(female_seiyu_category_members))
                 .to("log:" + female_seiyu_category_members.expression())
@@ -46,10 +50,10 @@ public class ChangingQueueConsumer extends QueueConsumer {
                 .end()
                 .choice()
                 .when(MasterUtil.isNotFilled(this))
-                .process(ConsumerUtil.requestSnapshotProcess())
+                .process(util().requestSnapshotProcess())
                 .otherwise()
                 .filter(QueueMessage.loadAffectPredicate())
                 .split().body()
-                .routingSlip(ConsumerUtil.affectQueueUri());
+                .routingSlip(QueueConsumerUtil.affectQueueUri());
     }
 }

@@ -11,8 +11,8 @@ public class CompletionQueueConsumer extends QueueConsumer {
 
     @Override
     public void configure() {
-        from(route().completionConsumeUri())
-                .routeId(route().completion().id())
+        from(util().completion().consumeUri())
+                .routeId(util().id())
                 .filter((Exchange exchange) -> {
                     return new MasterUtil(exchange).toCompleteLogic(this);
                 })
@@ -20,6 +20,6 @@ public class CompletionQueueConsumer extends QueueConsumer {
                         -> new MasterUtil(exchange).snapshotSaveToMaster(this))
                 .filter((Exchange exchange)
                         -> new DiffUtil(exchange).enableDiff(this))
-                .to(route().changed().postUri());
+                .to(util().copy().changed().postUri());
     }
 }
