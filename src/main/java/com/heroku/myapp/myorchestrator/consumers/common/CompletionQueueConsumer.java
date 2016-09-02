@@ -58,7 +58,7 @@ public class CompletionQueueConsumer extends QueueConsumer {
         ChoiceDefinition nestedChoice = choice.when((Exchange exchange)
                 -> !Optional.ofNullable(
                         (Boolean) new QueueMessage(exchange)
-                        .map().get("changed")).orElse(false))
+                        .map().get("changed")).orElse(true))
                 .id("when:changedIsFalse")
                 .choice();
         for (Kind k : Kind.values()) {
