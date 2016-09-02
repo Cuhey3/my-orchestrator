@@ -1,6 +1,7 @@
 package com.heroku.myapp.myorchestrator.consumers.common;
 
 import com.heroku.myapp.commons.config.enumerate.Kind;
+import com.heroku.myapp.commons.config.enumerate.KindOptions;
 import com.heroku.myapp.commons.consumers.DiffQueueConsumer;
 import org.apache.camel.CamelContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ public class CommonDiffQueueConsumers {
     public CommonDiffQueueConsumers(CamelContext context) {
         try {
             for (Kind kind : Kind.values()) {
-                if (kind.isUsedCommonDiffRoute()) {
+                if (kind.isEnable(KindOptions.common_diff)) {
                     context.addRoutes(new DiffQueueConsumer(kind) {
                     });
                 }
