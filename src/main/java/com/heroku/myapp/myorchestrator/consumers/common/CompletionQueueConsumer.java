@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CompletionQueueConsumer extends QueueConsumer {
-    
+
     @Override
     public void configure() {
         ChoiceDefinition topLevelChoice = from(util().completion().ironmqConsumeUri())
@@ -38,7 +38,7 @@ public class CompletionQueueConsumer extends QueueConsumer {
                 .id("when:isNotFilled")
                 .process(util().requestSnapshotProcess())
                 .otherwise().choice();
-        
+
         for (Kind k : Kind.values()) {
             if (k.optionIsEnable()) {
                 secondLevelChoiceOtherwise.when(messageKindIs(k)).to("log:" + k.expression());
@@ -50,10 +50,18 @@ public class CompletionQueueConsumer extends QueueConsumer {
                                         .ironmqPostUri());
                     });
                 }
+                if (k.isEnable(KindOptions.always_affect)) {
+                    k.alwaysAffects().stream().forEach((affect) -> {
+                        secondLevelChoiceOtherwise.setBody()
+                                .constant(affect.preMessage())
+                                .to(new QueueConsumerUtil(affect).snapshot()
+                                        .ironmqPostUri());
+                    });
+                }
             }
         }
     }
-    
+
     public void setAlwaysAffects(ChoiceDefinition choice) {
         ChoiceDefinition nestedChoice = choice.when((Exchange exchange)
                 -> !Optional.ofNullable(
