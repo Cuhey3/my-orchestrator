@@ -90,7 +90,6 @@ public class SnapshotKoepotaRankingConsumer extends SnapshotQueueConsumer {
             return map;
         }).collect(Collectors.toList());
 
-        util.setData(result);
-        return util.nullable();
+        return new DocumentUtil().setData(result).nullable();
     }
 }
