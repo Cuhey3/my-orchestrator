@@ -39,8 +39,10 @@ public class SnapshotSeiyuMultiLangConsumer extends SnapshotQueueConsumer {
                     }
                 });
         if (result.size() == data.size()) {
-            Optional.ofNullable(new DocumentUtil().setData(result).getDocument());
+            return Optional.ofNullable(new DocumentUtil().setData(result).getDocument());
+        } else {
+            util().sendLog("SnapshotSeiyuMultiLangConsumer#doSnapshot", "size not match result: " + result.size() + " orig: " + data.size());
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 }
