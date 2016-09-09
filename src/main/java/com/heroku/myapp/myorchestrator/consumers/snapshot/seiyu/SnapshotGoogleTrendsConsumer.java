@@ -34,6 +34,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
         super.configure();
 
         from("direct:google_trends")
+                .routeId("snapshot_google_trends_sub_route")
                 .process((Exchange exchange) -> {
                     List<String> body = exchange.getIn().getBody(List.class);
                     body.add("神谷明");
@@ -51,7 +52,9 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                     exchange.getIn().setBody(body1);
                     util().sendLog("process", body1);
                 })
+                .id("process:request_to_google_trends_api")
                 .choice().when(body().contains("google.visualization.Query.setResponse"))
+                .id("when:responseIsValid")
                 .setBody().javaScript("resource:classpath:googleTrendsParsing.js")
                 .unmarshal().json(JsonLibrary.Gson)
                 .process((Exchange exchange) -> {
@@ -62,6 +65,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                         exchange.getIn().setBody(util.createFailedResults());
                     }
                 })
+                .id("process:parse_google_trends_response")
                 .otherwise()
                 .setBody().constant(new ArrayList<>());
     }
