@@ -8,10 +8,7 @@ function parse(body) {
   var obj = eval(body);
   var cols = obj.table.cols;
   var rows = obj.table.rows;
-  var res = {};
-  for (var i = 1; i < cols.length; i++) {
-    res[cols[i].label] = [];
-  }
+  var res = setProgress({}, cols, rows[rows.length - 1].c);
   var re = /^\d{2}(\d{2})年(\d{1,2})月/;
   for (var i = 0; i < rows.length - 1; i++) {
     var row = rows[i].c;
@@ -22,6 +19,16 @@ function parse(body) {
       rec[yymm] = row[j].f;
       res[cols[j].label].push(rec);
     }
+  }
+  return res;
+}
+
+function setProgress(res, cols, row) {
+  for (var i = 1; i < row.length; i++) {
+    var rec = {'progress': row[i].f};
+    var name = cols[i].label;
+    res[name] = [];
+    res[name].push(rec);
   }
   return res;
 }

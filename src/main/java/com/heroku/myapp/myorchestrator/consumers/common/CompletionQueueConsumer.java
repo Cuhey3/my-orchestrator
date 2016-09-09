@@ -1,7 +1,7 @@
 package com.heroku.myapp.myorchestrator.consumers.common;
 
 import com.heroku.myapp.commons.config.enumerate.Kind;
-import com.heroku.myapp.commons.config.enumerate.KindOptions;
+import com.heroku.myapp.commons.config.enumerate.KindOption;
 import com.heroku.myapp.commons.consumers.QueueConsumer;
 import com.heroku.myapp.commons.util.actions.DiffUtil;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
@@ -40,9 +40,9 @@ public class CompletionQueueConsumer extends QueueConsumer {
                 .otherwise().choice();
 
         for (Kind k : Kind.values()) {
-            if (k.optionIsEnable()) {
+            if (k.hasConsumer()) {
                 secondLevelChoiceOtherwise.when(messageKindIs(k)).to("log:" + k.expression());
-                if (k.isEnable(KindOptions.affect)) {
+                if (k.isEnable(KindOption.affect)) {
                     k.affects().stream().forEach((affect) -> {
                         secondLevelChoiceOtherwise.setBody()
                                 .constant(affect.preMessage())
@@ -50,7 +50,7 @@ public class CompletionQueueConsumer extends QueueConsumer {
                                         .ironmqPostUri());
                     });
                 }
-                if (k.isEnable(KindOptions.always_affect)) {
+                if (k.isEnable(KindOption.always_affect)) {
                     k.alwaysAffects().stream().forEach((affect) -> {
                         secondLevelChoiceOtherwise.setBody()
                                 .constant(affect.preMessage())
@@ -70,8 +70,8 @@ public class CompletionQueueConsumer extends QueueConsumer {
                 .id("when:changedIsFalse")
                 .choice();
         for (Kind k : Kind.values()) {
-            if (k.optionIsEnable()) {
-                if (k.isEnable(KindOptions.always_affect)) {
+            if (k.hasConsumer()) {
+                if (k.isEnable(KindOption.always_affect)) {
                     nestedChoice.when(messageKindIs(k))
                             .id("when:is_" + k.expression())
                             .to("log:" + k.expression());
