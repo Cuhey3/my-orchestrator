@@ -30,7 +30,7 @@ public class SnapshotPagesRelatedSeiyuConsumer extends SnapshotQueueConsumer {
                                 Kind.categories_related_seiyu)).getData();
 
         LinkedHashMap<String, List<String>> reduce
-                = categories.parallelStream().map((map) -> (String) map.get("title"))
+                = categories.stream().map((map) -> (String) map.get("title"))
                 .map((category) -> {
                     try {
                         return new Object[]{category, new MediawikiApiRequest()
