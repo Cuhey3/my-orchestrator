@@ -40,8 +40,7 @@ public class SnapshotPagesRelatedSeiyuConsumer extends SnapshotQueueConsumer {
                             + "&cmlimit=500"
                             + "&cmnamespace=0"
                             + "&format=xml"
-                            + "&continue="
-                            + "&cmprop=title|ids|sortkeyprefix")
+                            + "&cmprop=title")
                             .setListName("categorymembers").setMapName("cm")
                             .setContinueElementName("cmcontinue")
                             .setIgnoreFields("ns").getResultByMapList()};
