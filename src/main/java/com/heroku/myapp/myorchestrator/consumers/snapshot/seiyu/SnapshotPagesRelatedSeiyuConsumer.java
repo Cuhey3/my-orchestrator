@@ -46,10 +46,10 @@ public class SnapshotPagesRelatedSeiyuConsumer extends SnapshotQueueConsumer {
                             .setContinueElementName("cmcontinue")
                             .setIgnoreFields("ns").getResultByMapList()};
                     } catch (UnsupportedEncodingException ex) {
-                        System.out.println("失敗！");
+                        util().sendError("SnapshotPagesRelatedSeiyuConsumer", ex);
                         throw new RuntimeException();
                     } catch (IOException ex) {
-                        System.out.println("失敗...");
+                        util().sendError("SnapshotPagesRelatedSeiyuConsumer", ex);
                         throw new RuntimeException();
                     }
                 }).reduce(new LinkedHashMap<String, List<String>>(), (result, objArray) -> {
@@ -64,10 +64,6 @@ public class SnapshotPagesRelatedSeiyuConsumer extends SnapshotQueueConsumer {
                     });
             return result;
         }, (foo, bar) -> foo);
-        int sum = reduce.entrySet().stream().mapToInt((entry) -> {
-            System.out.println(entry.getKey() + " " + entry.getValue());
-            return entry.getValue().size();
-        }).sum();
 
         List<Map<String, Object>> collect = reduce.entrySet().stream().map((entry) -> {
             Map<String, Object> map = new LinkedHashMap<>();
