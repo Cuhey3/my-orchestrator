@@ -41,7 +41,7 @@ public class SnapshotRecentchangesOfSeiyuConsumer extends SnapshotQueueConsumer 
         seiyuList.stream()
                 .filter((map) -> !listNames.contains(map.get("title")))
                 .forEach(rclist::add);
-        Set<Object> updatedNames = seiyuList.stream().map((map) -> (String) map.get("title")).collect(Collectors.toSet());
+        Set<Object> updatedNames = rclist.stream().map((map) -> (String) map.get("title")).collect(Collectors.toSet());
         List<Map<String, Object>> requestList;
         try {
             requestList = new MediawikiApiRequest()
@@ -61,9 +61,9 @@ public class SnapshotRecentchangesOfSeiyuConsumer extends SnapshotQueueConsumer 
         String nextRcstart = (String) requestList.get(requestList.size() - 1).get("timestamp");
         Set<Object> requestTitles = requestList.stream()
                 .map((map) -> map.get("title")).collect(Collectors.toSet());
-        List<Map<String, Object>> noChangeList = seiyuList.stream().filter((map) -> !requestTitles.contains(map.get("title")))
+        List<Map<String, Object>> noChangeList = rclist.stream().filter((map) -> !requestTitles.contains(map.get("title")))
                 .collect(Collectors.toList());
-        List<Map<String, Object>> hasChangeList = seiyuList.stream().filter((map) -> requestTitles.contains(map.get("title")))
+        List<Map<String, Object>> hasChangeList = rclist.stream().filter((map) -> requestTitles.contains(map.get("title")))
                 .collect(Collectors.toList());
         List<Map<String, Object>> hitList = requestList.stream().filter((map) -> updatedNames.contains(map.get("title"))).collect(Collectors.toList());
         hasChangeList.stream().map((map) -> {
