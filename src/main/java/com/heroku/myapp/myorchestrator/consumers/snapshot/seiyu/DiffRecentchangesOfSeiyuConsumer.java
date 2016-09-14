@@ -24,8 +24,8 @@ public class DiffRecentchangesOfSeiyuConsumer extends DiffQueueConsumer {
             if (!map.containsKey("revid")) {
                 return false;
             } else if (oldMap.containsKey(title)) {
-                if (oldMap.containsKey("revid")) {
-                    Map<String, Object> old = oldMap.get(title);
+                Map<String, Object> old = oldMap.get(title);
+                if (old.containsKey("revid")) {
                     if (old.get("revid").equals(map.get("old_revid"))) {
                         return true;
                     } else {
