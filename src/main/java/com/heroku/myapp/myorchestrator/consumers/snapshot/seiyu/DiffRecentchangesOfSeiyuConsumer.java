@@ -29,6 +29,10 @@ public class DiffRecentchangesOfSeiyuConsumer extends DiffQueueConsumer {
                 return true;
             }
         }).collect(Collectors.toList());
-        return new DocumentUtil().setDiff(collect).nullable();
+        if (collect.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return new DocumentUtil().setDiff(collect).nullable();
+        }
     }
 }
