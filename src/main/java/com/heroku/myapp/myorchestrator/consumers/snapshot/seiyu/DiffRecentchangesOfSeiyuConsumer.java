@@ -18,26 +18,26 @@ public class DiffRecentchangesOfSeiyuConsumer extends DiffQueueConsumer {
         List<Map<String, Object>> newList = new DocumentUtil().setDocument(snapshot).getData();
         List<Map<String, Object>> oldList = new DocumentUtil().setDocument(master).getData();
         Map<Object, Map<String, Object>> oldMap = new LinkedHashMap<>();
-        oldList.stream().forEach((map) -> oldMap.put(oldMap.get("title"), map));
-        List<Map<String, Object>> collect = newList.stream().filter((map) -> {
-            Object title = map.get("title");
-            if (!map.containsKey("revid")) {
-                return false;
-            } else if (oldMap.containsKey(title)) {
-                Map<String, Object> old = oldMap.get(title);
-                if (old.containsKey("revid")) {
-                    if (old.get("revid").equals(map.get("old_revid"))) {
-                        return true;
+        oldList.stream().forEach((map) -> oldMap.put(map.get("title"), map));
+        List<Map<String, Object>> collect = newList.stream()
+                .filter((map) -> map.containsKey("revid"))
+                .filter((map) -> {
+                    Object title = map.get("title");
+                    if (oldMap.containsKey(title)) {
+                        Map<String, Object> old = oldMap.get(title);
+                        if (old.containsKey("revid")) {
+                            if (old.get("revid").equals(map.get("old_revid"))) {
+                                return true;
+                            } else {
+                                throw new RuntimeException();
+                            }
+                        } else {
+                            return true;
+                        }
                     } else {
-                        throw new RuntimeException();
+                        return true;
                     }
-                } else {
-                    return true;
-                }
-            } else {
-                return true;
-            }
-        }).collect(Collectors.toList());
+                }).collect(Collectors.toList());
         if (collect.isEmpty()) {
             return Optional.empty();
         } else {
