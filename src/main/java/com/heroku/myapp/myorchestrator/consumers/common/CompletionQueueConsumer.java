@@ -40,7 +40,7 @@ public class CompletionQueueConsumer extends QueueConsumer {
                 .otherwise().choice();
 
         for (Kind k : Kind.values()) {
-            if (k.hasConsumer()) {
+            if (k.isShowCompletion()) {
                 secondLevelChoiceOtherwise.when(messageKindIs(k)).to("log:" + k.expression());
                 if (k.isEnable(KindOption.affect)) {
                     k.affects().stream().forEach((affect) -> {
