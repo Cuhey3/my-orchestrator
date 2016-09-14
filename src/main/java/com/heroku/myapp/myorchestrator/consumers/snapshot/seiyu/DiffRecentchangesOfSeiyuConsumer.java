@@ -18,7 +18,7 @@ public class DiffRecentchangesOfSeiyuConsumer extends DiffQueueConsumer {
         List<Map<String, Object>> newList = new DocumentUtil().setDocument(snapshot).getData();
         List<Map<String, Object>> oldList = new DocumentUtil().setDocument(master).getData();
         Map<Object, Map<String, Object>> oldMap = new LinkedHashMap<>();
-        oldList.stream().forEach((map) -> oldMap.put("title", map));
+        oldList.stream().forEach((map) -> oldMap.put(oldMap.get("title"), map));
         List<Map<String, Object>> collect = newList.stream().filter((map) -> {
             Object title = map.get("title");
             if (oldMap.containsKey(title)) {
