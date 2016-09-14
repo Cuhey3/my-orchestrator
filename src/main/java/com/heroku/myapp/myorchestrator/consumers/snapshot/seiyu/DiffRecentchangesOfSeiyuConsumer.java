@@ -21,13 +21,18 @@ public class DiffRecentchangesOfSeiyuConsumer extends DiffQueueConsumer {
         oldList.stream().forEach((map) -> oldMap.put(oldMap.get("title"), map));
         List<Map<String, Object>> collect = newList.stream().filter((map) -> {
             Object title = map.get("title");
-            if (oldMap.containsKey(title)) {
-                Object old_revid = map.get("old_revid");
-                Map<String, Object> old = oldMap.get(title);
-                if (old.get("revid").equals(old_revid)) {
-                    return true;
+            if (!map.containsKey("revid")) {
+                return false;
+            } else if (oldMap.containsKey(title)) {
+                if (oldMap.containsKey("revid")) {
+                    Map<String, Object> old = oldMap.get(title);
+                    if (old.get("revid").equals(map.get("old_revid"))) {
+                        return true;
+                    } else {
+                        throw new RuntimeException();
+                    }
                 } else {
-                    throw new RuntimeException();
+                    return true;
                 }
             } else {
                 return true;
