@@ -29,6 +29,7 @@ public class DiffRecentchangesOfSeiyuConsumer extends DiffQueueConsumer {
                             String old_new_revid = (String) old.get("revid");
                             String new_old_revid = (String) map.get("old_revid");
                             if (old_new_revid.equals(new_old_revid)) {
+                                map.put("type", "modify");
                                 return true;
                             } else {
                                 String old_old_revid = (String) old.get("old_revid");
@@ -40,9 +41,11 @@ public class DiffRecentchangesOfSeiyuConsumer extends DiffQueueConsumer {
                                 }
                             }
                         } else {
+                            map.put("type", "modify");
                             return true;
                         }
                     } else {
+                        map.put("type", "add");
                         return true;
                     }
                 }).collect(Collectors.toList());
