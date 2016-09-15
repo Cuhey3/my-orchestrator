@@ -88,7 +88,7 @@ public class DiffRecentchangesOfSeiyuConsumer extends DiffQueueConsumer {
                             return remove;
                         }).collect(Collectors.toList());
                 if (!removeList.isEmpty()) {
-                    map.put("remove", addList);
+                    map.put("remove", removeList);
                 }
             } catch (IOException ex) {
                 throw new RuntimeException();
