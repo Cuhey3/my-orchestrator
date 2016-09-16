@@ -90,7 +90,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
         DocumentUtil addNewByKey = util.addNewByKey(
                 google_trends, google_trends_seiyu_all, "title");
         List<String> collect = addNewByKey.getData().stream()
-                .filter((map) -> !map.containsKey("trends")).limit(4)
+                .filter((map) -> !map.containsKey("trends") && !map.get("title").equals("神谷明")).limit(4)
                 .map((map) -> (String) map.get("title"))
                 .collect(Collectors.toList());
         try {
