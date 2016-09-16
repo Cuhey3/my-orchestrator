@@ -132,8 +132,8 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
     }
 
     private boolean nameIsEqualToTitle(Map<String, Object> map, String title) {
-        String name = (String) map.get("name");
-        return title.startsWith(name)
-                || title.toLowerCase(Locale.US).equals(name);
+        String name = ((String) map.get("name")).toLowerCase(Locale.US);
+        title = title.toLowerCase(Locale.US);
+        return title.equals(name) || title.startsWith(name);
     }
 }
