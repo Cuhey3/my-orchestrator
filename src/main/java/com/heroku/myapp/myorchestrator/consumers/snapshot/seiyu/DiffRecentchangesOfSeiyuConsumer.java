@@ -75,7 +75,8 @@ public class DiffRecentchangesOfSeiyuConsumer extends DiffQueueConsumer {
                 List<Map<String, Object>> addList = newLinks.stream().filter((link) -> !oldLinks.contains(link))
                         .map((link) -> {
                             Map<String, Object> add = new LinkedHashMap<>();
-                            add.put(link, pagesMap.get(link));
+                            add.put("title", link);
+                            add.put("categories", pagesMap.get(link));
                             return add;
                         }).collect(Collectors.toList());
                 if (!addList.isEmpty()) {
@@ -84,7 +85,8 @@ public class DiffRecentchangesOfSeiyuConsumer extends DiffQueueConsumer {
                 List<Map<String, Object>> removeList = oldLinks.stream().filter((link) -> !newLinks.contains(link))
                         .map((link) -> {
                             Map<String, Object> remove = new LinkedHashMap<>();
-                            remove.put(link, pagesMap.get(link));
+                            remove.put("title", link);
+                            remove.put("categories", pagesMap.get(link));
                             return remove;
                         }).collect(Collectors.toList());
                 if (!removeList.isEmpty()) {
