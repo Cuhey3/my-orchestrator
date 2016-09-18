@@ -37,7 +37,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                 .routeId("snapshot_google_trends_sub_route")
                 .process((Exchange exchange) -> {
                     List<String> body = exchange.getIn().getBody(List.class);
-                    body.add("神谷明");
+                    body.add("名塚佳織");
                     List<String> collect = body.stream().map((str) -> str.replaceFirst(" \\(.+\\)$", ""))
                             .filter((str) -> str.length() > 0)
                             .map((str) -> {
@@ -58,7 +58,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                 .setBody().javaScript("resource:classpath:googleTrendsParsing.js")
                 .unmarshal().json(JsonLibrary.Gson)
                 .process((Exchange exchange) -> {
-                    GoogleTrendsParsingUtil util = new GoogleTrendsParsingUtil(exchange.getIn().getBody(Map.class), "神谷明", "2");
+                    GoogleTrendsParsingUtil util = new GoogleTrendsParsingUtil(exchange.getIn().getBody(Map.class), "名塚佳織", "2");
                     if (util.scaleIsValid()) {
                         exchange.getIn().setBody(util.createSuccessResults());
                     } else {
@@ -90,7 +90,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
         DocumentUtil addNewByKey = util.addNewByKey(
                 google_trends, google_trends_seiyu_all, "title");
         List<String> collect = addNewByKey.getData().stream()
-                .filter((map) -> !map.containsKey("trends") && !map.get("title").equals("神谷明")).limit(4)
+                .filter((map) -> filterTarget(map, "名塚佳織", "神谷明")).limit(4)
                 .map((map) -> (String) map.get("title"))
                 .collect(Collectors.toList());
         try {
@@ -135,5 +135,24 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
         String name = ((String) map.get("name")).toLowerCase(Locale.US);
         title = title.toLowerCase(Locale.US);
         return title.equals(name) || title.startsWith(name);
+    }
+
+    private boolean filterTarget(Map<String, Object> map, String newScale, String oldScale) {
+        if (map.get("title").equals(newScale)) {
+            return false;
+        }
+        if (!map.containsKey("trends")) {
+            return true;
+        }
+        Map<String, Object> trends = (Map<String, Object>) map.get("trends");
+        String scale = (String) trends.get("scale");
+        if (scale.equals(newScale)) {
+            return false;
+        }
+        if (scale.equals(oldScale)) {
+            return trends.get("status").equals("success");
+        } else {
+            return false;
+        }
     }
 }
