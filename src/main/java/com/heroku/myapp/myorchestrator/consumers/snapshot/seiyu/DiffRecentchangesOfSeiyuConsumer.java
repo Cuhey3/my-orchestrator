@@ -24,10 +24,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DiffRecentchangesOfSeiyuConsumer extends DiffQueueConsumer {
-    
+
     @Autowired
     CamelContext context;
-    
+
     @Override
     public Optional<Document> calculateDiff(Document master, Document snapshot) {
         // master:pages_related_seiyu to pagesMap (title, categories)
@@ -54,13 +54,9 @@ public class DiffRecentchangesOfSeiyuConsumer extends DiffQueueConsumer {
                 .map(diffPutFunction(pagesMap, pagesSet))
                 .filter(resultFiltering())
                 .collect(Collectors.toList());
-        if (result.isEmpty()) {
-            return Optional.empty();
-        } else {
-            return new DocumentUtil().setDiff(result).nullable();
-        }
+        return new DocumentUtil().setDiff(result).nullable();
     }
-    
+
     private Set<String> getFilteredLinks(String revid, Set<String> pagesSet) throws IOException {
         String url = "http://ja.wikipedia.org/w/api.php"
                 + "?action=parse"
@@ -74,7 +70,7 @@ public class DiffRecentchangesOfSeiyuConsumer extends DiffQueueConsumer {
                 .filter((text) -> pagesSet.contains(text))
                 .collect(Collectors.toSet());
     }
-    
+
     private Predicate<Map<String, Object>> targetFiltering(
             Map<String, Map<String, Object>> oldMap) {
         return (map) -> {
@@ -107,7 +103,7 @@ public class DiffRecentchangesOfSeiyuConsumer extends DiffQueueConsumer {
             }
         };
     }
-    
+
     private Function<Map<String, Object>, Map<String, Object>> diffPutFunction(
             Map<String, List<String>> pagesMap, Set<String> pagesSet) {
         return (map) -> {
@@ -144,11 +140,11 @@ public class DiffRecentchangesOfSeiyuConsumer extends DiffQueueConsumer {
             return map;
         };
     }
-    
+
     private Predicate<Map<String, Object>> resultFiltering() {
         return (map) -> map.containsKey("add") || map.containsKey("remove");
     }
-    
+
     @Override
     public void toDoWhenDiffIsPresent(Document diff, Exchange exchange, Document master, Document snapshot) {
         DiffUtil diffUtil = new DiffUtil(exchange);
