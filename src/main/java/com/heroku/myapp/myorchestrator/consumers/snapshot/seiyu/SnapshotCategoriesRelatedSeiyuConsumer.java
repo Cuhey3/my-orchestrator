@@ -147,9 +147,9 @@ public class SnapshotCategoriesRelatedSeiyuConsumer extends SnapshotQueueConsume
         List<Map<String, Object>> collect = categories.keySet().stream().map((key) -> {
             Map<String, Object> map = new LinkedHashMap<>();
             map.put("title", key);
-            map.put("from", "Category:"+parentMap.get(key));
+            map.put("from", "Category:" + parentMap.get(key));
             return map;
         }).collect(Collectors.toList());
-        return new DocumentUtil().setData(collect).nullable();
+        return new DocumentUtil(collect).nullable();
     }
 }

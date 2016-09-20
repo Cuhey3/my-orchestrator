@@ -21,11 +21,14 @@ public class SnapshotSeiyuMultiLangConsumer extends SnapshotQueueConsumer {
 
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {
-        MasterUtil util = new MasterUtil(exchange);
-        List<Map<String, Object>> data = new DocumentUtil().setDocument(util.kind(Kind.seiyu_has_recentchanges).findOrElseThrow()).getData();
+        List<Map<String, Object>> data = new DocumentUtil(
+                new MasterUtil(exchange).kind(Kind.seiyu_has_recentchanges)
+                .findOrElseThrow()).getData();
         List<String> urls = new ArrayList<>();
         for (int i = 0; i < data.size(); i = i + 50) {
-            urls.add(String.join("|", data.stream().map((map) -> (String) map.get("pageid")).skip(i).limit(i + 50).collect(Collectors.toList())));
+            urls.add(String.join("|", data.stream().map((map)
+                    -> (String) map.get("pageid")).skip(i).limit(i + 50)
+                    .collect(Collectors.toList())));
         }
         List result = new ArrayList<>();
         urls.stream().parallel()
@@ -39,7 +42,7 @@ public class SnapshotSeiyuMultiLangConsumer extends SnapshotQueueConsumer {
                     }
                 });
         if (result.size() == data.size()) {
-            return Optional.ofNullable(new DocumentUtil().setData(result).getDocument());
+            return Optional.ofNullable(new DocumentUtil(result).getDocument());
         } else {
             util().sendLog("SnapshotSeiyuMultiLangConsumer#doSnapshot", "size not match result: " + result.size() + " orig: " + data.size());
             return Optional.empty();

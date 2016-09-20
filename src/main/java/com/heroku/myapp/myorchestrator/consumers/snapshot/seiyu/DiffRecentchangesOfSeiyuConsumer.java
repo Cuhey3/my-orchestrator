@@ -2,6 +2,7 @@ package com.heroku.myapp.myorchestrator.consumers.snapshot.seiyu;
 
 import com.heroku.myapp.commons.config.enumerate.Kind;
 import com.heroku.myapp.commons.consumers.DiffQueueConsumer;
+import com.heroku.myapp.commons.util.actions.DiffUtil;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
 import java.io.IOException;
@@ -10,8 +11,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultExchange;
 import org.bson.Document;
 import org.jsoup.Jsoup;
@@ -20,59 +24,100 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DiffRecentchangesOfSeiyuConsumer extends DiffQueueConsumer {
-
+    
     @Autowired
     CamelContext context;
-
+    
     @Override
     public Optional<Document> calculateDiff(Document master, Document snapshot) {
+        // master:pages_related_seiyu to pagesMap (title, categories)
         Map<String, List<String>> pagesMap = new LinkedHashMap<>();
-        new DocumentUtil().setDocument(new MasterUtil(new DefaultExchange(context)).findOrElseThrow(Kind.pages_related_seiyu)).getData()
+        new DocumentUtil(new MasterUtil(new DefaultExchange(context))
+                .findOrElseThrow(Kind.pages_related_seiyu)).getData()
                 .stream().forEach((map) -> {
-                    pagesMap.put((String) map.get("title"), (List<String>) map.get("categories"));
+                    pagesMap.put((String) map.get("title"),
+                            (List<String>) map.get("categories"));
                 });
+
+        // pagesMap to pagesSet (keySet)
         Set<String> pagesSet = pagesMap.keySet();
-        List<Map<String, Object>> newList = new DocumentUtil().setDocument(snapshot).getData();
-        List<Map<String, Object>> oldList = new DocumentUtil().setDocument(master).getData();
+
+        // master:recentchanges_of_seiyu to oldMap (title, self)
         Map<String, Map<String, Object>> oldMap = new LinkedHashMap<>();
-        oldList.stream().forEach((map) -> oldMap.put((String) map.get("title"), map));
-        List<Map<String, Object>> collect = newList.stream()
-                .filter((map) -> map.containsKey("revid"))
-                .filter((map) -> {
-                    String title = (String) map.get("title");
-                    if (oldMap.containsKey(title)) {
-                        Map<String, Object> old = oldMap.get(title);
-                        if (old.containsKey("revid")) {
-                            String old_new_revid = (String) old.get("revid");
-                            String new_old_revid = (String) map.get("old_revid");
-                            if (old_new_revid.equals(new_old_revid)) {
-                                map.put("type", "modify");
-                                return true;
-                            } else {
-                                String old_old_revid = (String) old.get("old_revid");
-                                String new_new_revid = (String) map.get("revid");
-                                if (old_old_revid.equals(new_old_revid) && old_new_revid.equals(new_new_revid)) {
-                                    return false;
-                                } else {
-                                    throw new RuntimeException();
-                                }
-                            }
-                        } else {
-                            map.put("type", "modify");
-                            return true;
-                        }
-                    } else {
-                        map.put("type", "add");
+        new DocumentUtil(master).getData().stream().forEach((map)
+                -> oldMap.put((String) map.get("title"), map));
+
+        // calculateDiff main
+        List<Map<String, Object>> result = new DocumentUtil(snapshot)
+                .getData().stream()
+                .filter(targetFiltering(oldMap))
+                .map(diffPutFunction(pagesMap, pagesSet))
+                .filter(resultFiltering())
+                .collect(Collectors.toList());
+        if (result.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return new DocumentUtil().setDiff(result).nullable();
+        }
+    }
+    
+    private Set<String> getFilteredLinks(String revid, Set<String> pagesSet) throws IOException {
+        String url = "http://ja.wikipedia.org/w/api.php"
+                + "?action=parse"
+                + "&format=xml"
+                + "&prop=links"
+                + "&oldid=" + revid;
+        return Jsoup.connect(url).ignoreContentType(true)
+                .timeout(Integer.MAX_VALUE).get()
+                .select("links pl[ns=0][exists]")
+                .stream().map((element) -> element.text())
+                .filter((text) -> pagesSet.contains(text))
+                .collect(Collectors.toSet());
+    }
+    
+    private Predicate<Map<String, Object>> targetFiltering(
+            Map<String, Map<String, Object>> oldMap) {
+        return (map) -> {
+            if (!map.containsKey("revid")) {
+                return false;
+            }
+            String title = (String) map.get("title");
+            if (oldMap.containsKey(title)) {
+                Map<String, Object> old = oldMap.get(title);
+                if (old.containsKey("revid")) {
+                    String old_new_revid, new_old_revid;
+                    old_new_revid = (String) old.get("revid");
+                    new_old_revid = (String) map.get("old_revid");
+                    if (old_new_revid.equals(new_old_revid)) {
+                        map.put("type", "modify");
                         return true;
+                    } else if (old.get("old_revid").equals(new_old_revid)
+                            && old_new_revid.equals(map.get("revid"))) {
+                        return false;
+                    } else {
+                        throw new RuntimeException();
                     }
-                }).collect(Collectors.toList());
-        List<Map<String, Object>> collect1 = collect.stream().map((map) -> {
-            String revid = (String) map.get("revid");
-            String old_revid = (String) map.get("old_revid");
+                } else {
+                    map.put("type", "modify");
+                    return true;
+                }
+            } else {
+                map.put("type", "add");
+                return true;
+            }
+        };
+    }
+    
+    private Function<Map<String, Object>, Map<String, Object>> diffPutFunction(
+            Map<String, List<String>> pagesMap, Set<String> pagesSet) {
+        return (map) -> {
             try {
-                Set<String> newLinks = getFilteredLinks(revid, pagesSet);
-                Set<String> oldLinks = getFilteredLinks(old_revid, pagesSet);
-                List<Map<String, Object>> addList = newLinks.stream().filter((link) -> !oldLinks.contains(link))
+                Set<String> newLinks = getFilteredLinks(
+                        (String) map.get("revid"), pagesSet);
+                Set<String> oldLinks = getFilteredLinks(
+                        (String) map.get("old_revid"), pagesSet);
+                List<Map<String, Object>> addList = newLinks.stream()
+                        .filter((link) -> !oldLinks.contains(link))
                         .map((link) -> {
                             Map<String, Object> add = new LinkedHashMap<>();
                             add.put("title", link);
@@ -82,7 +127,8 @@ public class DiffRecentchangesOfSeiyuConsumer extends DiffQueueConsumer {
                 if (!addList.isEmpty()) {
                     map.put("add", addList);
                 }
-                List<Map<String, Object>> removeList = oldLinks.stream().filter((link) -> !newLinks.contains(link))
+                List<Map<String, Object>> removeList = oldLinks.stream()
+                        .filter((link) -> !newLinks.contains(link))
                         .map((link) -> {
                             Map<String, Object> remove = new LinkedHashMap<>();
                             remove.put("title", link);
@@ -96,15 +142,18 @@ public class DiffRecentchangesOfSeiyuConsumer extends DiffQueueConsumer {
                 throw new RuntimeException();
             }
             return map;
-        }).filter((map) -> map.containsKey("add") || map.containsKey("remove"))
-                .collect(Collectors.toList());
-        return new DocumentUtil().setDiff(collect1).nullable();
+        };
     }
-
-    private Set<String> getFilteredLinks(String revid, Set<String> pagesSet) throws IOException {
-        return Jsoup.connect("http://ja.wikipedia.org/w/api.php?action=parse&format=xml&prop=links&oldid=" + revid).ignoreContentType(true).timeout(Integer.MAX_VALUE).get().select("links pl[ns=0][exists]")
-                .stream().map((element) -> element.text())
-                .filter((text) -> pagesSet.contains(text))
-                .collect(Collectors.toSet());
+    
+    private Predicate<Map<String, Object>> resultFiltering() {
+        return (map) -> map.containsKey("add") || map.containsKey("remove");
+    }
+    
+    @Override
+    public void toDoWhenDiffIsPresent(Document diff, Exchange exchange, Document master, Document snapshot) {
+        DiffUtil diffUtil = new DiffUtil(exchange);
+        diffUtil.updateMessageComparedId(master);
+        diffUtil.writeDocuments(snapshot, diff);
+        //.writeDocumentWhenDiffIsNotEmpty(diff);
     }
 }

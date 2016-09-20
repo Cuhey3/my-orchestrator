@@ -25,10 +25,9 @@ public class SnapshotPagesRelatedSeiyuConsumer extends SnapshotQueueConsumer {
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {
         List<Map<String, Object>> categories
-                = new DocumentUtil().setDocument(
+                = new DocumentUtil(
                         new MasterUtil(exchange).findOrElseThrow(
                                 Kind.categories_related_seiyu)).getData();
-
         LinkedHashMap<String, List<String>> reduce
                 = categories.stream().map((map) -> (String) map.get("title"))
                 .map((category) -> {
@@ -72,6 +71,6 @@ public class SnapshotPagesRelatedSeiyuConsumer extends SnapshotQueueConsumer {
             map.put("categories", value);
             return map;
         }).collect(Collectors.toList());
-        return new DocumentUtil().setData(collect).nullable();
+        return new DocumentUtil(collect).nullable();
     }
 }

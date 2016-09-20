@@ -19,13 +19,13 @@ public class SnapshotKoepotaRankingConsumer extends SnapshotQueueConsumer {
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {
         MasterUtil masterUtil = new MasterUtil(exchange);
-        DocumentUtil util = new DocumentUtil();
-        List<String> collect = util.
-                setDocument(masterUtil.findOrElseThrow(Kind.koepota_events))
+        List<String> collect = new DocumentUtil(masterUtil
+                .findOrElseThrow(Kind.koepota_events))
                 .getData().stream().map((map) -> (String) map.get("c1"))
                 .collect(Collectors.toList());
-        List<Map<String, Object>> countedKoepotaSeiyu = util.setDocument(
-                masterUtil.findOrElseThrow(Kind.koepota_seiyu)).getData()
+        List<Map<String, Object>> countedKoepotaSeiyu
+                = new DocumentUtil(masterUtil
+                        .findOrElseThrow(Kind.koepota_seiyu)).getData()
                 .stream().map((map) -> {
                     String title = ((String) map.get("title"))
                             .replaceFirst(" \\(.+\\)", "");
@@ -90,6 +90,6 @@ public class SnapshotKoepotaRankingConsumer extends SnapshotQueueConsumer {
             return map;
         }).collect(Collectors.toList());
 
-        return new DocumentUtil().setData(result).nullable();
+        return new DocumentUtil(result).nullable();
     }
 }

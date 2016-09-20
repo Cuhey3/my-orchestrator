@@ -46,8 +46,8 @@ public class SnapshotGoogleTrendsSeiyuAllConsumer extends SnapshotQueueConsumer 
                     masterUtil.findOrElseThrow(koepota_seiyu_all),
                     masterUtil.findOrElseThrow(seiyu_has_recentchanges))
                     .getDocument();*/
-            return new DocumentUtil()
-                    .addNewByKey(latest, product, "title").nullable();
+            return new DocumentUtil().addNewByKey(latest, product, "title")
+                    .nullable();
         } catch (Exception ex) {
             util().sendError("doSnapshot", ex);
             return Optional.empty();

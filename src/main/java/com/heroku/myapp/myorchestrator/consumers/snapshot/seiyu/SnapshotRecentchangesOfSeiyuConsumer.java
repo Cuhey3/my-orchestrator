@@ -30,13 +30,13 @@ public class SnapshotRecentchangesOfSeiyuConsumer extends SnapshotQueueConsumer 
         String rcstart;
         if (optionalMaster.isPresent()) {
             Document master = optionalMaster.get();
-            rclist = new DocumentUtil().setDocument(master).getData();
+            rclist = new DocumentUtil(master).getData();
             rcstart = (String) master.getOrDefault("rcstart", getRcstart());
         } else {
             rclist = new ArrayList<>();
             rcstart = getRcstart();
         }
-        List<Map<String, Object>> seiyuList = new DocumentUtil().setDocument(masterUtil.findOrElseThrow(Kind.seiyu_category_members_include_template)).getData();
+        List<Map<String, Object>> seiyuList = new DocumentUtil(masterUtil.findOrElseThrow(Kind.seiyu_category_members_include_template)).getData();
         Set<Object> listNames = rclist.stream().map((map) -> map.get("title")).collect(Collectors.toSet());
         seiyuList.stream()
                 .filter((map) -> !listNames.contains(map.get("title")))
@@ -78,8 +78,7 @@ public class SnapshotRecentchangesOfSeiyuConsumer extends SnapshotQueueConsumer 
             }
             return map;
         }).forEach(noChangeList::add);
-        DocumentUtil util = new DocumentUtil();
-        Document document = util.setData(noChangeList).getDocument();
+        Document document = new DocumentUtil(noChangeList).getDocument();
         document.put("rcstart", nextRcstart);
         return Optional.ofNullable(document);
     }
