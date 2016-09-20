@@ -6,14 +6,13 @@ import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.MongoUtil;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
-import static com.heroku.myapp.commons.util.content.DocumentUtil.getData;
+import com.heroku.myapp.commons.util.content.MapListUtil;
 import com.mongodb.client.MongoCursor;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.apache.camel.Exchange;
 import org.bson.Document;
 import org.springframework.stereotype.Component;
@@ -44,14 +43,9 @@ public class SnapshotSeiyuHasRecentchanges extends SnapshotQueueConsumer {
                             .forEach(seiyuNames::add);
                 }
             }
-            List<Map<String, Object>> collect = getData(util
+            List<Map<String, Object>> collect = new MapListUtil(util
                     .findOrElseThrow(seiyu_category_members_include_template))
-                    .stream().filter((map)
-                            -> {
-                        String title = (String) map.get("title");
-                        return seiyuNames.contains(title);
-                    })
-                    .collect(Collectors.toList());
+                    .intersectionList(("title"), seiyuNames);
             return new DocumentUtil(collect).nullable();
         } catch (Exception ex) {
             util().sendError("doSnapshot", ex);

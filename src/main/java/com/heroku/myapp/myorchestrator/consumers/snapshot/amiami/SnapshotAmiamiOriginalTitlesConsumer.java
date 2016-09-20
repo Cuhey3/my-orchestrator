@@ -44,8 +44,8 @@ public class SnapshotAmiamiOriginalTitlesConsumer extends SnapshotQueueConsumer 
         }
         Set originalTitlesSet
                 = new MapListUtil(originalTitlesList).attrSet("amiami_title");
-        getData(masterUtil.findOrElseThrow(amiami_item))
-                .stream().map((map) -> (String) map.get("orig"))
+        new MapListUtil(masterUtil.findOrElseThrow(amiami_item))
+                .attrStream("orig", String.class)
                 .filter((title) -> title.length() > 0)
                 .collect(Collectors.toSet())
                 .stream()

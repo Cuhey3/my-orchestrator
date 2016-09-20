@@ -4,6 +4,7 @@ import com.heroku.myapp.commons.config.enumerate.Kind;
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
+import com.heroku.myapp.commons.util.content.MapListUtil;
 import com.heroku.myapp.commons.util.content.MediawikiApiRequest;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.apache.camel.Exchange;
 import org.bson.Document;
 import org.jsoup.Jsoup;
@@ -25,7 +25,8 @@ public class SnapshotRecentchangesOfSeiyuConsumer extends SnapshotQueueConsumer 
     protected Optional<Document> doSnapshot(Exchange exchange) {
         MasterUtil masterUtil = new MasterUtil(exchange);
         Optional<Document> optionalMaster
-                = masterUtil.optionalDocumentFromKindString(Kind.recentchanges_of_seiyu.expression());
+                = masterUtil.optionalDocumentFromKindString(
+                        Kind.recentchanges_of_seiyu.expression());
         List<Map<String, Object>> rclist;
         String rcstart;
         if (optionalMaster.isPresent()) {
@@ -36,12 +37,12 @@ public class SnapshotRecentchangesOfSeiyuConsumer extends SnapshotQueueConsumer 
             rclist = new ArrayList<>();
             rcstart = getRcstart();
         }
-        List<Map<String, Object>> seiyuList = new DocumentUtil(masterUtil.findOrElseThrow(Kind.seiyu_category_members_include_template)).getData();
-        Set<Object> listNames = rclist.stream().map((map) -> map.get("title")).collect(Collectors.toSet());
-        seiyuList.stream()
-                .filter((map) -> !listNames.contains(map.get("title")))
+        Set listNames = new MapListUtil(rclist).attrSet("title");
+        new MapListUtil(masterUtil.findOrElseThrow(
+                Kind.seiyu_category_members_include_template))
+                .intersection("title", listNames, false)
                 .forEach(rclist::add);
-        Set<Object> updatedNames = rclist.stream().map((map) -> (String) map.get("title")).collect(Collectors.toSet());
+        Set updatedNames = new MapListUtil(rclist).attrSet("title");
         List<Map<String, Object>> requestList;
         try {
             requestList = new MediawikiApiRequest()
@@ -58,26 +59,29 @@ public class SnapshotRecentchangesOfSeiyuConsumer extends SnapshotQueueConsumer 
         } catch (IOException ex) {
             throw new RuntimeException();
         }
-        String nextRcstart = (String) requestList.get(requestList.size() - 1).get("timestamp");
-        Set<Object> requestTitles = requestList.stream()
-                .map((map) -> map.get("title")).collect(Collectors.toSet());
-        List<Map<String, Object>> noChangeList = rclist.stream().filter((map) -> !requestTitles.contains(map.get("title")))
-                .collect(Collectors.toList());
-        List<Map<String, Object>> hasChangeList = rclist.stream().filter((map) -> requestTitles.contains(map.get("title")))
-                .collect(Collectors.toList());
-        List<Map<String, Object>> hitList = requestList.stream().filter((map) -> updatedNames.contains(map.get("title"))).collect(Collectors.toList());
-        hasChangeList.stream().map((map) -> {
-            Object title = map.get("title");
-            Map<String, Object> change = hitList.stream().filter((m) -> m.get("title").equals(title)).findFirst().get();
-            if (map.containsKey("revid")) {
-                map.put("old_revid", map.get("revid"));
-                map.put("revid", change.get("revid"));
-            } else {
-                map.put("revid", change.get("revid"));
-                map.put("old_revid", change.get("old_revid"));
-            }
-            return map;
-        }).forEach(noChangeList::add);
+        String nextRcstart = (String) requestList.get(requestList.size() - 1)
+                .get("timestamp");
+        Set requestTitles = new MapListUtil(requestList).attrSet("title");
+        List<Map<String, Object>> noChangeList = new MapListUtil(rclist)
+                .intersectionList("title", requestTitles, false);
+        List<Map<String, Object>> hitList = new MapListUtil(requestList)
+                .intersectionList("title", updatedNames);
+        new MapListUtil(rclist)
+                .intersection("title", requestTitles)
+                .map((map) -> {
+                    Object title = map.get("title");
+                    Map<String, Object> change = hitList.stream()
+                            .filter((m) -> m.get("title").equals(title))
+                            .findFirst().get();
+                    if (map.containsKey("revid")) {
+                        map.put("old_revid", map.get("revid"));
+                        map.put("revid", change.get("revid"));
+                    } else {
+                        map.put("revid", change.get("revid"));
+                        map.put("old_revid", change.get("old_revid"));
+                    }
+                    return map;
+                }).forEach(noChangeList::add);
         Document document = new DocumentUtil(noChangeList).getDocument();
         document.put("rcstart", nextRcstart);
         return Optional.ofNullable(document);
@@ -86,7 +90,10 @@ public class SnapshotRecentchangesOfSeiyuConsumer extends SnapshotQueueConsumer 
     public String getRcstart() {
         Elements recentchanges;
         try {
-            recentchanges = Jsoup.connect("https://ja.wikipedia.org/w/api.php?action=query&list=recentchanges&rcnamespace=0&rclimit=100&format=xml&rctype=edit&rctoponly").ignoreContentType(true).get().select("rc");
+            recentchanges = Jsoup.connect("https://ja.wikipedia.org/w/api.php"
+                    + "?action=query&list=recentchanges&rcnamespace=0"
+                    + "&rclimit=100&format=xml&rctype=edit&rctoponly")
+                    .ignoreContentType(true).get().select("rc");
         } catch (IOException ex) {
             throw new RuntimeException();
         }
