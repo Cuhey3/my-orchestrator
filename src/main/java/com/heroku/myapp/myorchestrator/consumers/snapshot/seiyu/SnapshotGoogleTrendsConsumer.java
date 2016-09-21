@@ -77,7 +77,8 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
         MapList addNewByKey = util.mapList(Kind.google_trends).addNewByKey(
                 util.mapList(Kind.google_trends_seiyu_all), "title");
         List<String> targetNames = addNewByKey.stream()
-                .filter((map) -> filterTarget(map, "名塚佳織", "神谷明")).limit(4)
+                .filter((map) -> firstFilter(map))
+                .filter((map) -> filterTarget(map, "神谷明")).limit(4)
                 .map((map) -> (String) map.get("title"))
                 .collect(Collectors.toList());
         try {
@@ -121,7 +122,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
         return title.equals(name) || title.startsWith(name);
     }
 
-    private boolean filterTarget(Map<String, Object> map, String newScale, String oldScale) {
+    private boolean filterTarget(Map<String, Object> map, String newScale) {
         if (map.get("title").equals(newScale)) {
             return false;
         }
@@ -130,13 +131,15 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
         }
         Map<String, Object> trends = (Map<String, Object>) map.get("trends");
         String scale = (String) trends.get("scale");
-        if (scale.equals(newScale)) {
-            return false;
-        }
-        if (scale.equals(oldScale)) {
-            return trends.get("status").equals("success");
+        return !scale.equals(newScale);
+    }
+
+    private boolean firstFilter(Map<String, Object> map) {
+        if (!map.containsKey("trends")) {
+            return true;
         } else {
-            return false;
+            Map<String, Object> trends = (Map<String, Object>) map.get("trends");
+            return trends.get("status").equals("failed");
         }
     }
 }
