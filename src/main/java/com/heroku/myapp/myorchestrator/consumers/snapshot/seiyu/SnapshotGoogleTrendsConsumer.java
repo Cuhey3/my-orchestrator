@@ -38,7 +38,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                 .routeId("snapshot_google_trends_sub_route")
                 .process((Exchange exchange) -> {
                     List<String> body = exchange.getIn().getBody(List.class);
-                    body.add("神谷明");
+                    body.add("新田恵海");
                     List<String> collect = body.stream().map((str) -> str.replaceFirst(" \\(.+\\)$", ""))
                             .filter((str) -> str.length() > 0)
                             .map((str) -> {
@@ -59,7 +59,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                 .setBody().javaScript("resource:classpath:googleTrendsParsing.js")
                 .unmarshal().json(JsonLibrary.Gson)
                 .process((Exchange exchange) -> {
-                    GoogleTrendsParsingUtil util = new GoogleTrendsParsingUtil(exchange.getIn().getBody(Map.class), "神谷明", "2");
+                    GoogleTrendsParsingUtil util = new GoogleTrendsParsingUtil(exchange.getIn().getBody(Map.class), "新田恵海", "2");
                     if (util.scaleIsValid()) {
                         exchange.getIn().setBody(util.createSuccessResults());
                     } else {
@@ -78,7 +78,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                 util.mapList(Kind.google_trends_seiyu_all), "title");
         List<String> targetNames = addNewByKey.stream()
                 .filter((map) -> firstFilter(map))
-                .filter((map) -> filterTarget(map, "神谷明")).limit(4)
+                .filter((map) -> filterTarget(map, "新田恵海")).limit(4)
                 .map((map) -> (String) map.get("title"))
                 .collect(Collectors.toList());
         try {
