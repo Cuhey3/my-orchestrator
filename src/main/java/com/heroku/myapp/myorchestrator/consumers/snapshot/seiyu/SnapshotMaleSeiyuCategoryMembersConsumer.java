@@ -2,11 +2,10 @@ package com.heroku.myapp.myorchestrator.consumers.snapshot.seiyu;
 
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
+import com.heroku.myapp.commons.util.content.MapList;
 import com.heroku.myapp.commons.util.content.MediawikiApiRequest;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.bson.Document;
@@ -18,8 +17,7 @@ public class SnapshotMaleSeiyuCategoryMembersConsumer extends SnapshotQueueConsu
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {
         try {
-            List<Map<String, Object>> mapList
-                    = new MediawikiApiRequest()
+            MapList mapList = new MediawikiApiRequest()
                     .setApiParam("action=query&list=categorymembers"
                             + "&cmtitle=Category:"
                             + URLEncoder.encode("日本の男性声優", "UTF-8")

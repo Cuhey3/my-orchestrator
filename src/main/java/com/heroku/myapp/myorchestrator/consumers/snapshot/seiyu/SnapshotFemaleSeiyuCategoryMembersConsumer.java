@@ -2,10 +2,9 @@ package com.heroku.myapp.myorchestrator.consumers.snapshot.seiyu;
 
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
+import com.heroku.myapp.commons.util.content.MapList;
 import com.heroku.myapp.commons.util.content.MediawikiApiRequest;
 import java.net.URLEncoder;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.bson.Document;
@@ -17,7 +16,7 @@ public class SnapshotFemaleSeiyuCategoryMembersConsumer extends SnapshotQueueCon
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {
         try {
-            List<Map<String, Object>> result
+            MapList result
                     = new MediawikiApiRequest()
                     .setApiParam("action=query&list=categorymembers"
                             + "&cmtitle=Category:"

@@ -2,10 +2,9 @@ package com.heroku.myapp.myorchestrator.consumers.snapshot.seiyu;
 
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
+import com.heroku.myapp.commons.util.content.MapList;
 import com.heroku.myapp.commons.util.content.MediawikiApiRequest;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.bson.Document;
@@ -17,7 +16,7 @@ public class SnapshotSeiyuTemplateIncludePagesConsumer extends SnapshotQueueCons
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {
         try {
-            List<Map<String, Object>> result = new MediawikiApiRequest()
+            MapList result = new MediawikiApiRequest()
                     .setApiParam("action=query&list=backlinks"
                             + "&bltitle=Template:%E5%A3%B0%E5%84%AA"
                             + "&format=xml&bllimit=500&blnamespace=0&continue=")

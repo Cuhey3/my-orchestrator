@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.JsonUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
+import com.heroku.myapp.commons.util.content.MapList;
 import com.heroku.myapp.commons.util.content.MediawikiApiRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,7 +12,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,10 +41,11 @@ public class SnapshotCategoriesRelatedSeiyuConsumer extends SnapshotQueueConsume
         }
         Map<String, String> parentMap = new LinkedHashMap<>();
         Map<String, Boolean> categories = new LinkedHashMap<>();
-        Set<String> pages = new HashSet<>();
         JsonUtil jsonUtil = new JsonUtil(fromJson).get("categories");
-        jsonUtil.map().get().keySet().forEach((key) -> categories.put("Category:" + key, Boolean.FALSE));
-        jsonUtil.map().get().keySet().forEach((key) -> parentMap.put("Category:" + key, (String) key));
+        jsonUtil.map().get().keySet().forEach((key)
+                -> categories.put("Category:" + key, Boolean.FALSE));
+        jsonUtil.map().get().keySet().forEach((key)
+                -> parentMap.put("Category:" + key, (String) key));
         int i = 0;
         while (categories.values().stream().filter((b) -> !b).findFirst().isPresent()) {
             if (i > 7) {
@@ -54,26 +55,30 @@ public class SnapshotCategoriesRelatedSeiyuConsumer extends SnapshotQueueConsume
                     .filter((key) -> !categories.get(key))
                     .flatMap((key) -> {
                         String parent = parentMap.get(key);
-                        List<Map<String, Object>> includeRaw = jsonUtil.get(parent).get("filter").get("include").list().get();
-                        List<Pattern> includePattern = includeRaw.stream().map((map) -> {
-                            Object[] args = Optional.ofNullable((List<String>) map.get("args")).orElse(new ArrayList<>())
-                                    .stream().map((str) -> {
-                                        switch (str) {
-                                            case "recent_years":
-                                                return "(2015|2016|2017)年";
-                                            case "years":
-                                                return "[\\d]{4}年";
-                                        }
-                                        return "";
-                                    }).toArray();
-                            String pattern = (String) map.get("pattern");
-                            if (args.length > 0) {
-                                return Pattern.compile("^Category:.*" + String.format(pattern, args));
-                            } else {
-                                return Pattern.compile("^Category:.*" + pattern);
-                            }
-                        }).collect(Collectors.toList());
-                        List<Map<String, Object>> excludeRaw = jsonUtil.get(parent).get("filter").get("exclude").list().get();
+                        MapList includeRaw = jsonUtil.get(parent)
+                                .get("filter").get("include").mapList().get();
+                        List<Pattern> includePattern = includeRaw.stream()
+                                .map((map) -> {
+                                    Object[] args
+                                            = Optional.ofNullable(
+                                                    (List<String>) map.get("args")).orElse(new ArrayList<>())
+                                            .stream().map((str) -> {
+                                                switch (str) {
+                                                    case "recent_years":
+                                                        return "(2015|2016|2017)年";
+                                                    case "years":
+                                                        return "[\\d]{4}年";
+                                                }
+                                                return "";
+                                            }).toArray();
+                                    String pattern = (String) map.get("pattern");
+                                    if (args.length > 0) {
+                                        return Pattern.compile("^Category:.*" + String.format(pattern, args));
+                                    } else {
+                                        return Pattern.compile("^Category:.*" + pattern);
+                                    }
+                                }).collect(Collectors.toList());
+                        MapList excludeRaw = jsonUtil.get(parent).get("filter").get("exclude").mapList().get();
                         List<Pattern> excludePattern = excludeRaw.stream().map((map) -> {
                             Object[] args = Optional.ofNullable((List<String>) map.get("args")).orElse(new ArrayList<>())
                                     .stream().map((str) -> {
@@ -92,10 +97,10 @@ public class SnapshotCategoriesRelatedSeiyuConsumer extends SnapshotQueueConsume
                                 return Pattern.compile("^Category:.*" + pattern);
                             }
                         }).collect(Collectors.toList());
-                        Set<String> noContinue = (Set<String>) jsonUtil.get(parent).get("filter").get("no_continue").list().get().stream().map((str) -> "Category:" + str).collect(Collectors.toSet());
+                        Set<String> noContinue = (Set<String>) jsonUtil.get(parent).get("filter").get("no_continue").mapList().get().stream().map((str) -> "Category:" + str).collect(Collectors.toSet());
                         categories.put(key, Boolean.TRUE);
                         if (noContinue.contains(key)) {
-                            return new ArrayList<Map<String, Object>>().stream();
+                            return new MapList().stream();
                         }
                         try {
                             return new MediawikiApiRequest()
@@ -136,7 +141,7 @@ public class SnapshotCategoriesRelatedSeiyuConsumer extends SnapshotQueueConsume
                         }
                     }).reduce(categories, (foo, bar) -> {
                 String title = (String) bar.get("title");
-                if (!categories.containsKey(title)/* && p.matcher(title).find()*/) {
+                if (!categories.containsKey(title)) {
                     categories.put(title, Boolean.FALSE);
                 }
                 return categories;
@@ -144,7 +149,7 @@ public class SnapshotCategoriesRelatedSeiyuConsumer extends SnapshotQueueConsume
                 return foo;
             });
         }
-        List<Map<String, Object>> collect = categories.keySet().stream().map((key) -> {
+        List collect = categories.keySet().stream().map((key) -> {
             Map<String, Object> map = new LinkedHashMap<>();
             map.put("title", key);
             map.put("from", "Category:" + parentMap.get(key));
