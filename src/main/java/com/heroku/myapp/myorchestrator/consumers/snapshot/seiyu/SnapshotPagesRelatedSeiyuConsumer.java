@@ -4,7 +4,7 @@ import com.heroku.myapp.commons.config.enumerate.Kind;
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
-import com.heroku.myapp.commons.util.content.MapListUtil;
+import com.heroku.myapp.commons.util.content.MapList;
 import com.heroku.myapp.commons.util.content.MediawikiApiRequest;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -29,7 +29,7 @@ public class SnapshotPagesRelatedSeiyuConsumer extends SnapshotQueueConsumer {
                 = new DocumentUtil(
                         new MasterUtil(exchange).findOrElseThrow(
                                 Kind.categories_related_seiyu)).getData();
-        LinkedHashMap<String, List<String>> reduce = new MapListUtil(categories)
+        LinkedHashMap<String, List<String>> reduce = new MapList(categories)
                 .attrStream("title", String.class)
                 .map((category) -> {
                     try {

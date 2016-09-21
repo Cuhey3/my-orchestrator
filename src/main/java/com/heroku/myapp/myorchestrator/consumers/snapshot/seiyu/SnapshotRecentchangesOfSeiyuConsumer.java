@@ -4,7 +4,7 @@ import com.heroku.myapp.commons.config.enumerate.Kind;
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
-import com.heroku.myapp.commons.util.content.MapListUtil;
+import com.heroku.myapp.commons.util.content.MapList;
 import com.heroku.myapp.commons.util.content.MediawikiApiRequest;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,12 +37,12 @@ public class SnapshotRecentchangesOfSeiyuConsumer extends SnapshotQueueConsumer 
             rclist = new ArrayList<>();
             rcstart = getRcstart();
         }
-        Set listNames = new MapListUtil(rclist).attrSet("title");
-        new MapListUtil(masterUtil.findOrElseThrow(
+        Set listNames = new MapList(rclist).attrSet("title");
+        new MapList(masterUtil.findOrElseThrow(
                 Kind.seiyu_category_members_include_template))
                 .intersection("title", listNames, false)
                 .forEach(rclist::add);
-        Set updatedNames = new MapListUtil(rclist).attrSet("title");
+        Set updatedNames = new MapList(rclist).attrSet("title");
         List<Map<String, Object>> requestList;
         try {
             requestList = new MediawikiApiRequest()
@@ -61,12 +61,12 @@ public class SnapshotRecentchangesOfSeiyuConsumer extends SnapshotQueueConsumer 
         }
         String nextRcstart = (String) requestList.get(requestList.size() - 1)
                 .get("timestamp");
-        Set requestTitles = new MapListUtil(requestList).attrSet("title");
-        List<Map<String, Object>> noChangeList = new MapListUtil(rclist)
+        Set requestTitles = new MapList(requestList).attrSet("title");
+        List<Map<String, Object>> noChangeList = new MapList(rclist)
                 .intersectionList("title", requestTitles, false);
-        List<Map<String, Object>> hitList = new MapListUtil(requestList)
+        List<Map<String, Object>> hitList = new MapList(requestList)
                 .intersectionList("title", updatedNames);
-        new MapListUtil(rclist)
+        new MapList(rclist)
                 .intersection("title", requestTitles)
                 .map((map) -> {
                     Object title = map.get("title");

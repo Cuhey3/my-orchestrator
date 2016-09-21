@@ -6,7 +6,7 @@ import static com.heroku.myapp.commons.config.enumerate.Kind.seiyu_multi_lang;
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
-import com.heroku.myapp.commons.util.content.MapListUtil;
+import com.heroku.myapp.commons.util.content.MapList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +26,7 @@ public class SnapshotGoogleTrendsSeiyuAllConsumer extends SnapshotQueueConsumer 
             DocumentUtil util = new DocumentUtil();
             Document latest = masterUtil.optionalLatest()
                     .orElse(new Document("data", new ArrayList<>()));
-            Set keySet = new MapListUtil(masterUtil
+            Set keySet = new MapList(masterUtil
                     .findOrElseThrow(koepota_seiyu_all)).attrSet("title");
             util.setDocument(masterUtil
                     .findOrElseThrow(seiyu_multi_lang)).getData()
@@ -36,7 +36,7 @@ public class SnapshotGoogleTrendsSeiyuAllConsumer extends SnapshotQueueConsumer 
                     })
                     .map((map) -> map.get("title"))
                     .forEach(keySet::add);
-            List<Map<String, Object>> product = new MapListUtil(
+            List<Map<String, Object>> product = new MapList(
                     masterUtil.findOrElseThrow(
                             seiyu_category_members_include_template))
                     .intersectionList("title", keySet);

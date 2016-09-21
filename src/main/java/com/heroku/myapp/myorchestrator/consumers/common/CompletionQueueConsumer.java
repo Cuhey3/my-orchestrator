@@ -18,7 +18,8 @@ public class CompletionQueueConsumer extends QueueConsumer {
 
     @Override
     public void configure() {
-        ChoiceDefinition topLevelChoice = from(util().completion().ironmqConsumeUri())
+        ChoiceDefinition topLevelChoice
+                = from(util().completion().ironmqConsumeUri())
                 .routeId(util().id()).choice();
         setAlwaysAffects(topLevelChoice);
         ChoiceDefinition secondLevelChoice
@@ -41,7 +42,8 @@ public class CompletionQueueConsumer extends QueueConsumer {
 
         for (Kind k : Kind.values()) {
             if (k.isShowCompletion()) {
-                secondLevelChoiceOtherwise.when(messageKindIs(k)).to("log:" + k.expression());
+                secondLevelChoiceOtherwise
+                        .when(messageKindIs(k)).to("log:" + k.expression());
                 if (k.isEnable(KindOption.affect)) {
                     k.affects().stream().forEach((affect) -> {
                         secondLevelChoiceOtherwise.setBody()

@@ -6,7 +6,7 @@ import static com.heroku.myapp.commons.config.enumerate.Kind.seiyu_category_memb
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
-import com.heroku.myapp.commons.util.content.MapListUtil;
+import com.heroku.myapp.commons.util.content.MapList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,7 +27,7 @@ public class SnapshotKoepotaSeiyuAllConsumer extends SnapshotQueueConsumer {
                     masterUtil.findOrElseThrow(koepota_seiyu_all),
                     masterUtil.findOrElseThrow(koepota_seiyu),
                     "title").getData();
-            Set scmitSet = new MapListUtil(masterUtil.findOrElseThrow(
+            Set scmitSet = new MapList(masterUtil.findOrElseThrow(
                     seiyu_category_members_include_template)).attrSet("title");
             allList.stream().forEach((map) -> {
                 if (scmitSet.contains(map.get("title"))) {

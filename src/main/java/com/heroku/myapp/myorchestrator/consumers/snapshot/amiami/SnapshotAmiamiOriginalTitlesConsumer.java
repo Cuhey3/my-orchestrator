@@ -6,7 +6,7 @@ import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
 import static com.heroku.myapp.commons.util.content.DocumentUtil.getData;
 import com.heroku.myapp.commons.util.content.GoogleWikiTitle;
-import com.heroku.myapp.commons.util.content.MapListUtil;
+import com.heroku.myapp.commons.util.content.MapList;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -43,8 +43,8 @@ public class SnapshotAmiamiOriginalTitlesConsumer extends SnapshotQueueConsumer 
             originalTitlesList = new ArrayList<>();
         }
         Set originalTitlesSet
-                = new MapListUtil(originalTitlesList).attrSet("amiami_title");
-        new MapListUtil(masterUtil.findOrElseThrow(amiami_item))
+                = new MapList(originalTitlesList).attrSet("amiami_title");
+        new MapList(masterUtil.findOrElseThrow(amiami_item))
                 .attrStream("orig", String.class)
                 .filter((title) -> title.length() > 0)
                 .collect(Collectors.toSet())

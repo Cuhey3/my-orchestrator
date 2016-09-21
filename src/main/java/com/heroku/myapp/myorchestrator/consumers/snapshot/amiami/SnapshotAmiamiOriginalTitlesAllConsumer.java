@@ -5,6 +5,9 @@ import static com.heroku.myapp.commons.config.enumerate.Kind.amiami_original_tit
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
+import com.heroku.myapp.commons.util.content.MapList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.bson.Document;
@@ -16,11 +19,12 @@ public class SnapshotAmiamiOriginalTitlesAllConsumer extends SnapshotQueueConsum
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {
         try {
-            MasterUtil masterUtil = new MasterUtil(exchange);
-            return new DocumentUtil().addNewByKey(
-                    masterUtil.findOrElseThrow(amiami_original_titles_all),
-                    masterUtil.findOrElseThrow(amiami_original_titles),
-                    "amiami_title").nullable();
+            MasterUtil util = new MasterUtil(exchange);
+            MapList aota, aot;
+            aota = util.mapList(amiami_original_titles_all);
+            aot = util.mapList(amiami_original_titles);
+            return new DocumentUtil(
+                    aota.addNewByKey(aot,"amiami_title")).nullable();
         } catch (Exception ex) {
             util().sendError("doSnapshot", ex);
             return Optional.empty();
