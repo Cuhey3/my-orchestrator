@@ -38,7 +38,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                 .routeId("snapshot_google_trends_sub_route")
                 .process((Exchange exchange) -> {
                     List<String> body = exchange.getIn().getBody(List.class);
-                    body.add("名塚佳織");
+                    body.add("神谷明");
                     List<String> collect = body.stream().map((str) -> str.replaceFirst(" \\(.+\\)$", ""))
                             .filter((str) -> str.length() > 0)
                             .map((str) -> {
@@ -59,7 +59,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                 .setBody().javaScript("resource:classpath:googleTrendsParsing.js")
                 .unmarshal().json(JsonLibrary.Gson)
                 .process((Exchange exchange) -> {
-                    GoogleTrendsParsingUtil util = new GoogleTrendsParsingUtil(exchange.getIn().getBody(Map.class), "名塚佳織", "2");
+                    GoogleTrendsParsingUtil util = new GoogleTrendsParsingUtil(exchange.getIn().getBody(Map.class), "神谷明", "2");
                     if (util.scaleIsValid()) {
                         exchange.getIn().setBody(util.createSuccessResults());
                     } else {
