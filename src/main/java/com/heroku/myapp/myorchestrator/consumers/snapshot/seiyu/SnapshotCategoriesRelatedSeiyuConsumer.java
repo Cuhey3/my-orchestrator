@@ -97,7 +97,7 @@ public class SnapshotCategoriesRelatedSeiyuConsumer extends SnapshotQueueConsume
                                 return Pattern.compile("^Category:.*" + pattern);
                             }
                         }).collect(Collectors.toList());
-                        Set<String> noContinue = (Set<String>) jsonUtil.get(parent).get("filter").get("no_continue").mapList().get().stream().map((str) -> "Category:" + str).collect(Collectors.toSet());
+                        Set<String> noContinue = (Set<String>) jsonUtil.get(parent).get("filter").get("no_continue").list().get().stream().map((str) -> "Category:" + str).collect(Collectors.toSet());
                         categories.put(key, Boolean.TRUE);
                         if (noContinue.contains(key)) {
                             return new MapList().stream();
