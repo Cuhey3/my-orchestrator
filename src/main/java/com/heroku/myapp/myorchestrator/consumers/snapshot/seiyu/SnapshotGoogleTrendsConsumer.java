@@ -38,7 +38,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                 .routeId("snapshot_google_trends_sub_route")
                 .process((Exchange exchange) -> {
                     List<String> body = exchange.getIn().getBody(List.class);
-                    body.add("新田恵海");
+                    body.add("名塚佳織");
                     List<String> collect = body.stream().map((str) -> str.replaceFirst(" \\(.+\\)$", ""))
                             .filter((str) -> str.length() > 0)
                             .map((str) -> {
@@ -59,7 +59,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                 .setBody().javaScript("resource:classpath:googleTrendsParsing.js")
                 .unmarshal().json(JsonLibrary.Gson)
                 .process((Exchange exchange) -> {
-                    GoogleTrendsParsingUtil util = new GoogleTrendsParsingUtil(exchange.getIn().getBody(Map.class), "新田恵海", "2");
+                    GoogleTrendsParsingUtil util = new GoogleTrendsParsingUtil(exchange.getIn().getBody(Map.class), "名塚佳織", "2");
                     if (util.scaleIsValid()) {
                         exchange.getIn().setBody(util.createSuccessResults());
                     } else {
@@ -77,8 +77,8 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
         MapList addNewByKey = util.mapList(Kind.google_trends).addNewByKey(
                 util.mapList(Kind.google_trends_seiyu_all), "title");
         List<String> targetNames = addNewByKey.stream()
-                .filter((map) -> firstFilter(map))
-                .filter((map) -> filterTarget(map, "新田恵海")).limit(4)
+                //.filter((map) -> firstFilter(map))
+                .filter((map) -> filterTarget(map, "名塚佳織")).limit(4)
                 .map((map) -> (String) map.get("title"))
                 .collect(Collectors.toList());
         try {
@@ -123,7 +123,7 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
     }
 
     private boolean filterTarget(Map<String, Object> map, String newScale) {
-        if (map.get("title").equals(newScale)) {
+        /*if (map.get("title").equals(newScale)) {
             return false;
         }
         if (!map.containsKey("trends")) {
@@ -131,7 +131,8 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
         }
         Map<String, Object> trends = (Map<String, Object>) map.get("trends");
         String scale = (String) trends.get("scale");
-        return !scale.equals(newScale);
+        return !scale.equals(newScale);*/
+        return !map.containsKey("trends");
     }
 
     private boolean firstFilter(Map<String, Object> map) {
