@@ -5,6 +5,7 @@ import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
 import com.heroku.myapp.commons.util.content.GoogleTrendsParsingUtil;
+import com.heroku.myapp.commons.util.content.MapList;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -72,39 +73,24 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
 
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {
-        MasterUtil masterUtil = new MasterUtil(exchange);
-        Document google_trends, google_trends_seiyu_all;
-        try {
-            google_trends
-                    = masterUtil.kind(Kind.google_trends).findOrElseThrow();
-        } catch (Exception ex) {
-            google_trends = new Document();
-        }
-        try {
-            google_trends_seiyu_all = masterUtil
-                    .kind(Kind.google_trends_seiyu_all).findOrElseThrow();
-        } catch (Exception ex) {
-            return Optional.empty();
-        }
-        DocumentUtil util = new DocumentUtil();
-        DocumentUtil addNewByKey = util.addNewByKey(
-                google_trends, google_trends_seiyu_all, "title");
-        List<String> collect = addNewByKey.getData().stream()
+        MasterUtil util = new MasterUtil(exchange);
+        MapList addNewByKey = util.mapList(Kind.google_trends).addNewByKey(
+                util.mapList(Kind.google_trends_seiyu_all), "title");
+        List<String> targetNames = addNewByKey.stream()
                 .filter((map) -> filterTarget(map, "名塚佳織", "神谷明")).limit(4)
                 .map((map) -> (String) map.get("title"))
                 .collect(Collectors.toList());
         try {
-            if (!collect.isEmpty()) {
+            if (!targetNames.isEmpty()) {
                 ProducerTemplate pt = context.createProducerTemplate();
                 DefaultExchange ex = new DefaultExchange(context);
-                ex.getIn().setBody(collect);
+                ex.getIn().setBody(targetNames);
                 Exchange send = pt.send("direct:google_trends", ex);
-                List<Map<String, Object>> body
-                        = send.getIn().getBody(List.class);
-                if (body == null || body.isEmpty()) {
+                MapList body = send.getIn().getBody(MapList.class);
+                if (body.isEmpty()) {
                     throw new Exception();
                 }
-                for (String title : collect) {
+                for (String title : targetNames) {
                     Optional<Map<String, Object>> findFirst = body.stream()
                             .filter((map) -> nameIsEqualToTitle(map, title))
                             .map((map) -> {
@@ -113,15 +99,13 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
                             })
                             .findFirst();
                     if (findFirst.isPresent()) {
-                        List<Map<String, Object>> data = addNewByKey.getData();
-                        data.stream().filter((map)
+                        Map<String, Object> get = findFirst.get();
+                        addNewByKey.stream().filter((map)
                                 -> ((String) map.get("title")).equals(title))
-                                .forEach((map)
-                                        -> map.put("trends", findFirst.get()));
-                        addNewByKey.setData(data);
+                                .forEach((map) -> map.put("trends", get));
                     }
                 }
-                return addNewByKey.nullable();
+                return new DocumentUtil(addNewByKey).nullable();
             } else {
                 return Optional.empty();
             }

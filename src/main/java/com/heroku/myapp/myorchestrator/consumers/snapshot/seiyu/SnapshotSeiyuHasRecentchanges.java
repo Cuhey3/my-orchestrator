@@ -6,7 +6,6 @@ import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.MongoUtil;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
-import com.heroku.myapp.commons.util.content.MapList;
 import com.mongodb.client.MongoCursor;
 import java.util.HashSet;
 import java.util.List;
@@ -43,10 +42,9 @@ public class SnapshotSeiyuHasRecentchanges extends SnapshotQueueConsumer {
                             .forEach(seiyuNames::add);
                 }
             }
-            List<Map<String, Object>> collect = new MapList(util
-                    .findOrElseThrow(seiyu_category_members_include_template))
-                    .intersectionList(("title"), seiyuNames);
-            return new DocumentUtil(collect).nullable();
+            return new DocumentUtil(util.mapList(
+                    seiyu_category_members_include_template)
+                    .intersectionList(("title"), seiyuNames)).nullable();
         } catch (Exception ex) {
             util().sendError("doSnapshot", ex);
             return Optional.empty();

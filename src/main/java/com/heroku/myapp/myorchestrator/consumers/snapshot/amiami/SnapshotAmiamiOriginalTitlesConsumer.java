@@ -1,15 +1,14 @@
 package com.heroku.myapp.myorchestrator.consumers.snapshot.amiami;
 
 import static com.heroku.myapp.commons.config.enumerate.Kind.amiami_item;
+import static com.heroku.myapp.commons.config.enumerate.Kind.amiami_original_titles;
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
-import static com.heroku.myapp.commons.util.content.DocumentUtil.getData;
 import com.heroku.myapp.commons.util.content.GoogleWikiTitle;
 import com.heroku.myapp.commons.util.content.MapList;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -24,27 +23,19 @@ public class SnapshotAmiamiOriginalTitlesConsumer extends SnapshotQueueConsumer 
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {
         try {
-            DocumentUtil util = new DocumentUtil();
-            mergeNewTitles(exchange, util);
-            updateWikiTitles(util);
-            return util.nullable();
+            return new DocumentUtil(updateWikiTitles(
+                    mergeNewTitles(exchange))).nullable();
         } catch (Exception ex) {
             util().sendError("doSnapshot", ex);
             return Optional.empty();
         }
     }
 
-    public void mergeNewTitles(Exchange exchange, DocumentUtil util) {
-        MasterUtil masterUtil = new MasterUtil(exchange);
-        List<Map<String, Object>> originalTitlesList;
-        try {
-            originalTitlesList = getData(masterUtil.findOrElseThrow());
-        } catch (Exception ex0) {
-            originalTitlesList = new ArrayList<>();
-        }
-        Set originalTitlesSet
-                = new MapList(originalTitlesList).attrSet("amiami_title");
-        new MapList(masterUtil.findOrElseThrow(amiami_item))
+    public MapList mergeNewTitles(Exchange exchange) {
+        MasterUtil util = new MasterUtil(exchange);
+        MapList originalTitles = util.mapList(amiami_original_titles);
+        Set originalTitlesSet = originalTitles.attrSet("amiami_title");
+        util.mapList(amiami_item)
                 .attrStream("orig", String.class)
                 .filter((title) -> title.length() > 0)
                 .collect(Collectors.toSet())
@@ -55,20 +46,18 @@ public class SnapshotAmiamiOriginalTitlesConsumer extends SnapshotQueueConsumer 
                     map.put("amiami_title", title);
                     return map;
                 })
-                .forEach(originalTitlesList::add);
-        util.setData(originalTitlesList);
+                .forEach(originalTitles::add);
+        return originalTitles;
     }
 
-    public void updateWikiTitles(DocumentUtil util) {
-        List<Map<String, Object>> titles = util.getData();
+    public MapList updateWikiTitles(MapList mergedTitles) {
         final GoogleWikiTitle gwt = new GoogleWikiTitle();
-        titles.stream().filter((map) -> !map.containsKey("wiki_titles"))
+        mergedTitles.stream().filter((map) -> !map.containsKey("wiki_titles"))
                 .limit(10).forEach((map) -> {
             String amiamiTitle = (String) map.get("amiami_title");
-            List<String> wikiTitles
-                    = new ArrayList<>(gwt.google(amiamiTitle).get());
-            map.put("wiki_titles", wikiTitles);
+            map.put("wiki_titles", new ArrayList<>(
+                    gwt.google(amiamiTitle).get()));
         });
-        util.setData(titles);
+        return mergedTitles;
     }
 }

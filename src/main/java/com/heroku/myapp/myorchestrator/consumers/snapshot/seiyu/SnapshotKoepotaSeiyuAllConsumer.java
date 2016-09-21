@@ -7,8 +7,6 @@ import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
 import com.heroku.myapp.commons.util.content.MapList;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.apache.camel.Exchange;
@@ -21,14 +19,11 @@ public class SnapshotKoepotaSeiyuAllConsumer extends SnapshotQueueConsumer {
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {
         try {
-            MasterUtil masterUtil = new MasterUtil(exchange);
-            DocumentUtil util = new DocumentUtil();
-            List<Map<String, Object>> allList = util.addNewByKey(
-                    masterUtil.findOrElseThrow(koepota_seiyu_all),
-                    masterUtil.findOrElseThrow(koepota_seiyu),
-                    "title").getData();
-            Set scmitSet = new MapList(masterUtil.findOrElseThrow(
-                    seiyu_category_members_include_template)).attrSet("title");
+            MasterUtil util = new MasterUtil(exchange);
+            MapList allList = util.mapList(koepota_seiyu_all)
+                    .addNewByKey(util.mapList(koepota_seiyu), "title");
+            Set scmitSet = util.mapList(seiyu_category_members_include_template)
+                    .attrSet("title");
             allList.stream().forEach((map) -> {
                 if (scmitSet.contains(map.get("title"))) {
                     map.remove("inactive");
@@ -36,7 +31,7 @@ public class SnapshotKoepotaSeiyuAllConsumer extends SnapshotQueueConsumer {
                     map.put("inactive", true);
                 }
             });
-            return util.setData(allList).nullable();
+            return new DocumentUtil(allList).nullable();
         } catch (Exception ex) {
             util().sendError("doSnapshot", ex);
             return Optional.empty();

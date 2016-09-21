@@ -4,9 +4,9 @@ import com.heroku.myapp.commons.config.enumerate.Kind;
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
+import com.heroku.myapp.commons.util.content.MapList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.camel.Exchange;
@@ -18,14 +18,12 @@ public class SnapshotKoepotaRankingConsumer extends SnapshotQueueConsumer {
 
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {
-        MasterUtil masterUtil = new MasterUtil(exchange);
-        List<String> collect = new DocumentUtil(masterUtil
-                .findOrElseThrow(Kind.koepota_events))
-                .getData().stream().map((map) -> (String) map.get("c1"))
+        MasterUtil util = new MasterUtil(exchange);
+        List<String> collect = util.mapList(Kind.koepota_events)
+                .stream().map((map) -> (String) map.get("c1"))
                 .collect(Collectors.toList());
-        List<Map<String, Object>> countedKoepotaSeiyu
-                = new DocumentUtil(masterUtil
-                        .findOrElseThrow(Kind.koepota_seiyu)).getData()
+        MapList countedKoepotaSeiyu = new MapList(
+                util.mapList(Kind.koepota_seiyu)
                 .stream().map((map) -> {
                     String title = ((String) map.get("title"))
                             .replaceFirst(" \\(.+\\)", "");
@@ -33,7 +31,8 @@ public class SnapshotKoepotaRankingConsumer extends SnapshotQueueConsumer {
                             .filter((str) -> str.contains(title)).count());
                     return map;
                 })
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+        );
 
         LinkedHashMap<Long, Integer> femaleMap, maleMap, allMap,
                 convertedFemaleMap, convertedMaleMap, convertedAllMap;
@@ -78,7 +77,7 @@ public class SnapshotKoepotaRankingConsumer extends SnapshotQueueConsumer {
                     .map((entry) -> entry.getValue())
                     .mapToInt(Integer::intValue).sum() + 1);
         });
-        List<Map<String, Object>> result = countedKoepotaSeiyu.stream().map((map) -> {
+        List result = countedKoepotaSeiyu.stream().map((map) -> {
             long count = (Long) map.get("koepota_count");
             if (map.get("gender").equals("f")) {
                 map.put("koepota_female_ranking", convertedFemaleMap.get(count));

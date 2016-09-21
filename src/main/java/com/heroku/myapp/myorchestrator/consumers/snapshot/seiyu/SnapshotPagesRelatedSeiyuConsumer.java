@@ -1,6 +1,6 @@
 package com.heroku.myapp.myorchestrator.consumers.snapshot.seiyu;
 
-import com.heroku.myapp.commons.config.enumerate.Kind;
+import static com.heroku.myapp.commons.config.enumerate.Kind.categories_related_seiyu;
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
@@ -25,12 +25,10 @@ public class SnapshotPagesRelatedSeiyuConsumer extends SnapshotQueueConsumer {
 
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {
-        List<Map<String, Object>> categories
-                = new DocumentUtil(
-                        new MasterUtil(exchange).findOrElseThrow(
-                                Kind.categories_related_seiyu)).getData();
-        LinkedHashMap<String, List<String>> reduce = new MapList(categories)
-                .attrStream("title", String.class)
+        MapList categories = new MasterUtil(exchange)
+                .mapList(categories_related_seiyu);
+        LinkedHashMap<String, List<String>> reduce
+                = categories.attrStream("title", String.class)
                 .map((category) -> {
                     try {
                         return new Object[]{category, new MediawikiApiRequest()
@@ -51,20 +49,23 @@ public class SnapshotPagesRelatedSeiyuConsumer extends SnapshotQueueConsumer {
                         util().sendError("SnapshotPagesRelatedSeiyuConsumer", ex);
                         throw new RuntimeException();
                     }
-                }).reduce(new LinkedHashMap<String, List<String>>(), (result, objArray) -> {
-            String category = (String) objArray[0];
-            List<Map<String, Object>> list = (List<Map<String, Object>>) objArray[1];
-            list.stream()
+                }).reduce(new LinkedHashMap<String, List<String>>(),
+                (result, objArray) -> {
+                    String category = (String) objArray[0];
+                    MapList list = new MapList((List) objArray[1]);
+                    list.stream()
                     .forEach((map) -> {
                         String title = (String) map.get("title");
-                        List<String> categoryList = result.getOrDefault(title, new ArrayList<>());
-                        categoryList.add(category.replaceFirst("^Category:", ""));
+                        List<String> categoryList = result.getOrDefault(
+                                title, new ArrayList<>());
+                        categoryList.add(
+                                category.replaceFirst("^Category:", ""));
                         result.put(title, categoryList);
                     });
-            return result;
-        }, (foo, bar) -> foo);
+                    return result;
+                }, (foo, bar) -> foo);
 
-        List<Map<String, Object>> collect = reduce.entrySet().stream().map((entry) -> {
+        List collect = reduce.entrySet().stream().map((entry) -> {
             Map<String, Object> map = new LinkedHashMap<>();
             map.put("title", entry.getKey());
             List<String> value = entry.getValue();

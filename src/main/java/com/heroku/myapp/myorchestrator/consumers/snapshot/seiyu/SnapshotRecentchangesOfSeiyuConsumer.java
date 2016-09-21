@@ -7,8 +7,6 @@ import com.heroku.myapp.commons.util.content.DocumentUtil;
 import com.heroku.myapp.commons.util.content.MapList;
 import com.heroku.myapp.commons.util.content.MediawikiApiRequest;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -23,29 +21,27 @@ public class SnapshotRecentchangesOfSeiyuConsumer extends SnapshotQueueConsumer 
 
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {
-        MasterUtil masterUtil = new MasterUtil(exchange);
+        MasterUtil util = new MasterUtil(exchange);
         Optional<Document> optionalMaster
-                = masterUtil.optionalDocumentFromKindString(
+                = util.optionalDocumentFromKindString(
                         Kind.recentchanges_of_seiyu.expression());
-        List<Map<String, Object>> rclist;
+        MapList rclist, requestList, noChangeList, hitList;
         String rcstart;
         if (optionalMaster.isPresent()) {
             Document master = optionalMaster.get();
-            rclist = new DocumentUtil(master).getData();
+            rclist = new MapList(master);
             rcstart = (String) master.getOrDefault("rcstart", getRcstart());
         } else {
-            rclist = new ArrayList<>();
+            rclist = new MapList();
             rcstart = getRcstart();
         }
-        Set listNames = new MapList(rclist).attrSet("title");
-        new MapList(masterUtil.findOrElseThrow(
-                Kind.seiyu_category_members_include_template))
+        Set listNames = rclist.attrSet("title");
+        util.mapList(Kind.seiyu_category_members_include_template)
                 .intersection("title", listNames, false)
                 .forEach(rclist::add);
-        Set updatedNames = new MapList(rclist).attrSet("title");
-        List<Map<String, Object>> requestList;
+        Set updatedNames = rclist.attrSet("title");
         try {
-            requestList = new MediawikiApiRequest()
+            requestList = new MapList(new MediawikiApiRequest()
                     .setApiParam("action=query&list=recentchanges"
                             + "&rcnamespace=0"
                             + "&rclimit=500&format=xml&rctype=edit"
@@ -55,19 +51,16 @@ public class SnapshotRecentchangesOfSeiyuConsumer extends SnapshotQueueConsumer 
                     .setMapName("rc")
                     .setContinueElementName("rccontinue")
                     .setIgnoreFields("ns")
-                    .getResultByMapList();
+                    .getResultByMapList());
         } catch (IOException ex) {
             throw new RuntimeException();
         }
         String nextRcstart = (String) requestList.get(requestList.size() - 1)
                 .get("timestamp");
-        Set requestTitles = new MapList(requestList).attrSet("title");
-        List<Map<String, Object>> noChangeList = new MapList(rclist)
-                .intersectionList("title", requestTitles, false);
-        List<Map<String, Object>> hitList = new MapList(requestList)
-                .intersectionList("title", updatedNames);
-        new MapList(rclist)
-                .intersection("title", requestTitles)
+        Set requestTitles = requestList.attrSet("title");
+        noChangeList = rclist.intersectionList("title", requestTitles, false);
+        hitList = requestList.intersectionList("title", updatedNames);
+        rclist.intersection("title", requestTitles)
                 .map((map) -> {
                     Object title = map.get("title");
                     Map<String, Object> change = hitList.stream()

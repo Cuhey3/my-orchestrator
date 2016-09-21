@@ -5,6 +5,7 @@ import com.heroku.myapp.commons.consumers.DiffQueueConsumer;
 import com.heroku.myapp.commons.util.actions.DiffUtil;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
+import com.heroku.myapp.commons.util.content.MapList;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,8 +33,8 @@ public class DiffRecentchangesOfSeiyuConsumer extends DiffQueueConsumer {
     public Optional<Document> calculateDiff(Document master, Document snapshot) {
         // master:pages_related_seiyu to pagesMap (title, categories)
         Map<String, List<String>> pagesMap = new LinkedHashMap<>();
-        new DocumentUtil(new MasterUtil(new DefaultExchange(context))
-                .findOrElseThrow(Kind.pages_related_seiyu)).getData()
+        new MasterUtil(new DefaultExchange(context))
+                .mapList(Kind.pages_related_seiyu)
                 .stream().forEach((map) -> {
                     pagesMap.put((String) map.get("title"),
                             (List<String>) map.get("categories"));
@@ -44,12 +45,12 @@ public class DiffRecentchangesOfSeiyuConsumer extends DiffQueueConsumer {
 
         // master:recentchanges_of_seiyu to oldMap (title, self)
         Map<String, Map<String, Object>> oldMap = new LinkedHashMap<>();
-        new DocumentUtil(master).getData().stream().forEach((map)
+        new MapList(master).stream().forEach((map)
                 -> oldMap.put((String) map.get("title"), map));
 
         // calculateDiff main
-        List<Map<String, Object>> result = new DocumentUtil(snapshot)
-                .getData().stream()
+        List result = new MapList(snapshot)
+                .stream()
                 .filter(targetFiltering(oldMap))
                 .map(diffPutFunction(pagesMap, pagesSet))
                 .filter(resultFiltering())
