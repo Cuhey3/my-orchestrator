@@ -67,4 +67,35 @@ public class Develop {
             categories.keySet().stream().forEach(System.out::println);
         };
     }
+    
+/*    public Processor dev0926(){
+        return (Exchange exchange) -> {
+                    List<String> list = Arrays.asList(new String[]{"岩浪美和", "鶴岡陽太", "蝦名恭範", "浦上靖夫", "亀山俊樹", "小林克良", "清水勝則", "若林和弘", "藤野貞義", "三間雅文", "三間雅文"});
+                    IntStream.range(0, list.size())
+                            .mapToObj((i) -> {
+                                Map<Integer, String> map = new LinkedHashMap<>();
+                                map.put(i, list.get(i));
+                                return map;
+                            })
+                            .collect(Collectors.groupingBy((map) -> map.keySet().iterator().next() / 3))
+                            .values().stream().map((values) -> values.stream().map((m) -> m.values().iterator().next()).collect(Collectors.toList()))
+                            .flatMap((titles) -> {
+                                Iterator<Elements> iterator = new IterableMediawikiApiRequest().setApiParam("action=query&titles=" + String.join("|", titles) + "&format=xml&redirects=true&prop=links|linkshere&plnamespace=0&lhnamespace=0&pllimit=500&lhlimit=500").setContinueElementNames(new String[]{"plcontinue", "lhcontinue"}).debug().iterator();
+                                Spliterator<Elements> spliterator = Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED);
+                                return StreamSupport.stream(spliterator, false).flatMap((elements) -> elements.stream());
+                            })
+                            .collect(Collectors.groupingBy((element) -> element.attr("title")))
+                            .forEach((k, v) -> {
+                                Set<String> plset = v.stream().flatMap((element) -> element.select("pl").stream())
+                                        .map((m) -> m.attr("title"))
+                                        .collect(Collectors.toSet());
+                                Set<String> mutual = v.stream().flatMap((element) -> element.select("lh").stream())
+                                        .map((m) -> m.attr("title"))
+                                        .filter((str) -> plset.contains(str))
+                                        .collect(Collectors.toSet());
+                                System.out.println(k + "\t" + mutual);
+                            });
+                }
+    }*/
+    
 }
