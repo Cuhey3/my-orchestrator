@@ -1,6 +1,8 @@
 package com.heroku.myapp.myorchestrator.consumers.snapshot.seiyu;
 
+import com.heroku.myapp.commons.config.enumerate.Kind;
 import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
+import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
 import com.heroku.myapp.commons.util.content.IterableMediawikiApiRequest;
 import com.heroku.myapp.commons.util.content.MediawikiApiRequestBuilder;
@@ -30,6 +32,9 @@ public class SnapshotPagesMutualSoundDirectorConsumer extends SnapshotQueueConsu
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {
         try {
+            MasterUtil util = new MasterUtil(exchange);
+            Set<String> seiyuNames = util.mapList(Kind.seiyu_category_members)
+                    .attrSet("title");
             final int groupingSize = 50;
             List<Map<String, Object>> result
                     = groupedStream(getSoundDirectors(), groupingSize)
@@ -41,6 +46,7 @@ public class SnapshotPagesMutualSoundDirectorConsumer extends SnapshotQueueConsu
                     .collect(Collectors.groupingBy((mutualArray)
                             -> mutualArray[0]))
                     .values().stream()
+                    .filter((arrays) -> !seiyuNames.contains(arrays.get(0)[0]))
                     .map((arrays) -> {
                         Map<String, Object> resultMap = new LinkedHashMap<>();
                         resultMap.put("title", arrays.get(0)[0]);
