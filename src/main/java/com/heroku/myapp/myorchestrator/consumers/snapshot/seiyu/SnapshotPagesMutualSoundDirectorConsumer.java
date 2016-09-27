@@ -35,9 +35,10 @@ public class SnapshotPagesMutualSoundDirectorConsumer extends SnapshotQueueConsu
             MasterUtil util = new MasterUtil(exchange);
             Set<String> seiyuNames = util.mapList(Kind.seiyu_category_members)
                     .attrSet("title");
-            final int groupingSize = 50;
+            final int groupingSize = 10;
             List<Map<String, Object>> result
                     = groupedStream(getSoundDirectors(), groupingSize)
+                    .parallel()
                     .flatMap((group) -> pageStream(group))
                     .collect(Collectors.groupingBy((page)
                             -> page.attr("title")))
