@@ -122,7 +122,9 @@ public class SnapshotPagesMutualSoundDirectorConsumer extends SnapshotQueueConsu
     }
 
     public String getGroup(Set<String> director, Set<String> seiyuNames) {
-        if (director.size() == 1) {
+        int directorSize, filteredSize;
+        directorSize = director.size();
+        if (directorSize == 1) {
             if (seiyuNames.contains(director.iterator().next())) {
                 return "s_one";
             } else {
@@ -130,13 +132,15 @@ public class SnapshotPagesMutualSoundDirectorConsumer extends SnapshotQueueConsu
             }
         } else {
             List<String> filtered = filtered(director, seiyuNames);
-            switch (filtered.size()) {
-                case 0:
-                    return "s_many";
-                case 1:
-                    return "filtered_d_one";
-                default:
-                    return "filtered_d_many";
+            filteredSize = filtered.size();
+            if (filteredSize == 0) {
+                return "s_many";
+            } else if (filteredSize == 1) {
+                return "filtered_d_one";
+            } else if (filteredSize == directorSize) {
+                return "d_many";
+            } else {
+                return "filtered_d_many";
             }
         }
     }
