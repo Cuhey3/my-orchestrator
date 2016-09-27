@@ -49,10 +49,15 @@ public class SnapshotPagesMutualSoundDirectorConsumer extends SnapshotQueueConsu
                     .filter((arrays) -> !seiyuNames.contains(arrays.get(0)[0]))
                     .map((arrays) -> {
                         Map<String, Object> resultMap = new LinkedHashMap<>();
+                        Set<String> director = arrays.stream().map((array) -> array[1]).collect(Collectors.toSet());
                         resultMap.put("title", arrays.get(0)[0]);
-                        resultMap.put("director", arrays.stream()
-                                .map((array) -> array[1])
-                                .collect(Collectors.toSet()));
+                        String group = getGroup(director, seiyuNames);
+                        resultMap.put("group", group);
+                        if (group.startsWith("filtered_")) {
+                            resultMap.put("director", filtered(director, seiyuNames));
+                        } else {
+                            resultMap.put("director", director);
+                        }
                         return resultMap;
                     })
                     .collect(Collectors.toList());
@@ -114,5 +119,31 @@ public class SnapshotPagesMutualSoundDirectorConsumer extends SnapshotQueueConsu
         return mutual.stream().map((title) -> {
             return new String[]{title, soundDirectorName};
         });
+    }
+
+    public String getGroup(Set<String> director, Set<String> seiyuNames) {
+        if (director.size() == 1) {
+            if (seiyuNames.contains(director.iterator().next())) {
+                return "s_one";
+            } else {
+                return "d_one";
+            }
+        } else {
+            List<String> filtered = filtered(director, seiyuNames);
+            switch (filtered.size()) {
+                case 0:
+                    return "s_many";
+                case 1:
+                    return "filtered_d_one";
+                default:
+                    return "filtered_d_many";
+            }
+        }
+    }
+
+    public List<String> filtered(Set<String> director, Set<String> seiyuNames) {
+        return director.stream()
+                .filter((name) -> !seiyuNames.contains(name))
+                .collect(Collectors.toList());
     }
 }
