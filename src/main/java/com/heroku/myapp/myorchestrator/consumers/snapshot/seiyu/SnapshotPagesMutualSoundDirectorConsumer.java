@@ -35,6 +35,7 @@ public class SnapshotPagesMutualSoundDirectorConsumer extends SnapshotQueueConsu
             MasterUtil util = new MasterUtil(exchange);
             Set<String> seiyuNames = util.mapList(Kind.seiyu_category_members)
                     .attrSet("title");
+            Set<String> relatedPages = util.mapList(Kind.pages_related_seiyu).attrSet("title");
             final int groupingSize = 10;
             List<Map<String, Object>> result
                     = groupedStream(getSoundDirectors(), groupingSize)
@@ -47,7 +48,11 @@ public class SnapshotPagesMutualSoundDirectorConsumer extends SnapshotQueueConsu
                     .collect(Collectors.groupingBy((mutualArray)
                             -> mutualArray[0]))
                     .values().stream()
-                    .filter((arrays) -> !seiyuNames.contains(arrays.get(0)[0]))
+                    .filter((arrays) -> {
+                        String title = arrays.get(0)[0];
+
+                        return relatedPages.contains(title) && !seiyuNames.contains(title);
+                    })
                     .map((arrays) -> {
                         Map<String, Object> resultMap = new LinkedHashMap<>();
                         Set<String> director = arrays.stream().map((array) -> array[1]).collect(Collectors.toSet());
