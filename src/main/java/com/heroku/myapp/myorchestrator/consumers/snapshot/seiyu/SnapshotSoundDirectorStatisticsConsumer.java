@@ -15,7 +15,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.camel.Exchange;
 import org.bson.Document;
+import org.springframework.stereotype.Component;
 
+@Component
 public class SnapshotSoundDirectorStatisticsConsumer extends SnapshotQueueConsumer {
 
     @Override
