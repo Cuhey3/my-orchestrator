@@ -43,8 +43,9 @@ public class SnapshotPagesMutualSoundDirectorConsumer extends SnapshotQueueConsu
                     .values().stream()
                     .map((arrays) -> {
                         Map<String, Object> resultMap = new LinkedHashMap<>();
-                        resultMap.put(arrays.get(0)[0],
-                                arrays.stream().map((array) -> array[1])
+                        resultMap.put("title", arrays.get(0)[0]);
+                        resultMap.put("director", arrays.stream()
+                                .map((array) -> array[1])
                                 .collect(Collectors.toSet()));
                         return resultMap;
                     })
