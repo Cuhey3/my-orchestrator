@@ -22,6 +22,7 @@ import org.bson.Document;
 public abstract class SnapshotCategoryPagesAggregationConsumer extends SnapshotQueueConsumer {
 
     protected Kind targetKind;
+    protected boolean includesCategoryFlag = true;
 
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {
@@ -69,7 +70,9 @@ public abstract class SnapshotCategoryPagesAggregationConsumer extends SnapshotQ
             map.put("title", entry.getKey());
             List<String> value = entry.getValue();
             Collections.sort(value);
-            map.put("categories", value);
+            if (includesCategoryFlag) {
+                map.put("categories", value);
+            }
             return map;
         }).collect(Collectors.toList());
         return new DocumentUtil(collect).nullable();

@@ -10,5 +10,6 @@ public class SnapshotPagesRelatedSoundDirectorConsumer extends SnapshotCategoryP
     public SnapshotPagesRelatedSoundDirectorConsumer() {
         super();
         targetKind = Kind.categories_related_sound_director;
+        includesCategoryFlag = false;
     }
 }
