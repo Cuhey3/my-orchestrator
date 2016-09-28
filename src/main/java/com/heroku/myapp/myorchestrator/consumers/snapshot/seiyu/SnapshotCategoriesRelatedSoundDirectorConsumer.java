@@ -7,14 +7,13 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SnapshotCategoriesRelatedSeiyuConsumer extends SnapshotCategoryAggregationConsumer {
+public class SnapshotCategoriesRelatedSoundDirectorConsumer extends SnapshotCategoryAggregationConsumer {
 
-    public SnapshotCategoriesRelatedSeiyuConsumer() {
+    public SnapshotCategoriesRelatedSoundDirectorConsumer() {
         super();
         prefix = "Category:";
-        resourcePath = "../../../../../wikipedia_category_filter.json";
+        resourcePath = "../../../../../sound_director_category_filter.json";
         jsonRoot = new JsonUtil(new ResourceUtil(resourcePath)
                 .getJson(Map.class)).get("categories");
     }
-
 }
