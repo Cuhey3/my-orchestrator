@@ -23,7 +23,7 @@ public class SnapshotSoundDirectorStatisticsConsumer extends SnapshotQueueConsum
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {
         MasterUtil util = new MasterUtil(exchange);
-        Set<String> ignore = new HashSet<>(Arrays.asList(new String[]{"藤原啓治", "井上和彦 (声優)", "千葉繁", "宮村優子 (声優)", "津久井教生", "山田陽", "幾原邦彦", "板垣伸", "水島努", "高松信司", "稲垣隆行", "佐藤順一", "三ツ矢雄二", "塩屋翼", "望月智充", "千葉耕市", "郷田ほづみ"}));
+        Set<String> ignore = new HashSet<>(Arrays.asList(new String[]{"藤原啓治", "井上和彦 (声優)", "千葉繁", "宮村優子 (声優)", "津久井教生", "山田陽", "幾原邦彦", "板垣伸", "水島努", "高松信司", "稲垣隆行", "佐藤順一", "三ツ矢雄二", "塩屋翼", "望月智充", "千葉耕市", "郷田ほづみ","山崎たくみ","松尾衡"}));
         MapList list = util.mapList(Kind.pages_mutual_sound_director).filteredList((map) -> {
             List<String> director = (List<String>) map.get("director");
             return !director.stream().allMatch((d) -> ignore.contains(d));
