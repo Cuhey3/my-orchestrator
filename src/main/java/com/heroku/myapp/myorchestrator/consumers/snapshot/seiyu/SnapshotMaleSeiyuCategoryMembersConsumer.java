@@ -1,40 +1,21 @@
 package com.heroku.myapp.myorchestrator.consumers.snapshot.seiyu;
 
-import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
-import com.heroku.myapp.commons.util.content.DocumentUtil;
 import com.heroku.myapp.commons.util.content.MapList;
-import com.heroku.myapp.commons.util.content.MediawikiApiRequest;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.Optional;
-import org.apache.camel.Exchange;
-import org.bson.Document;
+import com.heroku.myapp.commons.consumers.SnapshotCategoryPagesAggregationConsumer;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SnapshotMaleSeiyuCategoryMembersConsumer extends SnapshotQueueConsumer {
+public class SnapshotMaleSeiyuCategoryMembersConsumer extends SnapshotCategoryPagesAggregationConsumer {
+
+    public SnapshotMaleSeiyuCategoryMembersConsumer() {
+        super();
+        addTargetCategory("Category:日本の男性声優");
+        cmpropParam("title|ids|sortkeyprefix");
+        includesCategoryFlag(false);
+    }
 
     @Override
-    protected Optional<Document> doSnapshot(Exchange exchange) {
-        try {
-            MapList mapList = new MediawikiApiRequest()
-                    .setApiParam("action=query&list=categorymembers"
-                            + "&cmtitle=Category:"
-                            + URLEncoder.encode("日本の男性声優", "UTF-8")
-                            + "&cmlimit=500"
-                            + "&cmnamespace=0"
-                            + "&format=xml"
-                            + "&continue="
-                            + "&cmprop=title|ids|sortkeyprefix")
-                    .setListName("categorymembers").setMapName("cm")
-                    .setContinueElementName("cmcontinue")
-                    .setIgnoreFields("ns")
-                    .getResultByMapList();
-            mapList.forEach((m) -> m.put("gender", "m"));
-            return new DocumentUtil(mapList).nullable();
-        } catch (IOException ex) {
-            util().sendError("doSnapshot", ex);
-            return Optional.empty();
-        }
+    protected void afterProcess(MapList mapList) {
+        mapList.forEach((m) -> m.put("gender", "m"));
     }
 }
