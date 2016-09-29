@@ -30,25 +30,25 @@ public class SnapshotSeiyuMultiLangConsumer extends SnapshotQueueConsumer {
                     -> (String) map.get("pageid")).skip(i).limit(i + 50)
                     .collect(Collectors.toList())));
         }
-        List result = new ArrayList<>();
-        urls.stream().parallel()
-                .forEach((url) -> {
-                    try {
-                        String body = Jsoup.connect(
-                                "https://ja.wikipedia.org/w/api.php"
-                                + "?action=query&prop=langlinks"
-                                + "&pageids=" + url + "&redirects="
-                                + "&lllimit=500&format=json")
-                                .ignoreContentType(true)
-                                .timeout(Integer.MAX_VALUE).execute().body();
-                        Map<String, Object> fromJson
-                                = new Gson().fromJson(body, Map.class);
-                        Map<String, Map<String, Object>> pages
-                                = (Map<String, Map<String, Object>>) ((Map<String, Object>) fromJson.get("query")).get("pages");
-                        result.addAll(pages.values());
-                    } catch (IOException ex) {
-                    }
-                });
+        List<Map<String, Object>> result;
+        result = urls.stream().parallel().flatMap((url) -> {
+            try {
+                String body = Jsoup.connect(
+                        "https://ja.wikipedia.org/w/api.php"
+                        + "?action=query&prop=langlinks"
+                        + "&pageids=" + url + "&redirects="
+                        + "&lllimit=500&format=json")
+                        .ignoreContentType(true)
+                        .timeout(Integer.MAX_VALUE).execute().body();
+                Map<String, Object> fromJson
+                        = new Gson().fromJson(body, Map.class);
+                Map<String, Map<String, Object>> pages
+                        = (Map<String, Map<String, Object>>) ((Map<String, Object>) fromJson.get("query")).get("pages");
+                return pages.values().stream();
+            } catch (IOException ex) {
+                return new ArrayList<Map<String, Object>>().stream();
+            }
+        }).collect(Collectors.toList());
         if (result.size() == data.size()) {
             return new DocumentUtil(result).nullable();
         } else {

@@ -6,8 +6,6 @@ import com.heroku.myapp.commons.consumers.SnapshotQueueConsumer;
 import com.heroku.myapp.commons.util.actions.MasterUtil;
 import com.heroku.myapp.commons.util.content.DocumentUtil;
 import com.heroku.myapp.commons.util.content.MapList;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.apache.camel.Exchange;
 import org.bson.Document;

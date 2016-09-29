@@ -77,7 +77,6 @@ public class SnapshotGoogleTrendsConsumer extends SnapshotQueueConsumer {
         MapList addNewByKey = util.mapList(Kind.google_trends).addNewByKey(
                 util.mapList(Kind.google_trends_seiyu_all), "title");
         List<String> targetNames = addNewByKey.stream()
-                //.filter((map) -> firstFilter(map))
                 .filter((map) -> filterTarget(map, "名塚佳織")).limit(4)
                 .map((map) -> (String) map.get("title"))
                 .collect(Collectors.toList());

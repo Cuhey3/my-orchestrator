@@ -7,7 +7,9 @@ import com.heroku.myapp.commons.util.content.DocumentUtil;
 import com.heroku.myapp.commons.util.content.MapList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.apache.camel.Exchange;
 import org.bson.Document;
@@ -19,76 +21,64 @@ public class SnapshotKoepotaRankingConsumer extends SnapshotQueueConsumer {
     @Override
     protected Optional<Document> doSnapshot(Exchange exchange) {
         MasterUtil util = new MasterUtil(exchange);
-        List<String> collect = util.mapList(Kind.koepota_events)
+        List<String> eventNames = util.mapList(Kind.koepota_events)
                 .stream().map((map) -> (String) map.get("c1"))
                 .collect(Collectors.toList());
         MapList countedKoepotaSeiyu = new MapList(
-                util.mapList(Kind.koepota_seiyu)
-                .stream().map((map) -> {
-                    String title = ((String) map.get("title"))
-                            .replaceFirst(" \\(.+\\)", "");
-                    map.put("koepota_count", collect.stream()
-                            .filter((str) -> str.contains(title)).count());
-                    return map;
-                })
-                .collect(Collectors.toList())
-        );
-
-        LinkedHashMap<Long, Integer> femaleMap, maleMap, allMap,
-                convertedFemaleMap, convertedMaleMap, convertedAllMap;
-        femaleMap = new LinkedHashMap<>();
-        maleMap = new LinkedHashMap<>();
-        allMap = new LinkedHashMap<>();
-        convertedFemaleMap = new LinkedHashMap<>();
-        convertedMaleMap = new LinkedHashMap<>();
-        convertedAllMap = new LinkedHashMap<>();
-        countedKoepotaSeiyu.stream()
-                .filter((map) -> map.get("gender").equals("f"))
-                .forEach((map) -> {
-                    long count = (Long) map.get("koepota_count");
-                    femaleMap.put(count, femaleMap.getOrDefault(count, 0) + 1);
-                    allMap.put(count, allMap.getOrDefault(count, 0) + 1);
-                });
-        countedKoepotaSeiyu.stream()
-                .filter((map) -> map.get("gender").equals("m"))
-                .forEach((map) -> {
-                    long count = (Long) map.get("koepota_count");
-                    maleMap.put(count, maleMap.getOrDefault(count, 0) + 1);
-                    allMap.put(count, allMap.getOrDefault(count, 0) + 1);
-                });
-        femaleMap.entrySet().stream().forEach((ent) -> {
-            Long key = ent.getKey();
-            convertedFemaleMap.put(key, femaleMap.entrySet().stream()
-                    .filter((entry) -> entry.getKey() > key)
-                    .map((entry) -> entry.getValue())
-                    .mapToInt(Integer::intValue).sum() + 1);
-        });
-        maleMap.entrySet().stream().forEach((ent) -> {
-            Long key = ent.getKey();
-            convertedMaleMap.put(key, maleMap.entrySet().stream()
-                    .filter((entry) -> entry.getKey() > key)
-                    .map((entry) -> entry.getValue())
-                    .mapToInt(Integer::intValue).sum() + 1);
-        });
-        allMap.entrySet().stream().forEach((ent) -> {
-            Long key = ent.getKey();
-            convertedAllMap.put(key, allMap.entrySet().stream()
-                    .filter((entry) -> entry.getKey() > key)
-                    .map((entry) -> entry.getValue())
-                    .mapToInt(Integer::intValue).sum() + 1);
-        });
+                util.mapList(Kind.koepota_seiyu).stream().map((map) -> {
+            String title = ((String) map.get("title"))
+                    .replaceFirst(" \\(.+\\)", "");
+            map.put("koepota_count", eventNames.stream()
+                    .filter((str) -> str.contains(title)).count());
+            return map;
+        }).collect(Collectors.toList()));
+        LinkedHashMap<Long, Integer> totalFemaleCounts = new LinkedHashMap<>();
+        LinkedHashMap<Long, Integer> totalMaleCounts = new LinkedHashMap<>();
+        LinkedHashMap<Long, Integer> totalAllCounts = new LinkedHashMap<>();
+        makeTotalCounts(countedKoepotaSeiyu, totalFemaleCounts,
+                totalMaleCounts, totalAllCounts);
         List result = countedKoepotaSeiyu.stream().map((map) -> {
             long count = (Long) map.get("koepota_count");
             if (map.get("gender").equals("f")) {
-                map.put("koepota_female_ranking", convertedFemaleMap.get(count));
-
-            } else {
-                map.put("koepota_male_ranking", convertedMaleMap.get(count));
+                map.put("koepota_female_ranking", totalFemaleCounts.get(count));
+            } else if (map.get("gender").equals("m")) {
+                map.put("koepota_male_ranking", totalMaleCounts.get(count));
             }
-            map.put("koepota_ranking", convertedAllMap.get(count));
+            map.put("koepota_ranking", totalAllCounts.get(count));
             return map;
         }).collect(Collectors.toList());
-
         return new DocumentUtil(result).nullable();
+    }
+
+    public Consumer<Entry<Long, Integer>> convertToTotal(LinkedHashMap<Long, Integer> counts, LinkedHashMap<Long, Integer> totalCounts) {
+        return (entry) -> {
+            Long key = entry.getKey();
+            totalCounts.put(key, counts.entrySet().stream()
+                    .filter((ent) -> ent.getKey() > key)
+                    .map((ent) -> ent.getValue())
+                    .mapToInt(Integer::intValue).sum() + 1);
+        };
+    }
+
+    public void makeTotalCounts(MapList countedKoepotaSeiyu, LinkedHashMap<Long, Integer> totalFemaleCounts, LinkedHashMap<Long, Integer> totalMaleCounts, LinkedHashMap<Long, Integer> totalAllCounts) {
+        LinkedHashMap<Long, Integer> femaleCounts, maleCounts, allCounts;
+        femaleCounts = new LinkedHashMap<>();
+        maleCounts = new LinkedHashMap<>();
+        allCounts = new LinkedHashMap<>();
+        countedKoepotaSeiyu.stream().forEach((map) -> {
+            long count = (Long) map.get("koepota_count");
+            if (map.get("gender").equals("f")) {
+                femaleCounts.put(count, femaleCounts.getOrDefault(count, 0) + 1);
+            } else if (map.get("gender").equals("m")) {
+                maleCounts.put(count, maleCounts.getOrDefault(count, 0) + 1);
+            }
+            allCounts.put(count, allCounts.getOrDefault(count, 0) + 1);
+        });
+        femaleCounts.entrySet().stream()
+                .forEach(convertToTotal(femaleCounts, totalFemaleCounts));
+        maleCounts.entrySet().stream()
+                .forEach(convertToTotal(maleCounts, totalMaleCounts));
+        allCounts.entrySet().stream()
+                .forEach(convertToTotal(allCounts, totalAllCounts));
     }
 }
